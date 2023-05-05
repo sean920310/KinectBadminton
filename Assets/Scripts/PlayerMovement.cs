@@ -15,10 +15,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Transform GroundChk;
     [SerializeField] LayerMask WhatIsGround;
 
-    [SerializeField] GameObject ball;
+    [SerializeField] BallManager ball;
     [SerializeField] Transform LeftHand;
 
     [SerializeField] RacketManager racket;
+
+    [SerializeField] GameObject serveBorderL;
+    [SerializeField] GameObject serveBorderR;
 
     bool onGround = true;
     public bool PrepareServe = true;
@@ -65,21 +68,28 @@ public class PlayerMovement : MonoBehaviour
         // Serve
         if (PrepareServe)
         {
-            if(!animator.GetCurrentAnimatorStateInfo(0).IsName("ServePrepare"))
+            serveBorderL.SetActive(true);
+            serveBorderR.SetActive(true);
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("ServePrepare"))
             {
                 animator.SetTrigger("ServePrepare");
             }
             ball.transform.position = LeftHand.position;
             ball.transform.rotation = LeftHand.rotation;
+            ball.isServing = true;
 
             if (swinDown)
             {
+                SwooshSound.Play();
                 animator.SetTrigger("Serve");
 
-                StartCoroutine(ball.GetComponent<BallManager>().Serve(0f, facingRight));
-                
+                StartCoroutine(ball.Serve(0f, facingRight));
+
+                ball.isServing = false;
                 PrepareServe = false;
                 swinDown = false;
+                serveBorderL.SetActive(false);
+                serveBorderR.SetActive(false);
             }
             return;
         }

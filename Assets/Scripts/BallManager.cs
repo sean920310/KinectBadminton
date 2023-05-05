@@ -9,9 +9,11 @@ public class BallManager : MonoBehaviour
     [SerializeField] private float hitForce = 10.0f;
 
     [SerializeField] PlayerMovement p1;
+    [SerializeField] PlayerMovement p2;
 
     [SerializeField] AudioSource HitSound;
     [SerializeField] AudioSource HittingFloorSound;
+    public bool isServing = true;
 
     private void Start()
     {
@@ -31,11 +33,15 @@ public class BallManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         body.velocity = Vector3.zero;
 
-        if(faceRight)
-            body.AddForce( (new Vector3(1.0f, 3f,0.0f)).normalized * ServeForce, ForceMode.Impulse);
+        HitSound.Play();
+
+        if (faceRight)
+            body.AddForce( (new Vector3(1.0f, 2.5f,0.0f)).normalized * ServeForce, ForceMode.Impulse);
         else
-            body.AddForce((new Vector3(-1.0f, 3f, 0.0f)).normalized * ServeForce, ForceMode.Impulse);
+            body.AddForce((new Vector3(-1.0f, 2.5f, 0.0f)).normalized * ServeForce, ForceMode.Impulse);
     }
+
+    // Hit Racket
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Hit");
@@ -56,22 +62,27 @@ public class BallManager : MonoBehaviour
             racketManager.boxColliderDisable();
         }
     }
-    private void OnTriggerExit(Collider other)
-    {
-        Debug.Log("Exit");
-    }
 
-    private void OnTriggerStay(Collider other)
-    {
-        Debug.Log("Stay");
-    }
-
+    // Hit Floor
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.transform.tag == "Ground")
+        if(!isServing && collision.transform.tag == "Ground")
         {
-            HittingFloorSound.Play();
-            p1.PrepareServe = true;
+            p1.transform.position = new Vector3(-3, p1.transform.position.y, p1.transform.position.z);
+            p2.transform.position = new Vector3(3, p1.transform.position.y, p1.transform.position.z);
+
+            if (collision.gameObject.name == "Player2Floor")
+            {
+                Debug.Log("Player1 Point +1");
+                HittingFloorSound.Play();
+                p1.PrepareServe = true;
+            }
+            else if (collision.gameObject.name == "Player1Floor")
+            {
+                Debug.Log("Player2 Point +1");
+                HittingFloorSound.Play();
+                p2.PrepareServe = true;
+            }
         }
     }
 }
