@@ -7,6 +7,8 @@ public class PlayerMovement : MonoBehaviour
 {
     Rigidbody rb;
     Animator animator;
+    [SerializeField] AudioSource SwooshSound;
+
     [SerializeField] float speed = 1.0f;
 
     [SerializeField] float jumpForce = 5.0f;
@@ -85,12 +87,14 @@ public class PlayerMovement : MonoBehaviour
         // Swing
         if (swinUp)
         {
+            SwooshSound.Play();
             animator.SetTrigger("SwingUp");
             racket.swinUp();
             swinUp = false;
         }
         if (swinDown)
         {
+            SwooshSound.Play();
             animator.SetTrigger("SwingDown");
             racket.swinDown();
             swinDown = false;

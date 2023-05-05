@@ -9,6 +9,10 @@ public class BallManager : MonoBehaviour
     [SerializeField] private float hitForce = 10.0f;
 
     [SerializeField] PlayerMovement p1;
+
+    [SerializeField] AudioSource HitSound;
+    [SerializeField] AudioSource HittingFloorSound;
+
     private void Start()
     {
         body = GetComponent<Rigidbody>();
@@ -38,6 +42,7 @@ public class BallManager : MonoBehaviour
         RacketManager racketManager = other.transform.GetComponent<RacketManager>();
         if (racketManager)
         {
+            HitSound.Play();
             body.velocity = Vector3.zero;
             Debug.Log("Hit racketManager");
             if (racketManager.isSwinDown)
@@ -65,6 +70,7 @@ public class BallManager : MonoBehaviour
     {
         if(collision.transform.tag == "Ground")
         {
+            HittingFloorSound.Play();
             p1.PrepareServe = true;
         }
     }
