@@ -15,7 +15,13 @@ public class BallManager : MonoBehaviour
         Physics.IgnoreLayerCollision(7, 8,true);
         Physics.IgnoreLayerCollision(7, 9, true);
     }
-
+    private void Update()
+    {
+        if(body.velocity.x >= 0)
+            transform.rotation = Quaternion.Euler(0, 0, -Quaternion.LookRotation(body.velocity.normalized, Vector3.up).eulerAngles.x);
+        else
+            transform.rotation = Quaternion.Euler(0, 0, 180 + Quaternion.LookRotation(body.velocity.normalized, Vector3.up).eulerAngles.x);
+    }
     public IEnumerator Serve(float delay, bool faceRight)
     {
         yield return new WaitForSeconds(delay);
@@ -42,8 +48,17 @@ public class BallManager : MonoBehaviour
             {
                 body.AddForce((-racketManager.transform.up.normalized) * hitForce, ForceMode.Impulse);
             }
-            //racketManager.boxColliderDisable();
+            racketManager.boxColliderDisable();
         }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        Debug.Log("Exit");
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        Debug.Log("Stay");
     }
 
     private void OnCollisionEnter(Collision collision)
