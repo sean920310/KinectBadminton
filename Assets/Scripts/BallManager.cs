@@ -27,6 +27,8 @@ public class BallManager : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, 0, -Quaternion.LookRotation(body.velocity.normalized, Vector3.up).eulerAngles.x);
         else
             transform.rotation = Quaternion.Euler(0, 0, 180 + Quaternion.LookRotation(body.velocity.normalized, Vector3.up).eulerAngles.x);
+
+
     }
     public IEnumerator Serve(float delay, bool faceRight)
     {
@@ -74,12 +76,14 @@ public class BallManager : MonoBehaviour
             if (collision.gameObject.name == "Player2Floor")
             {
                 Debug.Log("Player1 Point +1");
+                GameManager.player1Score++;
                 HittingFloorSound.Play();
                 p1.PrepareServe = true;
             }
             else if (collision.gameObject.name == "Player1Floor")
             {
                 Debug.Log("Player2 Point +1");
+                GameManager.player2Score++;
                 HittingFloorSound.Play();
                 p2.PrepareServe = true;
             }

@@ -493,7 +493,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 909109874194044293}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1c41a24f6208a7f428fd01970274280c, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -521,6 +521,8 @@ MonoBehaviour:
   ball: {fileID: 0}
   LeftHand: {fileID: 4377193212131577387}
   racket: {fileID: 2523875935646291306}
+  serveBorderL: {fileID: 0}
+  serveBorderR: {fileID: 0}
   PrepareServe: 1
 --- !u!114 &2582724395849564969
 MonoBehaviour:
