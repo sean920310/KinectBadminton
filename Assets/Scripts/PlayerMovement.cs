@@ -22,8 +22,8 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] GameObject serveBorderL;
     [SerializeField] GameObject serveBorderR;
-
-    bool onGround = true;
+     
+    public bool onGround = true;
     public bool PrepareServe = true;
 
     float move = 0.0f;
@@ -58,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
         {
             onGround = false;
         }
+        animator.SetBool("OnGround", onGround);
 
         if (jump && onGround)
         {
@@ -113,16 +114,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Movement
         float movementX = move;
 
         if(Mathf.Abs( movementX) > 0f)
-        {
             animator.SetBool("Move", true);
-        }
         else
-        {
             animator.SetBool("Move", false);
-        }
 
         transform.position = transform.position + Vector3.right * movementX * speed;
     }

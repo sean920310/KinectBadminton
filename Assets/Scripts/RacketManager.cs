@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//[ExecuteInEditMode]
 public class RacketManager : MonoBehaviour
 {
     public bool isSwinUp { get; private set; }
@@ -18,7 +19,7 @@ public class RacketManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void swinUp()
