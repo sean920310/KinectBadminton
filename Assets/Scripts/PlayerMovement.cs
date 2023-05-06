@@ -115,6 +115,15 @@ public class PlayerMovement : MonoBehaviour
     {
         float movementX = move;
 
+        if(Mathf.Abs( movementX) > 0f)
+        {
+            animator.SetBool("Move", true);
+        }
+        else
+        {
+            animator.SetBool("Move", false);
+        }
+
         transform.position = transform.position + Vector3.right * movementX * speed;
     }
 

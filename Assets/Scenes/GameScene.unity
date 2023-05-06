@@ -803,7 +803,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.2
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -837,6 +837,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 909109874194044292, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_Bounds.m_Center.x
+      value: 0.0053450465
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109874194044292, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_Bounds.m_Center.y
+      value: -0.004549861
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109874194044292, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_Bounds.m_Extent.x
+      value: 0.549655
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109874194044292, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_Bounds.m_Extent.y
+      value: 1.7589504
+      objectReference: {fileID: 0}
     - target: {fileID: 909109874194044293, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_Name
       value: Player2
@@ -857,10 +873,6 @@ PrefabInstance:
       propertyPath: serveBorderR
       value: 
       objectReference: {fileID: 257269076}
-    - target: {fileID: 1962022973957402538, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2582724395849564969, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_DefaultActionMap
       value: Player2
@@ -2350,6 +2362,38 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 909109873539827998, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.27638763
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109873539827998, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.9610463
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109873539827998, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -147.911
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109873549840023, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.28199357
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109873549840023, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109873549840023, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109873549840023, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.95941633
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109873549840023, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -2360,7 +2404,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.2
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2410,17 +2454,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 529.775
       objectReference: {fileID: 0}
-    - target: {fileID: 909109874479623808, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+    - target: {fileID: 909109874378762827, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.6269655
+      value: 0.27004254
       objectReference: {fileID: 0}
-    - target: {fileID: 909109874479623808, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+    - target: {fileID: 909109874378762827, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109874378762827, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.77904695
+      value: -0.9628484
       objectReference: {fileID: 0}
-    - target: {fileID: 909109874479623808, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+    - target: {fileID: 909109874378762827, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 102.347
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1117428462548657271, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: ball
@@ -2434,14 +2482,6 @@ PrefabInstance:
       propertyPath: serveBorderR
       value: 
       objectReference: {fileID: 257269076}
-    - target: {fileID: 1962022973957402538, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: m_Size.x
-      value: 1.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1962022973957402538, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: m_Center.x
-      value: -0.09
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
 --- !u!114 &909109875199266210 stripped
