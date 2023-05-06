@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BallManager : MonoBehaviour
 {
-    Rigidbody body;
+    public Rigidbody body;
     ParticleSystem particleSystems;
     TrailRenderer trailRenderer;
 
@@ -27,6 +27,7 @@ public class BallManager : MonoBehaviour
     bool hitForceEnhenceFlag = false;
 
     bool isFlyingUp = false;
+    public bool isSmashBall { get; private set; } = false;
 
     [SerializeField] StatesPanel p1StatesPanel;
     [SerializeField] StatesPanel p2StatesPanel;
@@ -52,6 +53,11 @@ public class BallManager : MonoBehaviour
 
     private void Update()
     {
+
+        if (trailRenderer.startColor == Color.red)
+            isSmashBall = true;
+        else
+            isSmashBall = false;
 
         if (hitForceEnhenceFlag && hitForceEnhence)
         {
@@ -113,7 +119,7 @@ public class BallManager : MonoBehaviour
             particleSystems.Play();
 
             body.velocity = Vector3.zero;
-            bool isDefence = (trailRenderer.startColor == Color.red);
+            bool isDefence = isSmashBall;
 
             if (isDefence)
             {

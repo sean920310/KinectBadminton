@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -44,6 +45,11 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] AudioSource GameoverCheeringSound;
 
+    [SerializeField] RectTransform gameStartPanel;
+    [SerializeField] Toggle p1BotToggle;
+    [SerializeField] Toggle p2BotToggle;
+    [SerializeField] TMP_Dropdown scoreToWin;
+
     public Winner winner { get; private set; } = Winner.None;
 
     public static GameManager instance { get; private set; }
@@ -52,7 +58,6 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Time.timeScale = 1.0f;
         if (instance != null)
         {
             Debug.Log("Found more than one GameManager in the scene. Destroying the newest one.");
@@ -65,6 +70,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 0.0f;
         player1Score = 0;
         player2Score = 0;
 
@@ -124,8 +130,8 @@ public class GameManager : MonoBehaviour
 
     public void playerPositionReset()
     {
-        p1.transform.position = new Vector3(-3, p1.transform.position.y, p1.transform.position.z);
-        p2.transform.position = new Vector3(3, p2.transform.position.y, p2.transform.position.z);
+        p1.transform.position = new Vector3(-3, 1.25f, 0);
+        p2.transform.position = new Vector3(3, 1.25f, 0);
     }
 
     public void GameOver()
@@ -170,5 +176,18 @@ public class GameManager : MonoBehaviour
         p1.ResetInputFlag();
         p2.ResetInputFlag();
         p1.enabled = p2.enabled = true;
+    }
+
+    public void OnStartClick()
+    {
+        Time.timeScale = 1.0f;
+        p1.gameObject.SetActive(true);
+        p2.gameObject.SetActive(true);
+
+        if (p1BotToggle.isOn) { p1.GetComponent<BotManager>().enabled = true; }
+        if (p2BotToggle.isOn) { p2.GetComponent<BotManager>().enabled = true; }
+
+        int.TryParse(scoreToWin.options.ToArray()[scoreToWin.value].text, out WinScore);
+        gameStartPanel.gameObject.SetActive(false);
     }
 }

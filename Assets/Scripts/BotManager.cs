@@ -5,18 +5,30 @@ using UnityEngine.InputSystem;
 
 public class BotManager : MonoBehaviour
 {
-    [SerializeField] PlayerMovement player;
+    [SerializeField] PlayerMovement enemyPlayer;
     [SerializeField] PlayerMovement botPlayer;
     [SerializeField] BallManager ball;
     [SerializeField] Transform centerBorder;
 
-    [SerializeField] float swinupHeight;
+    [SerializeField] bool swinUpHeightRandom;
+    [SerializeField] float swinUpHeight;
+    [SerializeField] float swinUpHeightRange;
+
+    [SerializeField] bool swinDownHeightRandom;
+    [SerializeField] float swinDownHeight;
+    [SerializeField] float swinDownHeightRange;
+
+    [SerializeField] bool SmashHeightRandom;
     [SerializeField] float SmashHeight;
+    [SerializeField] float SmashHeightRange;
+    [SerializeField] float SmashProbability;
     [SerializeField] float hitDelay;
     bool newPrepareServe = false;
     bool canJump = false;
 
     float hitDelayCounter = 0;
+
+    [SerializeField] bool isRightSidePlayer = false;
 
     void Start()
     {
@@ -41,46 +53,129 @@ public class BotManager : MonoBehaviour
         {
             newPrepareServe = false;
 
-            // Ball is in player side: back to court center
-            if (ball.transform.position.x < centerBorder.position.x)
+            // Ball is in enemy side
+            if (isRightSidePlayer && ball.transform.position.x < centerBorder.position.x ||
+                !isRightSidePlayer && ball.transform.position.x > centerBorder.position.x)
             {
-                MoveBotTo(3f, 0.1f); // back to court center
+                BallInEnemySideMovement();
             }
             else
             // Ball is in bot side: find ball
             {
                 // Movement
-                MoveBotTo(ball.transform.position.x, 0.3f);
-
-                if(ball.transform.position.y > SmashHeight)
+                if(ball.isSmashBall && Mathf.Abs(ball.body.velocity.y) < 1f &&
+                    (isRightSidePlayer && ball.body.velocity.x > 3f ||
+                    !isRightSidePlayer && ball.body.velocity.x > -3f)
+                    )
                 {
-                    canJump = true;
+                    if(isRightSidePlayer)
+                    {
+                        if (ball.transform.position.x < botPlayer.transform.position.x)
+                        {
+                            MoveBotTo(4.5f, 0.1f);
+                        }
+                        else
+                        {
+                            MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
+                        }
+                    }
+                    else
+                    {
+                        if (ball.transform.position.x > botPlayer.transform.position.x)
+                        {
+                            MoveBotTo(-4.5f, 0.1f);
+                        }
+                        else
+                        {
+                            MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
+                        }
+                    }
                 }
                 else
                 {
-                    if (canJump)
+                    if (isRightSidePlayer)
+                        MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
+                    else
+                        MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
+                }
+
+                // Jump
+                if (ball.transform.position.y >= SmashHeight)
+                {
+                    if (Random.Range(0f, 1f) <= SmashProbability)
                     {
+                        canJump = true;
+                    }
+                }
+                else
+                {
+                    if (canJump && Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f)
+                    {
+                        setRandomValue();
                         botPlayer.jump = true;
                         canJump = false;
                     }
                 }
 
-                // SwinUp
-                if (ball.transform.position.y - botPlayer.transform.position.y <= swinupHeight && 
-                    Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f && 
-                    hitDelayCounter <= 0.0f)
+                if (canSwin())
                 {
-                    hitDelayReset();
-                    botPlayer.swinUp = true;
-                }
+                    // SwinDown
+                    if (ball.transform.position.y - botPlayer.transform.position.y <= swinDownHeight &&
+                        Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f)
+                    {
+                        hitDelayReset();
+                        setRandomValue();
+                        botPlayer.swinDown = true;
+                    }
 
-                // SwinUp
-                if (ball.transform.position.y - botPlayer.transform.position.y <= 0 &&
-                    Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f &&
-                    hitDelayCounter <= 0.0f)
+                    // SwinUp
+                    if (ball.transform.position.y - botPlayer.transform.position.y <= swinUpHeight &&
+                        Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f)
+                    {
+                        hitDelayReset();
+                        setRandomValue();
+                        botPlayer.swinUp = true;
+                    }
+                }
+            }
+        }
+    }
+
+    private void BallInEnemySideMovement()
+    {
+        if (isRightSidePlayer && (1.5 >= ball.body.velocity.x && ball.body.velocity.x > 0) ||
+            !isRightSidePlayer && (-1.5 <= ball.body.velocity.x && ball.body.velocity.x < 0))
+        {
+            if(isRightSidePlayer)
+                MoveBotTo(2.7f, 0.1f);
+            else
+                MoveBotTo(-2.7f, 0.1f);
+        }
+        else
+        {
+
+            if (isRightSidePlayer)
+            {
+                if (enemyPlayer.onGround)
                 {
-                    hitDelayReset();
-                    botPlayer.swinDown = true;
+                    MoveBotTo(3f, 0.1f); // back to court center
+                }
+                else
+                {
+                    // Player Smash Predict
+                    MoveBotTo(4.5f, 0.1f);
+                }
+            }
+            else
+            {
+                if (enemyPlayer.onGround)
+                {
+                    MoveBotTo(-3f, 0.1f); // back to court center
+                }
+                else
+                {
+                    // Player Smash Predict
+                    MoveBotTo(-4.5f, 0.1f);
                 }
             }
         }
@@ -106,16 +201,60 @@ public class BotManager : MonoBehaviour
     {
         hitDelayCounter = hitDelay;
     }
+    bool canSwin()
+    {
+        return hitDelayCounter <= 0.0f;
+    }
+    void setRandomValue()
+    {
+        if (swinUpHeightRandom)
+        {
+            if(Random.Range(-swinUpHeightRange, swinUpHeightRange) > 0f)
+                swinUpHeight += swinUpHeightRange;
+            else
+                swinUpHeight -= swinUpHeightRange;
+
+        }
+        if(swinDownHeightRandom)
+        {
+            if (Random.Range(-swinDownHeightRange, swinDownHeightRange) > 0f)
+                swinDownHeight += swinDownHeightRange;
+            else
+                swinDownHeight -= swinDownHeightRange;
+        }
+        if(SmashHeightRandom)
+        {
+            if (Random.Range(-SmashHeightRange, SmashHeightRange) > 0f)
+                SmashHeight += SmashHeightRange;
+            else
+                SmashHeight -= SmashHeightRange;
+        }
+    }
+
     IEnumerator ServeCoroutine(float delay)
     {
+        float destinationX;
 
-        float destinationX = Random.Range(3f,5f);
-
-        while (!(destinationX + 0.2f >= botPlayer.transform.position.x && botPlayer.transform.position.x >= destinationX - 0.2f))
+        if (isRightSidePlayer)
         {
-            MoveBotTo(destinationX, 0.0f);
-            yield return new WaitForEndOfFrame();
+            destinationX = Random.Range(3f, 5f);
+            while (!(destinationX + 0.2f >= botPlayer.transform.position.x && botPlayer.transform.position.x >= destinationX - 0.2f))
+            {
+                MoveBotTo(destinationX, 0.0f);
+                yield return new WaitForFixedUpdate();
+            }
         }
+        else
+        {
+            destinationX = Random.Range(-5f, -3f);
+            while (!(destinationX + 0.2f >= botPlayer.transform.position.x && botPlayer.transform.position.x >= destinationX - 0.2f))
+            {
+                MoveBotTo(destinationX, 0.0f);
+                yield return new WaitForFixedUpdate();
+            }
+        }
+
+        MoveBotTo(destinationX, 0.2f);
 
         yield return new WaitForSeconds(delay);
 
