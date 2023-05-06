@@ -8,6 +8,10 @@ public class RacketManager : MonoBehaviour
     public bool isSwinUp { get; private set; }
     public bool isSwinDown { get; private set; }
 
+    public float ServeForce = 10.0f;
+    public float hitForce = 10.0f;
+    public float powerHitForce = 10.0f;
+
 
     [SerializeField] BoxCollider boxCollider;
     // Start is called before the first frame update

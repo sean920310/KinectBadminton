@@ -43,6 +43,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject GameoverPanel;
     [SerializeField] GameObject HUD;
 
+    [SerializeField] AudioSource PlayerOneWinSound;
+    [SerializeField] AudioSource PlayerTwoWinSound;
     [SerializeField] AudioSource GameoverCheeringSound;
 
     [SerializeField] RectTransform gameStartPanel;
@@ -138,6 +140,7 @@ public class GameManager : MonoBehaviour
     {
         if (player1Score >= WinScore)
         {
+            PlayerOneWinSound.Play();
             winner = Winner.Player1;
             p1.animator.SetTrigger("Dancing1");
             p2.animator.SetTrigger("Lose");
@@ -145,6 +148,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            PlayerTwoWinSound.Play();
             winner = Winner.Player2;
             p1.animator.SetTrigger("Lose");
             p2.animator.SetTrigger("Dancing1");

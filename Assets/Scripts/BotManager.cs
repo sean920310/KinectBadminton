@@ -100,8 +100,9 @@ public class BotManager : MonoBehaviour
                 }
 
                 // Jump
-                if (ball.transform.position.y >= SmashHeight)
+                if (!canJump && ball.transform.position.y >= SmashHeight)
                 {
+
                     if (Random.Range(0f, 1f) <= SmashProbability)
                     {
                         canJump = true;

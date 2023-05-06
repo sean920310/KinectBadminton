@@ -132,6 +132,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce7de569fd28b343b0e7d61c0bc1c4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ServeForce: 11
+  hitForce: 9.5
+  powerHitForce: 11
   boxCollider: {fileID: 1962022973957402538}
 --- !u!65 &1962022973957402538
 BoxCollider:
@@ -761,7 +764,7 @@ MonoBehaviour:
   SmashHeightRandom: 1
   SmashHeight: 5.5
   SmashHeightRange: 0.05
-  SmashProbability: 0.6
+  SmashProbability: 0.3
   hitDelay: 0.25
   isRightSidePlayer: 0
 --- !u!1 &909109874211609609

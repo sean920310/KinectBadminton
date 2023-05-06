@@ -8,10 +8,6 @@ public class BallManager : MonoBehaviour
     ParticleSystem particleSystems;
     TrailRenderer trailRenderer;
 
-    [SerializeField] private float ServeForce = 10.0f;
-    [SerializeField] private float hitForce = 10.0f;
-    [SerializeField] private float powerHitForce = 10.0f;
-
     [SerializeField] AudioSource HitSound;
     [SerializeField] AudioSource SmashSound;
     [SerializeField] AudioSource HittingFloorSound;
@@ -93,7 +89,7 @@ public class BallManager : MonoBehaviour
             trailRenderer.enabled = true;
         }
     }
-    public IEnumerator Serve(float delay, bool faceRight)
+    public IEnumerator Serve(float delay, bool faceRight, float ServeForce)
     {
 
         yield return new WaitForSeconds(delay);
@@ -138,7 +134,7 @@ public class BallManager : MonoBehaviour
             if (racketManager.isSwinDown)
             {
 
-                body.AddForce(racketManager.transform.up.normalized * hitForce, ForceMode.Impulse);
+                body.AddForce(racketManager.transform.up.normalized * racketManager.hitForce, ForceMode.Impulse);
                 trailRenderer.startColor = Color.white;
 
                 HitSound.Play();
@@ -154,7 +150,7 @@ public class BallManager : MonoBehaviour
                 Vector3 hittingAngle = Quaternion.FromToRotation(Vector3.right, -racketManager.transform.up).eulerAngles;
                 if ((360 >= hittingAngle.z && hittingAngle.z >= 170 || 10 >= hittingAngle.z && hittingAngle.z >= 0) && !racketManager.transform.root.GetComponent<PlayerMovement>().onGround)
                 {
-                    body.AddForce((-racketManager.transform.up.normalized) * powerHitForce, ForceMode.Impulse);
+                    body.AddForce((-racketManager.transform.up.normalized) * racketManager.powerHitForce, ForceMode.Impulse);
                     trailRenderer.startColor = Color.red;
                     SmashSound.Play();
 
@@ -172,7 +168,7 @@ public class BallManager : MonoBehaviour
                 }
                 else
                 {
-                    body.AddForce((-racketManager.transform.up.normalized) * hitForce, ForceMode.Impulse);
+                    body.AddForce((-racketManager.transform.up.normalized) * racketManager.hitForce, ForceMode.Impulse);
                     trailRenderer.startColor = Color.white;
                     HitSound.Play();
 

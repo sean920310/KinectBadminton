@@ -79,7 +79,7 @@ public class PlayerMovement : MonoBehaviour
                 SwooshSound.Play();
                 animator.SetTrigger("Serve");
 
-                StartCoroutine(ball.Serve(0f, facingRight));
+                StartCoroutine(ball.Serve(0f, facingRight, racket.ServeForce));
 
                 ball.isServing = false;
                 PrepareServe = false;
