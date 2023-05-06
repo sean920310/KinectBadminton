@@ -23,10 +23,10 @@ public class PlayerMovement : MonoBehaviour
     public bool onGround = true;
     public bool PrepareServe = true;
 
-    float move = 0.0f;
-    bool jump = false;
-    bool swinUp = false;
-    bool swinDown = false;
+    public float move = 0.0f;
+    public bool jump = false;
+    public bool swinUp = false;
+    public bool swinDown = false;
 
     bool facingRight = false;
 

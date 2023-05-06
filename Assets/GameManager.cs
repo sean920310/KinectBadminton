@@ -125,7 +125,7 @@ public class GameManager : MonoBehaviour
     public void playerPositionReset()
     {
         p1.transform.position = new Vector3(-3, p1.transform.position.y, p1.transform.position.z);
-        p2.transform.position = new Vector3(3, p1.transform.position.y, p1.transform.position.z);
+        p2.transform.position = new Vector3(3, p2.transform.position.y, p2.transform.position.z);
     }
 
     public void GameOver()

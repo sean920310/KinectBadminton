@@ -28,6 +28,9 @@ public class BallManager : MonoBehaviour
 
     bool isFlyingUp = false;
 
+    [SerializeField] StatesPanel p1StatesPanel;
+    [SerializeField] StatesPanel p2StatesPanel;
+
     private void Start()
     {
         body = GetComponent<Rigidbody>();
@@ -110,29 +113,34 @@ public class BallManager : MonoBehaviour
             particleSystems.Play();
 
             body.velocity = Vector3.zero;
+            bool isDefence = (trailRenderer.startColor == Color.red);
+
+            if (isDefence)
+            {
+                if (racketManager.transform.root.name == "Player1")
+                {
+                    GameManager.instance.player1Defence++;
+                    p1StatesPanel.ShowMessageLeft("Defence!!!");
+                }
+                if (racketManager.transform.root.name == "Player2")
+                {
+                    GameManager.instance.player2Defence++;
+                    p2StatesPanel.ShowMessageRight("Defence!!!");
+                }
+            }
+
             if (racketManager.isSwinDown)
             {
-                bool isDefence = (trailRenderer.startColor == Color.red);
 
                 body.AddForce(racketManager.transform.up.normalized * hitForce, ForceMode.Impulse);
                 trailRenderer.startColor = Color.white;
 
                 HitSound.Play();
 
-                if (isDefence)
-                {
-                    if (racketManager.transform.root.name == "Player1")
-                        GameManager.instance.player1Defence++;
-                    if (racketManager.transform.root.name == "Player2")
-                        GameManager.instance.player2Defence++;
-                }
-                else
-                {
-                    if (racketManager.transform.root.name == "Player1")
-                        GameManager.instance.player1Underhand++;
-                    if (racketManager.transform.root.name == "Player2")
-                        GameManager.instance.player2Underhand++;
-                }
+                if (racketManager.transform.root.name == "Player1")
+                    GameManager.instance.player1Underhand++;
+                if (racketManager.transform.root.name == "Player2")
+                    GameManager.instance.player2Underhand++;
             }
             else
             {
@@ -145,9 +153,15 @@ public class BallManager : MonoBehaviour
                     SmashSound.Play();
 
                     if (racketManager.transform.root.name == "Player1")
+                    {
+                        p1StatesPanel.ShowMessageLeft("Smash!!!");
                         GameManager.instance.player1Smash++;
+                    }
                     if (racketManager.transform.root.name == "Player2")
+                    {
+                        p2StatesPanel.ShowMessageRight("Smash!!!");
                         GameManager.instance.player2Smash++;
+                    }
 
                 }
                 else
