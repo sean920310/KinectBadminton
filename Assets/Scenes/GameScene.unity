@@ -2762,7 +2762,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50dcd183fb839c54193bc10a8f4ea7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ServeForce: 10
+  ServeForce: 11
   hitForce: 10
   powerHitForce: 7
   HitSound: {fileID: 796490635}
