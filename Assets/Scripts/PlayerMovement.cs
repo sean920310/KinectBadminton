@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     Rigidbody rb;
-    Animator animator;
+    public Animator animator;
     [SerializeField] AudioSource SwooshSound;
 
     [SerializeField] float speed = 1.0f;

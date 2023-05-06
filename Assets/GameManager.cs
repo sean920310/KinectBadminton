@@ -85,8 +85,7 @@ public class GameManager : MonoBehaviour
 
         if(!p1.PrepareServe && !p2.PrepareServe)
         {
-            serveBorderL.SetActive(false);
-            serveBorderR.SetActive(false);
+            ServeBorderActive(false);
         }
 
         p1ScoreText.text = player1Score.ToString();
@@ -101,9 +100,10 @@ public class GameManager : MonoBehaviour
         p2.PrepareServe = false;
 
         playerPositionReset();
-        serveBorderL.SetActive(true);
-        serveBorderR.SetActive(true);
+        ServeBorderActive(true);
+        StartCoroutine(PlayerMovementDisableForAWhile(0.01f));
     }
+
     public void p2GetPoint()
     {
         player2Score++;
@@ -112,8 +112,14 @@ public class GameManager : MonoBehaviour
         p2.PrepareServe = true;
 
         playerPositionReset();
-        serveBorderL.SetActive(true);
-        serveBorderR.SetActive(true);
+        ServeBorderActive(true);
+        StartCoroutine(PlayerMovementDisableForAWhile(0.01f));
+    }
+
+    private void ServeBorderActive(bool active)
+    {
+        serveBorderL.SetActive(active);
+        serveBorderR.SetActive(active);
     }
 
     public void playerPositionReset()
@@ -124,19 +130,27 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        GameoverCheeringSound.Play();
-        Time.timeScale = 0.0f;
-        HUD.SetActive(false);
         if (player1Score >= WinScore)
         {
             winner = Winner.Player1;
+            p1.animator.SetTrigger("Dancing1");
+            p2.animator.SetTrigger("Lose");
+
         }
         else
         {
-            winner= Winner.Player2;
+            winner = Winner.Player2;
+            p1.animator.SetTrigger("Lose");
+            p2.animator.SetTrigger("Dancing1");
         }
 
+        GameoverCheeringSound.Play();
+        Time.timeScale = 0.0f;
+        HUD.SetActive(false);
         GameoverPanel.SetActive(true);
+
+        p1.enabled = false;
+        p2.enabled = false;
     }
 
     public void OnQuitClick()
@@ -146,5 +160,12 @@ public class GameManager : MonoBehaviour
     public void OnRematchClick()
     {
         SceneManager.LoadScene(0);
+    }
+
+    IEnumerator PlayerMovementDisableForAWhile(float delay)
+    {
+        p1.enabled = p2.enabled = false;
+        yield return new WaitForSeconds(delay);
+        p1.enabled = p2.enabled = true;
     }
 }
