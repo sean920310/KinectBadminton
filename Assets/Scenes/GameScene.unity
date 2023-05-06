@@ -466,7 +466,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f96f942cf8bbf744aad8abf84fbbd09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WinScore: 10
+  WinScore: 3
   player1Smash: 0
   player2Smash: 0
   player1Defence: 0
@@ -485,6 +485,7 @@ MonoBehaviour:
   serveBorderR: {fileID: 257269076}
   GameoverPanel: {fileID: 877779758}
   HUD: {fileID: 850623059}
+  GameoverCheeringSound: {fileID: 234814730}
 --- !u!4 &234814729
 Transform:
   m_ObjectHideFlags: 0
