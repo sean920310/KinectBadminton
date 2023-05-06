@@ -8,7 +8,6 @@ public class BallManager : MonoBehaviour
     ParticleSystem particleSystems;
     TrailRenderer trailRenderer;
 
-
     [SerializeField] private float ServeForce = 10.0f;
     [SerializeField] private float hitForce = 10.0f;
     [SerializeField] private float powerHitForce = 10.0f;
@@ -19,6 +18,16 @@ public class BallManager : MonoBehaviour
 
     public bool isServing = false;
 
+    [SerializeField] bool badmintonSimulation = false;
+    [SerializeField] float velocityDecayMultiplier = 0.99f;
+    [SerializeField] float FlyDownVelocityDecayMultiplier = 0.99f;
+    [SerializeField] float FlyDownVelocityXDecayMultiplier = 0.99f;
+    [SerializeField] bool hitForceEnhence = false;
+    [SerializeField] float hitForceEnhenceMultiplier = 1.5f;
+    bool hitForceEnhenceFlag = false;
+
+    bool isFlyingUp = false;
+
     private void Start()
     {
         body = GetComponent<Rigidbody>();
@@ -28,8 +37,42 @@ public class BallManager : MonoBehaviour
         Physics.IgnoreLayerCollision(7, 8,true);
         Physics.IgnoreLayerCollision(7, 9, true);
     }
+
+    private void FixedUpdate()
+    {
+
+        if (badmintonSimulation && isFlyingUp)
+        {
+            body.velocity *= velocityDecayMultiplier;
+        }
+    }
+
     private void Update()
     {
+
+        if (hitForceEnhenceFlag && hitForceEnhence)
+        {
+            body.velocity *= hitForceEnhenceMultiplier;
+            hitForceEnhenceFlag = false;
+        }
+
+        if (badmintonSimulation)
+        {
+            if (body.velocity.y > 0)
+            {
+                isFlyingUp = true;
+            }
+            else
+            {
+                if (isFlyingUp)
+                {
+                    body.velocity = new Vector3(body.velocity.x * FlyDownVelocityXDecayMultiplier, body.velocity.y, body.velocity.z) * FlyDownVelocityDecayMultiplier;
+                }
+
+                isFlyingUp = false;
+            }
+        }
+
         transform.rotation = Quaternion.Euler(0, 0, Quaternion.FromToRotation(Vector3.right, body.velocity).eulerAngles.z);
 
         if (isServing)
@@ -43,6 +86,7 @@ public class BallManager : MonoBehaviour
     }
     public IEnumerator Serve(float delay, bool faceRight)
     {
+
         yield return new WaitForSeconds(delay);
         body.velocity = Vector3.zero;
 
@@ -50,9 +94,11 @@ public class BallManager : MonoBehaviour
         particleSystems.Play();
 
         if (faceRight)
-            body.AddForce( (new Vector3(1.0f, 2.5f,0.0f)).normalized * ServeForce, ForceMode.Impulse);
+            body.AddForce( (new Vector3(1.0f, 1.5f,0.0f)).normalized * ServeForce, ForceMode.Impulse);
         else
-            body.AddForce((new Vector3(-1.0f, 2.5f, 0.0f)).normalized * ServeForce, ForceMode.Impulse);
+            body.AddForce((new Vector3(-1.0f, 1.5f, 0.0f)).normalized * ServeForce, ForceMode.Impulse);
+
+        //hitForceEnhenceFlag = true;
     }
 
     // Hit Racket
@@ -90,6 +136,7 @@ public class BallManager : MonoBehaviour
             }
             else
             {
+                // Power Hit
                 Vector3 hittingAngle = Quaternion.FromToRotation(Vector3.right, -racketManager.transform.up).eulerAngles;
                 if ((360 >= hittingAngle.z && hittingAngle.z >= 170 || 10 >= hittingAngle.z && hittingAngle.z >= 0) && !racketManager.transform.root.GetComponent<PlayerMovement>().onGround)
                 {
@@ -118,6 +165,7 @@ public class BallManager : MonoBehaviour
 
             racketManager.boxColliderDisable();
 
+            hitForceEnhenceFlag = true;
             // Hit ball slow motion
             //StartCoroutine(AddTimeScale());
         }
@@ -128,7 +176,7 @@ public class BallManager : MonoBehaviour
     {
         if(!isServing && collision.transform.tag == "Ground")
         {
-
+            isServing = true;
             trailRenderer.startColor = Color.white;
 
             if (collision.gameObject.name == "Player2Floor")

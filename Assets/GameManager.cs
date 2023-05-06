@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
 
         playerPositionReset();
         ServeBorderActive(true);
-        StartCoroutine(PlayerMovementDisableForAWhile(0.01f));
+        StartCoroutine(PlayerMovementDisableForAWhile(0.2f));
     }
 
     public void p2GetPoint()
@@ -165,7 +165,10 @@ public class GameManager : MonoBehaviour
     IEnumerator PlayerMovementDisableForAWhile(float delay)
     {
         p1.enabled = p2.enabled = false;
+
         yield return new WaitForSeconds(delay);
+        p1.ResetInputFlag();
+        p2.ResetInputFlag();
         p1.enabled = p2.enabled = true;
     }
 }

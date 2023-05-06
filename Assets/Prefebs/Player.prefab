@@ -515,7 +515,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   SwooshSound: {fileID: 1700846048299065563}
   speed: 0.09
-  jumpForce: 5
+  jumpForce: 6
   GroundChk: {fileID: 6496281337871292043}
   WhatIsGround:
     serializedVersion: 2
@@ -524,7 +524,7 @@ MonoBehaviour:
   LeftHand: {fileID: 4377193212131577387}
   racket: {fileID: 2523875935646291306}
   onGround: 1
-  PrepareServe: 1
+  PrepareServe: 0
 --- !u!114 &2582724395849564969
 MonoBehaviour:
   m_ObjectHideFlags: 0

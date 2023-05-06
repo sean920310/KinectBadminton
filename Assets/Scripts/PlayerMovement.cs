@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
         }
         animator.SetBool("OnGround", onGround);
 
-        if (jump && onGround)
+        if (!PrepareServe && jump && onGround)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             jump = false;
@@ -158,5 +158,12 @@ public class PlayerMovement : MonoBehaviour
 
         if (context.canceled)
             swinDown = false;
+    }
+    public void ResetInputFlag()
+    {
+        move = 0.0f;
+        jump = false;
+        swinUp = false;
+        swinDown = false;
     }
 }
