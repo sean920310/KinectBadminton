@@ -17,8 +17,7 @@ public class BallManager : MonoBehaviour
     [SerializeField] AudioSource SmashSound;
     [SerializeField] AudioSource HittingFloorSound;
 
-
-    public bool isServing = true;
+    public bool isServing = false;
 
     private void Start()
     {
@@ -67,11 +66,27 @@ public class BallManager : MonoBehaviour
             body.velocity = Vector3.zero;
             if (racketManager.isSwinDown)
             {
+                bool isDefence = (trailRenderer.startColor == Color.red);
+
                 body.AddForce(racketManager.transform.up.normalized * hitForce, ForceMode.Impulse);
                 trailRenderer.startColor = Color.white;
 
                 HitSound.Play();
 
+                if (isDefence)
+                {
+                    if (racketManager.transform.root.name == "Player1")
+                        GameManager.instance.player1Defence++;
+                    if (racketManager.transform.root.name == "Player2")
+                        GameManager.instance.player2Defence++;
+                }
+                else
+                {
+                    if (racketManager.transform.root.name == "Player1")
+                        GameManager.instance.player1Underhand++;
+                    if (racketManager.transform.root.name == "Player2")
+                        GameManager.instance.player2Underhand++;
+                }
             }
             else
             {
@@ -81,12 +96,23 @@ public class BallManager : MonoBehaviour
                     body.AddForce((-racketManager.transform.up.normalized) * powerHitForce, ForceMode.Impulse);
                     trailRenderer.startColor = Color.red;
                     SmashSound.Play();
+
+                    if (racketManager.transform.root.name == "Player1")
+                        GameManager.instance.player1Smash++;
+                    if (racketManager.transform.root.name == "Player2")
+                        GameManager.instance.player2Smash++;
+
                 }
                 else
                 {
                     body.AddForce((-racketManager.transform.up.normalized) * hitForce, ForceMode.Impulse);
                     trailRenderer.startColor = Color.white;
                     HitSound.Play();
+
+                    if (racketManager.transform.root.name == "Player1")
+                        GameManager.instance.player1Overhand++;
+                    if (racketManager.transform.root.name == "Player2")
+                        GameManager.instance.player2Overhand++;
                 }
             }
 

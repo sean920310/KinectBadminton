@@ -19,9 +19,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Transform LeftHand;
 
     [SerializeField] RacketManager racket;
-
-    [SerializeField] GameObject serveBorderL;
-    [SerializeField] GameObject serveBorderR;
      
     public bool onGround = true;
     public bool PrepareServe = true;
@@ -69,8 +66,6 @@ public class PlayerMovement : MonoBehaviour
         // Serve
         if (PrepareServe)
         {
-            serveBorderL.SetActive(true);
-            serveBorderR.SetActive(true);
             if (!animator.GetCurrentAnimatorStateInfo(0).IsName("ServePrepare"))
             {
                 animator.SetTrigger("ServePrepare");
@@ -89,8 +84,6 @@ public class PlayerMovement : MonoBehaviour
                 ball.isServing = false;
                 PrepareServe = false;
                 swinDown = false;
-                serveBorderL.SetActive(false);
-                serveBorderR.SetActive(false);
             }
             return;
         }
