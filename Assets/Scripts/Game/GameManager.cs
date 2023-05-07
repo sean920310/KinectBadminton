@@ -206,14 +206,19 @@ public class GameManager : MonoBehaviour
         Player1Name = player1NameInput.text;
         Player2Name = player2NameInput.text;
 
-        GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player1currentIdx].hatData.HatPrefab);
 
-        if(tmpHatPrefab != null)
+        if(CharacterSlot.HatList[CharacterSlot.player1currentIdx].hatData.HatPrefab != null)
+        {
+            GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player1currentIdx].hatData.HatPrefab);
             tmpHatPrefab.transform.SetParent(Player1HatPoint, false);
+        }
 
-        tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player2currentIdx].hatData.HatPrefab);
-        if (tmpHatPrefab != null)
-            tmpHatPrefab.transform.SetParent(Player2HatPoint, false);
+        if (CharacterSlot.HatList[CharacterSlot.player2currentIdx].hatData.HatPrefab != null)
+        {
+            GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player2currentIdx].hatData.HatPrefab);
+            if (tmpHatPrefab != null)
+                tmpHatPrefab.transform.SetParent(Player2HatPoint, false);
+        }
 
         p1.gameObject.SetActive(true);
         p2.gameObject.SetActive(true);
