@@ -622,18 +622,18 @@ MonoBehaviour:
   enemyPlayer: {fileID: 1117428462548657271}
   botPlayer: {fileID: 1117428462548657271}
   ball: {fileID: 0}
-  swinUpHeightRandom: 0
+  swinUpHeightRandom: 1
   swinUpHeightDefault: 2.2
-  swinUpHeightRange: 0.02
+  swinUpHeightRange: 0.01
   swinUpHeight: 0
-  swinDownHeightRandom: 0
+  swinDownHeightRandom: 1
   swinDownHeightDefault: 0.85
-  swinDownHeightRange: 0.02
+  swinDownHeightRange: 0.01
   swinDownHeight: 0
   SmashProbability: 0.9
-  SmashHeightRandom: 0
+  SmashHeightRandom: 1
   SmashHeightDefault: 5.1
-  SmashHeightRange: 0.02
+  SmashHeightRange: 0.01
   SmashHeight: 0
   jumpDelay: 0.1
   DefensePositionX: 5
