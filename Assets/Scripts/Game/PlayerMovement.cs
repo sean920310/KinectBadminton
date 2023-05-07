@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Transform LeftHand;
 
     [SerializeField] RacketManager racket;
-     
+
     public bool onGround = true;
     public bool PrepareServe = true;
 
@@ -32,12 +32,15 @@ public class PlayerMovement : MonoBehaviour
 
     bool facingRight = false;
 
+    [SerializeField] float hitCoolDown;
+    float hitCoolDownCounter = 0;
+
     void Start()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
 
-        if(transform.rotation.y == 0f)
+        if (transform.rotation.y == 0f)
         {
             facingRight = true;
         }
@@ -46,9 +49,10 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        hitCoolDownCounter -= Time.deltaTime;
 
         // Jump
-        if(Physics.Raycast(GroundChk.position, Vector3.down, 0.05f, WhatIsGround))
+        if (Physics.Raycast(GroundChk.position, Vector3.down, 0.05f, WhatIsGround))
         {
             onGround = true;
         }
@@ -75,7 +79,7 @@ public class PlayerMovement : MonoBehaviour
             ball.transform.rotation = LeftHand.rotation;
             ball.isServing = true;
 
-            if (swinDown)
+            if (swinDown && hitCoolDownCounter <= 0)
             {
                 SwooshSound.Play();
                 animator.SetTrigger("Serve");
@@ -85,24 +89,30 @@ public class PlayerMovement : MonoBehaviour
                 ball.isServing = false;
                 PrepareServe = false;
                 swinDown = false;
+
+                hitCoolDownReset();
             }
             return;
         }
 
         // Swing
-        if (swinUp)
+        if (swinUp && hitCoolDownCounter <= 0)
         {
             SwooshSound.Play();
             animator.SetTrigger("SwingUp");
             racket.swinUp();
             swinUp = false;
+
+            hitCoolDownReset();
         }
-        if (swinDown)
+        if (swinDown && hitCoolDownCounter <= 0)
         {
             SwooshSound.Play();
             animator.SetTrigger("SwingDown");
             racket.swinDown();
             swinDown = false;
+
+            hitCoolDownReset();
         }
     }
 
@@ -111,7 +121,7 @@ public class PlayerMovement : MonoBehaviour
         // Movement
         float movementX = move;
 
-        if(Mathf.Abs( movementX) > 0f)
+        if (Mathf.Abs(movementX) > 0f)
             animator.SetBool("Move", true);
         else
             animator.SetBool("Move", false);
@@ -130,10 +140,10 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        if(context.performed)
+        if (context.performed)
             move = context.ReadValue<float>();
 
-        if(context.canceled)
+        if (context.canceled)
             move = 0f;
     }
     public void OnJump(InputAction.CallbackContext context)
@@ -166,5 +176,9 @@ public class PlayerMovement : MonoBehaviour
         jump = false;
         swinUp = false;
         swinDown = false;
+    }
+    void hitCoolDownReset()
+    {
+        hitCoolDownCounter = hitCoolDown;
     }
 }

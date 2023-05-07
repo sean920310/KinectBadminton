@@ -400,6 +400,7 @@ MonoBehaviour:
   jump: 0
   swinUp: 0
   swinDown: 0
+  hitCoolDown: 0
 --- !u!114 &2582724395849564969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,7 +638,7 @@ MonoBehaviour:
   jumpDelay: 0.1
   DefensePositionX: 5
   CenterPositionX: 3.1
-  hitDelay: 0
+  hitDelay: 0.2
   isRightSidePlayer: 0
   whatIsDropPoint:
     serializedVersion: 2
