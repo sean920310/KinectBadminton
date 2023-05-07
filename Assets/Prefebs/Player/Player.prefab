@@ -637,7 +637,7 @@ MonoBehaviour:
   jumpDelay: 0.1
   DefensePositionX: 5
   CenterPositionX: 3.1
-  hitDelay: 0.2
+  hitDelay: 0
   isRightSidePlayer: 0
   whatIsDropPoint:
     serializedVersion: 2

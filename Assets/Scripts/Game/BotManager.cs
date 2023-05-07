@@ -84,7 +84,7 @@ public class BotManager : MonoBehaviour
         }
         else
         {
-            if(isHitAfterServeLocked)
+            if (isHitAfterServeLocked)
             {
                 if (isRightSidePlayer && ball.BallInLeftSide || !isRightSidePlayer && !ball.BallInLeftSide)
                 {
@@ -109,7 +109,7 @@ public class BotManager : MonoBehaviour
                 Movement();
                 Jump();
 
-                if(!isHitAfterServeLocked)
+                if (!isHitAfterServeLocked)
                     HitTheBall();
             }
         }
@@ -126,7 +126,8 @@ public class BotManager : MonoBehaviour
                 hitDelayReset();
                 setRandomValue();
                 botPlayer.swinDown = true;
-            }else if (ball.transform.position.y - botPlayer.transform.position.y <= swinUpHeight &&
+            }
+            else if (ball.transform.position.y - botPlayer.transform.position.y <= swinUpHeight &&
                 Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f)
             {
                 hitDelayReset();
@@ -157,7 +158,7 @@ public class BotManager : MonoBehaviour
                 setRandomValue();
                 jumpDelayReset();
 
-                if(!isJumpLocked)
+                if (!isJumpLocked)
                     botPlayer.jump = true;
 
                 isJumpLocked = false;
@@ -169,6 +170,10 @@ public class BotManager : MonoBehaviour
     private void Movement()
     {
         // Smash Liner
+        if (!isBallFlyingToYou() && Mathf.Abs(enemyPlayer.transform.position.x) <= 3)
+        {
+            MoveBotTo(DefensePositionX, 0.01f);
+        }
         if (ball.isSmashBall && Mathf.Abs(ball.body.velocity.y) < 1f)
         {
             if (3.5f > DropPointInfo.point.y && DropPointInfo.point.y > 0)
@@ -240,6 +245,8 @@ public class BotManager : MonoBehaviour
     {
         if (isRightSidePlayer)
         {
+
+
             if (isBallFlyingToYou())
             {
                 if (DropPointInfo.collider != null)
@@ -251,10 +258,13 @@ public class BotManager : MonoBehaviour
                     MoveBotTo(ball.transform.position.x, 0.01f);
                 }
             }
-            else if((3.5 >= ball.body.velocity.x && ball.body.velocity.x > 0))
+            else if (Mathf.Abs(enemyPlayer.transform.position.x) <= 3)
             {
-                // enemy wants to smash in front
-                MoveBotTo(2.6f, 0.1f);
+                MoveBotTo(DefensePositionX, 0.01f);
+            }
+            else if ((3.5 >= ball.body.velocity.x && ball.body.velocity.x > 0))
+            {
+                MoveBotTo(2.6f, 0.01f);
             }
             else
             {
@@ -280,7 +290,6 @@ public class BotManager : MonoBehaviour
         }
         else
         {
-
             if (isBallFlyingToYou())
             {
                 if (DropPointInfo.collider != null)
@@ -292,9 +301,13 @@ public class BotManager : MonoBehaviour
                     MoveBotTo(ball.transform.position.x, 0.01f);
                 }
             }
+            else if (Mathf.Abs(enemyPlayer.transform.position.x) <= 3)
+            {
+                MoveBotTo(DefensePositionX, 0.01f);
+            }
             else if ((-3.5 >= ball.body.velocity.x && ball.body.velocity.x > 0))
             {
-                MoveBotTo(-2.6f, 0.1f);
+                MoveBotTo(-2.6f, 0.01f);
             }
             else
             {
@@ -345,20 +358,20 @@ public class BotManager : MonoBehaviour
     {
         if (swinUpHeightRandom)
         {
-            if(Random.Range(-swinUpHeightRange, swinUpHeightRange) > 0f)
+            if (Random.Range(-swinUpHeightRange, swinUpHeightRange) > 0f)
                 swinUpHeight += swinUpHeightRange;
             else
                 swinUpHeight -= swinUpHeightRange;
 
         }
-        if(swinDownHeightRandom)
+        if (swinDownHeightRandom)
         {
             if (Random.Range(-swinDownHeightRange, swinDownHeightRange) > 0f)
                 swinDownHeight += swinDownHeightRange;
             else
                 swinDownHeight -= swinDownHeightRange;
         }
-        if(SmashHeightRandom)
+        if (SmashHeightRandom)
         {
             if (Random.Range(-SmashHeightRange, SmashHeightRange) > 0f)
                 SmashHeight += SmashHeightRange;
