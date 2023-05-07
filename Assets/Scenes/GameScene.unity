@@ -777,6 +777,7 @@ MonoBehaviour:
   Player2Serve: 0
   Player1HatPoint: {fileID: 909109875199266208}
   Player2HatPoint: {fileID: 758331620}
+  neverFinish: 0
   player1Smash: 0
   player2Smash: 0
   player1Defence: 0
@@ -13339,6 +13340,8 @@ MonoBehaviour:
     - m_Text: 7
       m_Image: {fileID: 0}
     - m_Text: 15
+      m_Image: {fileID: 0}
+    - m_Text: Endless
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:

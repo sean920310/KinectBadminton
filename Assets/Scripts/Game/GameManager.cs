@@ -44,6 +44,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Transform Player1HatPoint;
     [SerializeField] Transform Player2HatPoint;
 
+    [SerializeField] bool neverFinish = false;
+
     public string Player1Name { get; private set; } = "Player1";
     public string Player2Name { get; private set; } = "Player2";
 
@@ -85,18 +87,19 @@ public class GameManager : MonoBehaviour
         p1.PrepareServe = Player1Serve;
         p2.PrepareServe = Player2Serve;
 
+        neverFinish = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!isGameover && (player1Score >= WinScore || player2Score >= WinScore))
+        if (!neverFinish && !isGameover && (player1Score >= WinScore || player2Score >= WinScore))
         {
             isGameover = true;
             GameOver();
         }
 
-        if(!p1.PrepareServe && !p2.PrepareServe)
+        if (!p1.PrepareServe && !p2.PrepareServe)
         {
             ServeBorderActive(false);
         }
@@ -207,7 +210,7 @@ public class GameManager : MonoBehaviour
         Player2Name = player2NameInput.text;
 
 
-        if(CharacterSlot.HatList[CharacterSlot.player1currentIdx].hatData.HatPrefab != null)
+        if (CharacterSlot.HatList[CharacterSlot.player1currentIdx].hatData.HatPrefab != null)
         {
             GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player1currentIdx].hatData.HatPrefab);
             tmpHatPrefab.transform.SetParent(Player1HatPoint, false);
@@ -224,7 +227,11 @@ public class GameManager : MonoBehaviour
         p2.gameObject.SetActive(true);
         ball.gameObject.SetActive(true);
 
-        int.TryParse(scoreToWin.options.ToArray()[scoreToWin.value].text, out WinScore);
+        if (scoreToWin.options.ToArray()[scoreToWin.value].text != "Endless")
+            int.TryParse(scoreToWin.options.ToArray()[scoreToWin.value].text, out WinScore);
+        else
+            neverFinish = true;
+
         gameStartPanel.gameObject.SetActive(false);
     }
 }
