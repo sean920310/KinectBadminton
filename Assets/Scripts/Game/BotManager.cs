@@ -74,7 +74,6 @@ public class BotManager : MonoBehaviour
     {
         // Drop Point Compute
         Physics.Raycast(ball.transform.position, ball.transform.right, out DropPointInfo, 100, whatIsDropPoint);
-        Debug.Log(DropPointInfo.point);
 
         hitDelayCounter -= Time.deltaTime;
         jumpDelayCounter -= Time.deltaTime;

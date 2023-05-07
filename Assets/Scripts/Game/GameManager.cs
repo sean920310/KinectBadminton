@@ -41,6 +41,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] bool Player1Serve;
     [SerializeField] bool Player2Serve;
 
+    [SerializeField] Transform Player1HatPoint;
+    [SerializeField] Transform Player2HatPoint;
+
     public string Player1Name { get; private set; } = "Player1";
     public string Player2Name { get; private set; } = "Player2";
 
@@ -194,10 +197,6 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1.0f;
 
-        p1.gameObject.SetActive(true);
-        p2.gameObject.SetActive(true);
-        ball.gameObject.SetActive(true);
-
         // Get Info From Game Start Setting
         if (p1BotToggle.isOn)
             p1.GetComponent<BotManager>().enabled = true;
@@ -206,6 +205,19 @@ public class GameManager : MonoBehaviour
 
         Player1Name = player1NameInput.text;
         Player2Name = player2NameInput.text;
+
+        GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player1currentIdx].hatData.HatPrefab);
+
+        if(tmpHatPrefab != null)
+            tmpHatPrefab.transform.SetParent(Player1HatPoint, false);
+
+        tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player2currentIdx].hatData.HatPrefab);
+        if (tmpHatPrefab != null)
+            tmpHatPrefab.transform.SetParent(Player2HatPoint, false);
+
+        p1.gameObject.SetActive(true);
+        p2.gameObject.SetActive(true);
+        ball.gameObject.SetActive(true);
 
         int.TryParse(scoreToWin.options.ToArray()[scoreToWin.value].text, out WinScore);
         gameStartPanel.gameObject.SetActive(false);

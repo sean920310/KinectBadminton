@@ -1003,7 +1003,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3097128635166130281}
   m_Layer: 0
-  m_Name: HeadTop
+  m_Name: HatPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
