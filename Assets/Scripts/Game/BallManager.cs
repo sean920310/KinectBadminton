@@ -5,7 +5,10 @@ using UnityEngine;
 public class BallManager : MonoBehaviour
 {
     public Rigidbody body;
-    ParticleSystem particleSystems;
+
+    [SerializeField] ParticleSystem HitParticle;
+    [SerializeField] ParticleSystem PowerHitParticle;
+
     TrailRenderer trailRenderer;
 
     [SerializeField] AudioSource HitSound;
@@ -33,7 +36,6 @@ public class BallManager : MonoBehaviour
     private void Start()
     {
         body = GetComponent<Rigidbody>();
-        particleSystems = GetComponent<ParticleSystem>();
         trailRenderer = GetComponent<TrailRenderer>();
 
         Physics.IgnoreLayerCollision(7, 8,true);
@@ -99,7 +101,7 @@ public class BallManager : MonoBehaviour
         body.velocity = Vector3.zero;
 
         HitSound.Play();
-        particleSystems.Play();
+        HitParticle.Play();
 
         if (faceRight)
             body.AddForce( (new Vector3(1.0f, 1.5f,0.0f)).normalized * ServeForce, ForceMode.Impulse);
@@ -115,7 +117,7 @@ public class BallManager : MonoBehaviour
         RacketManager racketManager = other.transform.GetComponent<RacketManager>();
         if (racketManager)
         {
-            particleSystems.Play();
+            HitParticle.Play();
 
             body.velocity = Vector3.zero;
             bool isDefence = isSmashBall;
@@ -168,6 +170,7 @@ public class BallManager : MonoBehaviour
                         GameManager.instance.player2Smash++;
                     }
 
+                    PowerHitParticle.Play();
                 }
                 else
                 {
