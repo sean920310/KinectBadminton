@@ -385,7 +385,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   SwooshSound: {fileID: 1700846048299065563}
-  speed: 0.09
+  speed: 0.1
   jumpForce: 6
   GroundChk: {fileID: 6496281337871292043}
   WhatIsGround:
@@ -626,18 +626,18 @@ MonoBehaviour:
   swinUpHeightRange: 0.02
   swinUpHeight: 0
   swinDownHeightRandom: 0
-  swinDownHeightDefault: 0.8
+  swinDownHeightDefault: 0.85
   swinDownHeightRange: 0.02
   swinDownHeight: 0
-  SmashProbability: 0.8
+  SmashProbability: 0.9
   SmashHeightRandom: 0
-  SmashHeightDefault: 5
+  SmashHeightDefault: 5.1
   SmashHeightRange: 0.02
   SmashHeight: 0
   jumpDelay: 0.1
   DefensePositionX: 5
   CenterPositionX: 3.1
-  hitDelay: 0.25
+  hitDelay: 0.2
   isRightSidePlayer: 0
   whatIsDropPoint:
     serializedVersion: 2

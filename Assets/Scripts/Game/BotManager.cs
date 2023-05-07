@@ -99,6 +99,9 @@ public class BotManager : MonoBehaviour
                 !isRightSidePlayer && !ball.BallInLeftSide)
             {
                 BallInEnemySideMovement();
+                Jump();
+                if (!isHitAfterServeLocked)
+                    HitTheBall();
             }
             else
             // Ball is in bot side: find ball
@@ -123,10 +126,7 @@ public class BotManager : MonoBehaviour
                 hitDelayReset();
                 setRandomValue();
                 botPlayer.swinDown = true;
-            }
-
-            // SwinUp
-            if (ball.transform.position.y - botPlayer.transform.position.y <= swinUpHeight &&
+            }else if (ball.transform.position.y - botPlayer.transform.position.y <= swinUpHeight &&
                 Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f)
             {
                 hitDelayReset();
@@ -152,7 +152,7 @@ public class BotManager : MonoBehaviour
         }
         else
         {
-            if (jumpDelayCounter <= 0f && canJump && Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f)
+            if (ball.body.velocity.y < 0 && jumpDelayCounter <= 0f && canJump && Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.4f)
             {
                 setRandomValue();
                 jumpDelayReset();
@@ -169,7 +169,6 @@ public class BotManager : MonoBehaviour
     private void Movement()
     {
         // Smash Liner
-
         if (ball.isSmashBall && Mathf.Abs(ball.body.velocity.y) < 1f)
         {
             if (3.5f > DropPointInfo.point.y && DropPointInfo.point.y > 0)
@@ -254,6 +253,7 @@ public class BotManager : MonoBehaviour
             }
             else if((3.5 >= ball.body.velocity.x && ball.body.velocity.x > 0))
             {
+                // enemy wants to smash in front
                 MoveBotTo(2.6f, 0.1f);
             }
             else
