@@ -3,41 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-/*
-
-    jump height: 2.7
-    jump and swin up height: 4.5
-    Ground swin up height: 2.8
-    Ground swin down height: 1 ~ 0.4
- 
-*/
-
-
 public class BotManager : MonoBehaviour
 {
     [SerializeField] PlayerMovement enemyPlayer;
     [SerializeField] PlayerMovement botPlayer;
     [SerializeField] BallManager ball;
 
-    [SerializeField] bool swinUpHeightRandom;
-    [SerializeField] float swinUpHeightDefault;
-    [SerializeField] float swinUpHeightRange;
-    [SerializeField] float swinUpHeight;
+    [SerializeField] Vector2 swinUpRangeDefault;
+    [SerializeField] bool swinUpRangeXRandom;
+    [SerializeField] float swinUpRangeXRandomRange;
+    [SerializeField] bool swinUpRangeYRandom;
+    [SerializeField] float swinUpRangeYRandomRange;
+    [SerializeField] Vector2 swinUpRange;
 
-    [SerializeField] bool swinDownHeightRandom;
-    [SerializeField] float swinDownHeightDefault;
-    [SerializeField] float swinDownHeightRange;
-    [SerializeField] float swinDownHeight;
+    [SerializeField] Vector2 swinDownRangeDefault;
+    [SerializeField] bool swinDownRangeXRandom;
+    [SerializeField] float swinDownRangeXRandomRange;
+    [SerializeField] bool swinDownRangeYRandom;
+    [SerializeField] float swinDownRangeYRandomRange;
+    [SerializeField] Vector2 swinDownRange;
 
-    [SerializeField] float SmashProbability;
-    [SerializeField] bool SmashHeightRandom;
-    [SerializeField] float SmashHeightDefault;
-    [SerializeField] float SmashHeightRange;
-    [SerializeField] float SmashHeight;
+    [SerializeField] float JumpProbability;
+    [SerializeField] bool JumpHeightRandom;
+    [SerializeField] float JumpHeightDefault;
+    [SerializeField] float JumpHeightRange;
+    [SerializeField] float JumpHeight;
 
-    bool isJumpLocked = false;
     [SerializeField] float jumpDelay;
     float jumpDelayCounter = 0;
+
+    bool isJumpLocked = false;
 
     [SerializeField] float DefensePositionX;
     [SerializeField] float CenterPositionX;
@@ -47,29 +42,19 @@ public class BotManager : MonoBehaviour
 
     [SerializeField] bool isRightSidePlayer = false;
 
+    RaycastHit DropPointInfo;
+    [SerializeField] LayerMask whatIsDropPoint;
+
     bool newPrepareServe = false;
     bool canJump = false;
     bool isHitAfterServeLocked = false;
 
-    RaycastHit DropPointInfo;
-    [SerializeField] LayerMask whatIsDropPoint;
-
     void Start()
     {
-        swinUpHeight = swinUpHeightDefault;
-        swinDownHeight = swinDownHeightDefault;
-        SmashHeight = SmashHeightDefault;
+        swinUpRange = swinUpRangeDefault;
+        swinDownRange = swinDownRangeDefault;
+        JumpHeight = JumpHeightDefault;
     }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = new Color(1.0f, 0.0f, 0.0f);
-        Gizmos.DrawCube(new Vector3(DropPointInfo.point.x, DropPointInfo.point.y, 0), new Vector3(0.05f, 0.05f, 0.05f));
-        Gizmos.color = new Color(0.0f, 1.0f, 0.0f);
-        Gizmos.DrawLine(ball.transform.position, ball.transform.position + ball.transform.right.normalized * 10);
-    }
-
-    // Update is called once per frame
     void Update()
     {
         // Drop Point Compute
@@ -84,6 +69,7 @@ public class BotManager : MonoBehaviour
         }
         else
         {
+
             if (isHitAfterServeLocked)
             {
                 if (isRightSidePlayer && ball.BallInLeftSide || !isRightSidePlayer && !ball.BallInLeftSide)
@@ -91,8 +77,6 @@ public class BotManager : MonoBehaviour
                     isHitAfterServeLocked = false;
                 }
             }
-
-            newPrepareServe = false;
 
             // Ball is in enemy side
             if (isRightSidePlayer && ball.BallInLeftSide ||
@@ -115,139 +99,19 @@ public class BotManager : MonoBehaviour
         }
     }
 
-    private void HitTheBall()
-    {
-        if (canSwin())
-        {
-            // SwinDown
-            if (ball.transform.position.y - botPlayer.transform.position.y <= swinDownHeight &&
-                Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f)
-            {
-                hitDelayReset();
-                setRandomValue();
-                botPlayer.swinDown = true;
-            }
-            else if (ball.transform.position.y - botPlayer.transform.position.y <= swinUpHeight &&
-                Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.6f)
-            {
-                hitDelayReset();
-                setRandomValue();
-                botPlayer.swinUp = true;
-            }
-        }
-    }
-
-    private void Jump()
-    {
-        if (!canJump && ball.transform.position.y >= SmashHeight)
-        {
-            canJump = true;
-            if (Random.Range(0f, 1f) <= SmashProbability)
-            {
-                isJumpLocked = false;
-            }
-            else
-            {
-                isJumpLocked = true;
-            }
-        }
-        else
-        {
-            if (ball.body.velocity.y < 0 && jumpDelayCounter <= 0f && canJump && 
-                Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.5f)
-            {
-                setRandomValue();
-                jumpDelayReset();
-
-                if (!isJumpLocked)
-                    botPlayer.jump = true;
-
-                isJumpLocked = false;
-                canJump = false;
-            }
-        }
-    }
-
-    private void Movement()
-    {
-        // Smash Liner
-        if (!isBallFlyingToYou() && Mathf.Abs(enemyPlayer.transform.position.x) <= 5f && Mathf.Abs(ball.body.velocity.x) >= 9f)
-        {
-            MoveBotTo(DropPointInfo.point.x, 0.01f);
-        }
-        if (ball.isSmashBall && Mathf.Abs(ball.body.velocity.y) < 1f)
-        {
-            if (3.5f > DropPointInfo.point.y && DropPointInfo.point.y > 0)
-            {
-                MoveBotTo(DropPointInfo.point.x, 0.01f);
-            }
-            else
-            {
-                if (isRightSidePlayer)
-                {
-                    // Fast Liner
-                    if (ball.body.velocity.x > 10f)
-                    {
-                        if (ball.transform.position.x < botPlayer.transform.position.x)
-                        {
-                            MoveBotTo(5f, 0.1f);
-                        }
-                        else
-                        {
-                            MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
-                        }
-                    }
-                    else
-                    {
-                        MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
-                    }
-                }
-                else
-                {
-                    // Fast Liner
-                    if (ball.body.velocity.x < -10f)
-                    {
-                        if (ball.transform.position.x > botPlayer.transform.position.x)
-                        {
-                            MoveBotTo(-5f, 0.1f);
-                        }
-                        else
-                        {
-                            MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
-                        }
-                    }
-                    else
-                    {
-                        MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (isRightSidePlayer)
-                MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
-            else
-                MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
-        }
-    }
-
     private void Serve()
     {
         if (newPrepareServe == false)
         {
-            StartCoroutine(ServeCoroutine(Random.Range(0.5f, 1.5f)));
             newPrepareServe = true;
             isHitAfterServeLocked = true;
+            StartCoroutine(ServeCoroutine(Random.Range(0.5f, 1.5f)));
         }
     }
-
     private void BallInEnemySideMovement()
     {
         if (isRightSidePlayer)
         {
-
-
             if (isBallFlyingToYou())
             {
                 if (DropPointInfo.collider != null)
@@ -263,7 +127,7 @@ public class BotManager : MonoBehaviour
             {
                 MoveBotTo(DefensePositionX, 0.01f);
             }
-            else if ((3.5 >= ball.body.velocity.x && ball.body.velocity.x > 0))
+            else if ((3.5 >= ball.rb.velocity.x && ball.rb.velocity.x > 0))
             {
                 MoveBotTo(2.6f, 0.01f);
             }
@@ -271,7 +135,7 @@ public class BotManager : MonoBehaviour
             {
                 if (enemyPlayer.onGround)
                 {
-                    if (ball.body.velocity.magnitude <= 18f)
+                    if (ball.rb.velocity.magnitude <= 18f)
                     {
                         // back to court center
                         MoveBotTo(CenterPositionX, 0.1f);
@@ -306,7 +170,7 @@ public class BotManager : MonoBehaviour
             {
                 MoveBotTo(DefensePositionX, 0.01f);
             }
-            else if ((-3.5 >= ball.body.velocity.x && ball.body.velocity.x > 0))
+            else if ((-3.5 >= ball.rb.velocity.x && ball.rb.velocity.x > 0))
             {
                 MoveBotTo(-2.6f, 0.01f);
             }
@@ -325,22 +189,143 @@ public class BotManager : MonoBehaviour
             }
         }
     }
+    private void Movement()
+    {
+        // Smash Liner
+        if (!isBallFlyingToYou() && Mathf.Abs(enemyPlayer.transform.position.x) <= 5f && Mathf.Abs(ball.rb.velocity.x) >= 9f)
+        {
+            MoveBotTo(DropPointInfo.point.x, 0.01f);
+        }
+        if (ball.ballStates == BallManager.BallStates.Smash && Mathf.Abs(ball.rb.velocity.y) < 1f)
+        {
+            if (3.5f > DropPointInfo.point.y && DropPointInfo.point.y > 0)
+            {
+                MoveBotTo(DropPointInfo.point.x, 0.01f);
+            }
+            else
+            {
+                if (isRightSidePlayer)
+                {
+                    // Fast Liner
+                    if (ball.rb.velocity.x > 10f)
+                    {
+                        if (ball.transform.position.x < botPlayer.transform.position.x)
+                        {
+                            MoveBotTo(5f, 0.1f);
+                        }
+                        else
+                        {
+                            MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
+                        }
+                    }
+                    else
+                    {
+                        MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
+                    }
+                }
+                else
+                {
+                    // Fast Liner
+                    if (ball.rb.velocity.x < -10f)
+                    {
+                        if (ball.transform.position.x > botPlayer.transform.position.x)
+                        {
+                            MoveBotTo(-5f, 0.1f);
+                        }
+                        else
+                        {
+                            MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
+                        }
+                    }
+                    else
+                    {
+                        MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (isRightSidePlayer)
+                MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
+            else
+                MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
+        }
+    }
+    private void Jump()
+    {
+        if (!canJump && ball.transform.position.y >= JumpHeight)
+        {
+            canJump = true;
+            if (Random.Range(0f, 1f) <= JumpProbability)
+            {
+                isJumpLocked = false;
+            }
+            else
+            {
+                isJumpLocked = true;
+            }
+        }
+        else
+        {
+            if (ball.rb.velocity.y < 0 && jumpDelayCounter <= 0f && canJump && 
+                Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.5f)
+            {
+                setRandomValue();
+                jumpDelayReset();
 
+                if (!isJumpLocked)
+                    botPlayer.jumpInputFlag = true;
+
+                isJumpLocked = false;
+                canJump = false;
+            }
+        }
+    }
+    private void HitTheBall()
+    {
+        if (canSwin())
+        {
+            // SwinDown
+            if (ball.transform.position.y - botPlayer.transform.position.y <= swinDownRange.y &&
+                Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= swinDownRange.x)
+            {
+                hitDelayReset();
+                setRandomValue();
+                botPlayer.swinDownInputFlag = true;
+            }
+            else if (ball.transform.position.y - botPlayer.transform.position.y <= swinUpRange.y &&
+                Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= swinUpRange.x)
+            {
+                hitDelayReset();
+                setRandomValue();
+                botPlayer.swinUpInputFlag = true;
+            }
+        }
+    }
     private void MoveBotTo(float x, float stopRange)
     {
         if (botPlayer.transform.position.x > x + stopRange)
         {
-            botPlayer.move = -1;
+            botPlayer.moveInputFlag = -1;
         }
         else if (botPlayer.transform.position.x < x - stopRange)
         {
-            botPlayer.move = 1;
+            botPlayer.moveInputFlag = 1;
         }
         else
         {
-            botPlayer.move = 0;
+            botPlayer.moveInputFlag = 0;
         }
     }
+
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = new Color(1.0f, 0.0f, 0.0f);
+    //    Gizmos.DrawCube(new Vector3(DropPointInfo.point.x, DropPointInfo.point.y, 0), new Vector3(0.05f, 0.05f, 0.05f));
+    //    Gizmos.color = new Color(0.0f, 1.0f, 0.0f);
+    //    Gizmos.DrawLine(ball.transform.position, ball.transform.position + ball.transform.right.normalized * 10);
+    //}
 
     void hitDelayReset()
     {
@@ -355,35 +340,50 @@ public class BotManager : MonoBehaviour
     {
         return hitDelayCounter <= 0.0f;
     }
-    void setRandomValue()
-    {
-        if (swinUpHeightRandom)
-        {
-            if (Random.Range(-swinUpHeightRange, swinUpHeightRange) > 0f)
-                swinUpHeight += swinUpHeightRange;
-            else
-                swinUpHeight -= swinUpHeightRange;
-
-        }
-        if (swinDownHeightRandom)
-        {
-            if (Random.Range(-swinDownHeightRange, swinDownHeightRange) > 0f)
-                swinDownHeight += swinDownHeightRange;
-            else
-                swinDownHeight -= swinDownHeightRange;
-        }
-        if (SmashHeightRandom)
-        {
-            if (Random.Range(-SmashHeightRange, SmashHeightRange) > 0f)
-                SmashHeight += SmashHeightRange;
-            else
-                SmashHeight -= SmashHeightRange;
-        }
-    }
-
     bool isBallFlyingToYou()
     {
-        return isRightSidePlayer ? (ball.body.velocity.x > 0) : (ball.body.velocity.x < 0);
+        return isRightSidePlayer ? (ball.rb.velocity.x > 0) : (ball.rb.velocity.x < 0);
+    }
+
+    void setRandomValue()
+    {
+        if (swinUpRangeYRandom)
+        {
+            if (Random.Range(-swinUpRangeYRandomRange, swinUpRangeYRandomRange) > 0f)
+                swinUpRange.y += swinUpRangeYRandomRange;
+            else
+                swinUpRange.y -= swinUpRangeYRandomRange;
+        }
+        if (swinUpRangeXRandom)
+        {
+            if (Random.Range(-swinUpRangeXRandomRange, swinUpRangeXRandomRange) > 0f)
+                swinUpRange.x += swinUpRangeXRandomRange;
+            else
+                swinUpRange.x -= swinUpRangeXRandomRange;
+        }
+
+        if (swinDownRangeYRandom)
+        {
+            if (Random.Range(-swinDownRangeYRandomRange, swinDownRangeYRandomRange) > 0f)
+                swinDownRange.y += swinDownRangeYRandomRange;
+            else
+                swinDownRange.y -= swinDownRangeYRandomRange;
+        }
+        if (swinDownRangeXRandom)
+        {
+            if (Random.Range(-swinDownRangeXRandomRange, swinDownRangeXRandomRange) > 0f)
+                swinDownRange.x += swinDownRangeXRandomRange;
+            else
+                swinDownRange.x -= swinDownRangeXRandomRange;
+        }
+
+        if (JumpHeightRandom)
+        {
+            if (Random.Range(-JumpHeightRange, JumpHeightRange) > 0f)
+                JumpHeight += JumpHeightRange;
+            else
+                JumpHeight -= JumpHeightRange;
+        }
     }
 
     IEnumerator ServeCoroutine(float delay)
@@ -393,7 +393,7 @@ public class BotManager : MonoBehaviour
         if (isRightSidePlayer)
         {
             destinationX = Random.Range(3f, 5f);
-            while (!(destinationX + 0.2f >= botPlayer.transform.position.x && botPlayer.transform.position.x >= destinationX - 0.2f))
+            while (!(destinationX + 0.1f >= botPlayer.transform.position.x && botPlayer.transform.position.x >= destinationX - 0.1f))
             {
                 MoveBotTo(destinationX, 0.0f);
                 yield return new WaitForFixedUpdate();
@@ -402,7 +402,7 @@ public class BotManager : MonoBehaviour
         else
         {
             destinationX = Random.Range(-5f, -3f);
-            while (!(destinationX + 0.2f >= botPlayer.transform.position.x && botPlayer.transform.position.x >= destinationX - 0.2f))
+            while (!(destinationX + 0.1f >= botPlayer.transform.position.x && botPlayer.transform.position.x >= destinationX - 0.1f))
             {
                 MoveBotTo(destinationX, 0.0f);
                 yield return new WaitForFixedUpdate();
@@ -413,7 +413,9 @@ public class BotManager : MonoBehaviour
 
         yield return new WaitForSeconds(delay);
 
-        botPlayer.swinDown = true;
+        botPlayer.swinDownInputFlag = true;
         hitDelayCounter = hitDelay * 2.5f;
+
+        newPrepareServe = false;
     }
 }

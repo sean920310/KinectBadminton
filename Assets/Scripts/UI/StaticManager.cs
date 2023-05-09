@@ -32,48 +32,50 @@ public class StaticManager : MonoBehaviour
     {
         gameManager = GameManager.instance;
 
-        P1NameHeader.text = gameManager.Player1Name;
-        P2NameHeader.text = gameManager.Player2Name;
+        P1NameHeader.text = gameManager.Player1Info.name;
+        P2NameHeader.text = gameManager.Player2Info.name;
 
-        P1ScoreText.text = gameManager.player1Score.ToString();
-        P2ScoreText.text = gameManager.player2Score.ToString();
-        if (gameManager.player1Score > gameManager.player2Score)
+        P1ScoreText.text = gameManager.Player1Info.score.ToString();
+        P2ScoreText.text = gameManager.Player2Info.score.ToString();
+        if (gameManager.Player1Info.score > gameManager.Player2Info.score)
             P1ScoreText.color = Color.yellow;
-        else if (gameManager.player1Score < gameManager.player2Score)
+        else if (gameManager.Player1Info.score < gameManager.Player2Info.score)
             P2ScoreText.color = Color.yellow;
 
-        P1SmashText.text = gameManager.player1Smash.ToString();
-        P2SmashText.text = gameManager.player2Smash.ToString();
-        if (gameManager.player1Smash > gameManager.player2Smash)
+        P1SmashText.text = gameManager.Player1Info.smashCount.ToString();
+        P2SmashText.text = gameManager.Player2Info.smashCount.ToString();
+        if (gameManager.Player1Info.smashCount > gameManager.Player2Info.smashCount)
             P1SmashText.color = Color.yellow;
-        else if (gameManager.player1Smash < gameManager.player2Smash)
+        else if (gameManager.Player1Info.smashCount < gameManager.Player2Info.smashCount)
             P2SmashText.color = Color.yellow;
 
-        P1DefenseText.text = gameManager.player1Defence.ToString();
-        P2DefenseText.text = gameManager.player2Defence.ToString();
-        if (gameManager.player1Defence > gameManager.player2Defence)
+        P1DefenseText.text = gameManager.Player1Info.defenceCount.ToString();
+        P2DefenseText.text = gameManager.Player2Info.defenceCount.ToString();
+        if (gameManager.Player1Info.defenceCount > gameManager.Player2Info.defenceCount)
             P1DefenseText.color = Color.yellow;
-        else if (gameManager.player1Defence < gameManager.player2Defence)
+        else if (gameManager.Player1Info.defenceCount < gameManager.Player2Info.defenceCount)
             P2DefenseText.color = Color.yellow;
 
-        P1OverhandText.text = gameManager.player1Overhand.ToString();
-        P2OverhandText.text = gameManager.player2Overhand.ToString();
+        P1OverhandText.text = gameManager.Player1Info.overhandCount.ToString();
+        P2OverhandText.text = gameManager.Player2Info.overhandCount.ToString();
 
-        if (gameManager.player1Overhand > gameManager.player2Overhand)
+        if (gameManager.Player1Info.overhandCount > gameManager.Player2Info.overhandCount)
             P1OverhandText.color = Color.yellow;
-        else if (gameManager.player1Overhand < gameManager.player2Overhand)
+        else if (gameManager.Player1Info.overhandCount < gameManager.Player2Info.overhandCount)
             P2OverhandText.color = Color.yellow;
 
-        P1UnderhandText.text = gameManager.player1Underhand.ToString();
-        P2UnderhandText.text = gameManager.player2Underhand.ToString();
-        if (gameManager.player1Underhand > gameManager.player2Underhand)
+        P1UnderhandText.text = gameManager.Player1Info.underhandCount.ToString();
+        P2UnderhandText.text = gameManager.Player2Info.underhandCount.ToString();
+        if (gameManager.Player1Info.underhandCount > gameManager.Player2Info.underhandCount)
             P1UnderhandText.color = Color.yellow;
-        else if (gameManager.player1Underhand < gameManager.player2Underhand)
+        else if (gameManager.Player1Info.underhandCount < gameManager.Player2Info.underhandCount)
             P2UnderhandText.color = Color.yellow;
 
-        winText.text = ((gameManager.winner == GameManager.Players.Player1) ? gameManager.Player1Name : gameManager.Player2Name) + " Win!";
+        winText.text = ((gameManager.Winner == GameManager.Players.Player1) ? gameManager.Player1Info.name : gameManager.Player2Info.name) + " Win!";
 
     }
+
+
 
     // Update is called once per frame
     void Update()

@@ -15,28 +15,21 @@ public class RacketManager : MonoBehaviour
     public float defenceHitForce = 11.0f;
 
     [SerializeField] BoxCollider boxCollider;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     public void swinUp()
     {
         isSwinUp = true;
         isSwinDown= false;
+
+        boxColliderEnable();
     }
 
     public void swinDown()
     {
         isSwinUp = false;
         isSwinDown = true;
+
+        boxColliderEnable();
     }
 
     public void boxColliderDisable()

@@ -756,36 +756,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f96f942cf8bbf744aad8abf84fbbd09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WinScore: 7
-  p1: {fileID: 909109875199266210}
-  p2: {fileID: 758331621}
-  ball: {fileID: 796490629}
-  serveBorderL: {fileID: 468233089}
-  serveBorderR: {fileID: 257269076}
+  winScore: 0
+  neverFinish: 0
+  Player1Movement: {fileID: 909109875199266210}
+  Player2Movement: {fileID: 758331621}
+  Ball: {fileID: 796490629}
+  ServeBorderL: {fileID: 468233089}
+  ServeBorderR: {fileID: 257269076}
   GameoverPanel: {fileID: 877779758}
   HUD: {fileID: 850623063}
-  gameStartPanel: {fileID: 502148407}
-  p1BotToggle: {fileID: 534259770}
-  p2BotToggle: {fileID: 1178770335}
+  GameStartPanel: {fileID: 502148407}
+  P1BotToggle: {fileID: 534259770}
+  P2BotToggle: {fileID: 1178770335}
   scoreToWin: {fileID: 1423199794}
-  player1NameInput: {fileID: 767394794}
-  player2NameInput: {fileID: 897015654}
+  Player1NameInput: {fileID: 767394794}
+  Player2NameInput: {fileID: 897015654}
   PlayerOneWinSound: {fileID: 234814733}
   PlayerTwoWinSound: {fileID: 234814732}
   GameoverCheeringSound: {fileID: 234814730}
-  Player1Serve: 1
-  Player2Serve: 0
   Player1HatPoint: {fileID: 909109875199266208}
   Player2HatPoint: {fileID: 758331620}
-  neverFinish: 0
-  player1Smash: 0
-  player2Smash: 0
-  player1Defence: 0
-  player2Defence: 0
-  player1Overhand: 0
-  player2Overhand: 0
-  player1Underhand: 0
-  player2Underhand: 0
+  Player1Info:
+    name: Player1
+    score: 0
+    smashCount: 0
+    defenceCount: 0
+    overhandCount: 0
+    underhandCount: 0
+  Player2Info:
+    name: Player2
+    score: 0
+    smashCount: 0
+    defenceCount: 0
+    overhandCount: 0
+    underhandCount: 0
 --- !u!4 &234814729
 Transform:
   m_ObjectHideFlags: 0
@@ -16710,10 +16714,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: enemyPlayer
-      value: 
-      objectReference: {fileID: 909109875199266210}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: centerBorder
       value: 
       objectReference: {fileID: 877380383}
@@ -17007,26 +17007,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50dcd183fb839c54193bc10a8f4ea7b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 0}
-  HitParticle: {fileID: 1503760237}
-  PowerHitParticle: {fileID: 242793778}
-  HitSound: {fileID: 796490635}
-  SmashSound: {fileID: 796490632}
-  HittingFloorSound: {fileID: 796490631}
-  isServing: 1
+  rb: {fileID: 0}
+  p1StatesPanel: {fileID: 1319798802}
+  p2StatesPanel: {fileID: 107296251}
+  centerBorder: {fileID: 877380383}
+  LeftPlayerServeDirection: {x: 1, y: 1.5, z: 0}
+  RightPlayerServeDirection: {x: -1, y: 1.5, z: 0}
   badmintonSimulation: 1
   velocityDecayMultiplier: 0.97
   FlyDownVelocityDecayMultiplier: 0.7
   FlyDownVelocityXDecayMultiplier: 0.8
-  hitForceEnhence: 0
-  hitForceEnhenceMultiplier: 10
-  p1StatesPanel: {fileID: 1319798802}
-  p2StatesPanel: {fileID: 107296251}
-  centerBorder: {fileID: 877380383}
+  HitParticle: {fileID: 1503760237}
+  PowerHitParticle: {fileID: 242793778}
+  DefenseVFX: {fileID: 559555827}
   SmashTrailColor: {r: 1, g: 0, b: 0, a: 0.8627451}
   DefenseTrailColor: {r: 1, g: 0.73893946, b: 0, a: 0.8627451}
   NormalTrailColor: {r: 1, g: 1, b: 1, a: 0.8627451}
-  DefenseVFX: {fileID: 559555827}
+  HitSound: {fileID: 796490635}
+  SmashSound: {fileID: 796490632}
+  HittingFloorSound: {fileID: 796490631}
+  ballStates: 0
 --- !u!96 &796490630
 TrailRenderer:
   serializedVersion: 2
@@ -29821,7 +29821,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044293, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 909109874211609608, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalScale.x
@@ -29995,10 +29995,6 @@ PrefabInstance:
       propertyPath: multiAimConstraint
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 2582724395849564969, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4980850899324457717, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -30007,14 +30003,6 @@ PrefabInstance:
       propertyPath: ball
       value: 
       objectReference: {fileID: 796490629}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: enemyPlayer
-      value: 
-      objectReference: {fileID: 758331621}
     - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: centerBorder
       value: 

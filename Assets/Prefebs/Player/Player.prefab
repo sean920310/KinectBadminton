@@ -383,24 +383,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ba488f35b29822408c7e6ac632ed3fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 909109874194044289}
+  LeftHand: {fileID: 4377193212131577387}
   SwooshSound: {fileID: 1700846048299065563}
-  speed: 0.1
+  movementSpeed: 4.8
   jumpForce: 6
   GroundChk: {fileID: 6496281337871292043}
   WhatIsGround:
     serializedVersion: 2
     m_Bits: 64
-  ball: {fileID: 0}
-  LeftHand: {fileID: 4377193212131577387}
-  racket: {fileID: 2523875935646291306}
   onGround: 1
+  hitCoolDown: 0.2
+  ball: {fileID: 0}
+  racket: {fileID: 2523875935646291306}
   PrepareServe: 0
-  move: 0
-  jump: 0
-  swinUp: 0
-  swinDown: 0
-  hitCoolDown: 0
+  moveInputFlag: 0
+  jumpInputFlag: 0
+  swinUpInputFlag: 0
+  swinDownInputFlag: 0
 --- !u!114 &2582724395849564969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -622,23 +622,27 @@ MonoBehaviour:
   enemyPlayer: {fileID: 1117428462548657271}
   botPlayer: {fileID: 1117428462548657271}
   ball: {fileID: 0}
-  swinUpHeightRandom: 1
-  swinUpHeightDefault: 2.2
-  swinUpHeightRange: 0.01
-  swinUpHeight: 0
-  swinDownHeightRandom: 1
-  swinDownHeightDefault: 0.85
-  swinDownHeightRange: 0.01
-  swinDownHeight: 0
-  SmashProbability: 0.9
-  SmashHeightRandom: 1
-  SmashHeightDefault: 5.1
-  SmashHeightRange: 0.01
-  SmashHeight: 0
+  swinUpRangeDefault: {x: 0.6, y: 2.2}
+  swinUpRangeXRandom: 0
+  swinUpRangeXRandomRange: 0
+  swinUpRangeYRandom: 1
+  swinUpRangeYRandomRange: 0.01
+  swinUpRange: {x: 0.6, y: 2.2}
+  swinDownRangeDefault: {x: 0.6, y: 0.85}
+  swinDownRangeXRandom: 0
+  swinDownRangeXRandomRange: 0
+  swinDownRangeYRandom: 1
+  swinDownRangeYRandomRange: 0.01
+  swinDownRange: {x: 0.6, y: 0.85}
+  JumpProbability: 0.9
+  JumpHeightRandom: 1
+  JumpHeightDefault: 0.51
+  JumpHeightRange: 0.01
+  JumpHeight: 0.51
   jumpDelay: 0.1
   DefensePositionX: 5
   CenterPositionX: 3.1
-  hitDelay: 0.2
+  hitDelay: 0
   isRightSidePlayer: 0
   whatIsDropPoint:
     serializedVersion: 2

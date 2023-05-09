@@ -5,57 +5,67 @@ using UnityEngine.VFX;
 
 public class BallManager : MonoBehaviour
 {
-    public Rigidbody body;
+    public enum BallStates
+    {
+        Serving,
+        NormalHit,
+        Smash,
+        Defense,
+        TouchFloor
+    }
 
-    [SerializeField] ParticleSystem HitParticle;
-    [SerializeField] ParticleSystem PowerHitParticle;
-
-    TrailRenderer trailRenderer;
-
-    [SerializeField] AudioSource HitSound;
-    [SerializeField] AudioSource SmashSound;
-    [SerializeField] AudioSource HittingFloorSound;
-
-    public bool isServing = false;
-
-    [SerializeField] bool badmintonSimulation = false;
-    [SerializeField] float velocityDecayMultiplier = 0.99f;
-    [SerializeField] float FlyDownVelocityDecayMultiplier = 0.99f;
-    [SerializeField] float FlyDownVelocityXDecayMultiplier = 0.99f;
-    [SerializeField] bool hitForceEnhence = false;
-    [SerializeField] float hitForceEnhenceMultiplier = 1.5f;
-    bool hitForceEnhenceFlag = false;
+    public Rigidbody rb;
 
     [SerializeField] StatesPanel p1StatesPanel;
     [SerializeField] StatesPanel p2StatesPanel;
 
     [SerializeField] Transform centerBorder;
 
+    [SerializeField] Vector3 LeftPlayerServeDirection = new Vector3(1.0f, 1.5f, 0.0f);
+    [SerializeField] Vector3 RightPlayerServeDirection = new Vector3(-1.0f, 1.5f, 0.0f);
+
+    [SerializeField] bool badmintonSimulation = false;
+    [SerializeField] float velocityDecayMultiplier = 0.99f;
+    [SerializeField] float FlyDownVelocityDecayMultiplier = 0.99f;
+    [SerializeField] float FlyDownVelocityXDecayMultiplier = 0.99f;
+
+    // Visual Effect
+    [SerializeField] ParticleSystem HitParticle;
+    [SerializeField] ParticleSystem PowerHitParticle;
+
+    [SerializeField] VisualEffect DefenseVFX;
+
+    TrailRenderer trailRenderer;
     [SerializeField] Color SmashTrailColor;
     [SerializeField] Color DefenseTrailColor;
     [SerializeField] Color NormalTrailColor;
 
-    [SerializeField] VisualEffect DefenseVFX;
+    // Audio
+    [SerializeField] AudioSource HitSound;
+    [SerializeField] AudioSource SmashSound;
+    [SerializeField] AudioSource HittingFloorSound;
 
     bool isFlyingUp = false;
-    public bool isSmashBall { get; private set; } = false;
-    public bool isDefenseBall { get; private set; } = false;
+
+    // Serve State will set to true in GameManager when some one is about to serve.
+    public BallStates ballStates = BallStates.Serving;
+
     public bool BallInLeftSide { get; private set; }
+
     private void Start()
     {
-        body = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
         trailRenderer = GetComponent<TrailRenderer>();
 
-        Physics.IgnoreLayerCollision(7, 8,true);
-        Physics.IgnoreLayerCollision(7, 9, true);
+        Physics.IgnoreLayerCollision(7, 8, true); // Border
+        Physics.IgnoreLayerCollision(7, 9, true); // Player
     }
 
     private void FixedUpdate()
     {
-
         if (badmintonSimulation && isFlyingUp)
         {
-            body.velocity *= velocityDecayMultiplier;
+            rb.velocity *= velocityDecayMultiplier;
         }
     }
 
@@ -63,49 +73,44 @@ public class BallManager : MonoBehaviour
     {
         BallInLeftSide = (transform.position.x < centerBorder.transform.position.x);
 
-        if (hitForceEnhenceFlag && hitForceEnhence)
-        {
-            body.velocity *= hitForceEnhenceMultiplier;
-            hitForceEnhenceFlag = false;
-        }
-
         if (badmintonSimulation)
         {
-            if (body.velocity.y > 0)
+            if (rb.velocity.y > 0)
             {
                 isFlyingUp = true;
             }
             else
             {
+                // To simulate badminton physics, reduce the velocity of the shuttle when it transitions from flying upwards to downwards.
                 if (isFlyingUp)
                 {
-                    body.velocity = new Vector3(body.velocity.x * FlyDownVelocityXDecayMultiplier, body.velocity.y, body.velocity.z) * FlyDownVelocityDecayMultiplier;
+                    // Reduce the velocity of the shuttle especially velocity x.
+                    rb.velocity = new Vector3(rb.velocity.x * FlyDownVelocityXDecayMultiplier, rb.velocity.y, rb.velocity.z) * FlyDownVelocityDecayMultiplier;
                 }
-
                 isFlyingUp = false;
             }
         }
 
-        transform.rotation = Quaternion.Euler(0, 0, Quaternion.FromToRotation(Vector3.right, body.velocity).eulerAngles.z);
+        transform.rotation = Quaternion.Euler(0, 0, Quaternion.FromToRotation(Vector3.right, rb.velocity).eulerAngles.z);
 
     }
     public IEnumerator Serve(float delay, bool faceRight, float ServeForce)
     {
-
         yield return new WaitForSeconds(delay);
-        body.velocity = Vector3.zero;
 
-        HitSound.Play();
-        HitParticle.Play();
+        ballStates = BallStates.NormalHit;
+
+        rb.velocity = Vector3.zero;
+        if (faceRight)
+            rb.AddForce( LeftPlayerServeDirection.normalized * ServeForce, ForceMode.Impulse);
+        else
+            rb.AddForce( RightPlayerServeDirection.normalized * ServeForce, ForceMode.Impulse);
+
 
         trailRenderer.enabled = true;
+        HitParticle.Play();
 
-        if (faceRight)
-            body.AddForce( (new Vector3(1.0f, 1.5f,0.0f)).normalized * ServeForce, ForceMode.Impulse);
-        else
-            body.AddForce((new Vector3(-1.0f, 1.5f, 0.0f)).normalized * ServeForce, ForceMode.Impulse);
-
-        //hitForceEnhenceFlag = true;
+        HitSound.Play();
 
     }
 
@@ -113,144 +118,144 @@ public class BallManager : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         RacketManager racketManager = other.transform.GetComponent<RacketManager>();
-        if (racketManager)
+        if (racketManager != null)
         {
-            trailRenderer.enabled = true;
-            HitParticle.Play();
+            rb.velocity = Vector3.zero;
 
-            body.velocity = Vector3.zero;
-            bool isDefence = isSmashBall;
-
-            if (isDefence)
-            {
-                isDefenseBall = true;
-                trailRenderer.startColor = DefenseTrailColor;
-
-                if (racketManager.transform.root.name == "Player1")
-                {
-                    GameManager.instance.player1Defence++;
-                    p1StatesPanel.ShowMessageLeft("Defence!!!");
-                }
-                if (racketManager.transform.root.name == "Player2")
-                {
-                    GameManager.instance.player2Defence++;
-                    p2StatesPanel.ShowMessageRight("Defence!!!");
-                }
-                DefenseVFX.Play();
-            }
             if (racketManager.isSwinDown)
             {
-                isDefenseBall = false;
-                isSmashBall = false;
 
-                if (!isDefence)
+                if (racketManager.transform.root.name == "Player1")
+                    GameManager.instance.Player1Info.underhandCount++;
+                if (racketManager.transform.root.name == "Player2")
+                    GameManager.instance.Player2Info.underhandCount++;
+
+                // If the previous state was a smash, then this hit should be a defensive shot.
+                if (ballStates == BallStates.Smash)
                 {
-                    trailRenderer.startColor = NormalTrailColor;
-                    body.AddForce(racketManager.transform.up.normalized * racketManager.swinDownForce, ForceMode.Impulse);
+                    ballStates = BallStates.Defense;
+
+                    rb.AddForce(racketManager.transform.up.normalized * racketManager.defenceHitForce, ForceMode.Impulse);
+
+                    if (racketManager.transform.root.name == "Player1")
+                    {
+                        GameManager.instance.Player1Info.defenceCount++;
+                        p1StatesPanel.ShowMessageLeft("Defence!!!");
+                    }
+                    if (racketManager.transform.root.name == "Player2")
+                    {
+                        GameManager.instance.Player2Info.defenceCount++;
+                        p2StatesPanel.ShowMessageRight("Defence!!!");
+                    }
+
+                    trailRenderer.startColor = DefenseTrailColor;
+                    DefenseVFX.Play();
+
                 }
                 else
                 {
-                    body.AddForce(racketManager.transform.up.normalized * racketManager.defenceHitForce, ForceMode.Impulse);
+                    ballStates = BallStates.NormalHit;
+
+                    rb.AddForce(racketManager.transform.up.normalized * racketManager.swinDownForce, ForceMode.Impulse);
+
+                    trailRenderer.startColor = NormalTrailColor;
+                    HitSound.Play();
                 }
-
-                HitSound.Play();
-
-                if (racketManager.transform.root.name == "Player1")
-                    GameManager.instance.player1Underhand++;
-                if (racketManager.transform.root.name == "Player2")
-                    GameManager.instance.player2Underhand++;
             }
             else
             {
                 // Power Hit
                 Vector3 hittingAngle = Quaternion.FromToRotation(Vector3.right, -racketManager.transform.up).eulerAngles;
-                if ((360 >= hittingAngle.z && hittingAngle.z >= 170 || 10 >= hittingAngle.z && hittingAngle.z >= 0) && !racketManager.transform.root.GetComponent<PlayerMovement>().onGround)
+                if ((360 >= hittingAngle.z && hittingAngle.z >= 170 || 10 >= hittingAngle.z && hittingAngle.z >= 0) && 
+                    !racketManager.transform.root.GetComponent<PlayerMovement>().onGround)
                 {
-                    isSmashBall = true;
-                    trailRenderer.startColor = SmashTrailColor;
-                    SmashSound.Play();
+                    ballStates = BallStates.Smash;
 
-                    body.AddForce((-racketManager.transform.up.normalized) * racketManager.powerHitForce, ForceMode.Impulse);
+                    rb.AddForce((-racketManager.transform.up.normalized) * racketManager.powerHitForce, ForceMode.Impulse);
 
                     if (racketManager.transform.root.name == "Player1")
                     {
                         p1StatesPanel.ShowMessageLeft("Smash!!!");
-                        GameManager.instance.player1Smash++;
+                        GameManager.instance.Player1Info.smashCount++;
                     }
                     if (racketManager.transform.root.name == "Player2")
                     {
                         p2StatesPanel.ShowMessageRight("Smash!!!");
-                        GameManager.instance.player2Smash++;
+                        GameManager.instance.Player2Info.smashCount++;
                     }
 
                     PowerHitParticle.Play();
+                    trailRenderer.startColor = SmashTrailColor;
+                    SmashSound.Play();
                 }
                 else
                 {
-                    isDefenseBall = false;
-                    isSmashBall = false;
 
-                    if (!isDefence)
+                    if (racketManager.transform.root.name == "Player1")
+                        GameManager.instance.Player1Info.overhandCount++;
+                    if (racketManager.transform.root.name == "Player2")
+                        GameManager.instance.Player2Info.overhandCount++;
+
+                    // If the previous state was a smash, then this hit should be a defensive shot.
+                    if (ballStates == BallStates.Smash)
                     {
-                        trailRenderer.startColor = NormalTrailColor;
-                        body.AddForce(-racketManager.transform.up.normalized * racketManager.hitForce, ForceMode.Impulse);
+                        ballStates = BallStates.Defense;
+
+                        rb.AddForce(-racketManager.transform.up.normalized * racketManager.defenceHitForce, ForceMode.Impulse);
+
+                        if (racketManager.transform.root.name == "Player1")
+                        {
+                            GameManager.instance.Player1Info.defenceCount++;
+                            p1StatesPanel.ShowMessageLeft("Defence!!!");
+                        }
+                        if (racketManager.transform.root.name == "Player2")
+                        {
+                            GameManager.instance.Player2Info.defenceCount++;
+                            p2StatesPanel.ShowMessageRight("Defence!!!");
+                        }
+
+                        trailRenderer.startColor = DefenseTrailColor;
+                        DefenseVFX.Play();
+
                     }
                     else
                     {
-                        body.AddForce(-racketManager.transform.up.normalized * racketManager.defenceHitForce, ForceMode.Impulse);
+                        ballStates = BallStates.NormalHit;
+
+                        rb.AddForce(-racketManager.transform.up.normalized * racketManager.hitForce, ForceMode.Impulse);
+
+                        trailRenderer.startColor = NormalTrailColor;
+                        HitSound.Play();
                     }
-
-                    HitSound.Play();
-
-                    if (racketManager.transform.root.name == "Player1")
-                        GameManager.instance.player1Overhand++;
-                    if (racketManager.transform.root.name == "Player2")
-                        GameManager.instance.player2Overhand++;
                 }
             }
 
             racketManager.boxColliderDisable();
 
-            hitForceEnhenceFlag = true;
-            // Hit ball slow motion
-            //StartCoroutine(AddTimeScale());
+            trailRenderer.enabled = true;
+            HitParticle.Play();
         }
     }
 
     // Hit Floor
     private void OnCollisionEnter(Collision collision)
     {
-        if(!isServing && collision.transform.tag == "Ground")
+        if(ballStates != BallStates.Serving && collision.transform.tag == "Ground")
         {
-            isDefenseBall = false;
-            isSmashBall = false;
-
-            isServing = true;
-
-            trailRenderer.enabled = false;
-            trailRenderer.startColor = NormalTrailColor;
+            ballStates = BallStates.Serving;
 
             if (collision.gameObject.name == "Player2Floor")
             {
-                Debug.Log("Player1 Point +1");
                 GameManager.instance.p1GetPoint();
-
-                HittingFloorSound.Play();
             }
             else if (collision.gameObject.name == "Player1Floor")
             {
-                Debug.Log("Player2 Point +1");
                 GameManager.instance.p2GetPoint();
-
-                HittingFloorSound.Play();
             }
-        }
-    }
 
-    IEnumerator AddTimeScale()
-    {
-        Time.timeScale = 0.5f;
-        yield return new WaitForSeconds(0.3f);
-        Time.timeScale = 1f;
+            trailRenderer.startColor = NormalTrailColor;
+            trailRenderer.enabled = false;
+            HittingFloorSound.Play();
+        }
     }
 }

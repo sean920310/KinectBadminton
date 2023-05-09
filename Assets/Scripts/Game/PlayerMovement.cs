@@ -10,31 +10,34 @@ public class PlayerMovement : MonoBehaviour
 {
     Rigidbody rb;
     public Animator animator;
+    [SerializeField] Transform LeftHand;
     [SerializeField] AudioSource SwooshSound;
 
-    [SerializeField] float speed = 1.0f;
+    // Player Parameter
+    // Move
+    [SerializeField] float movementSpeed = 1.0f;
 
+    // Jump
     [SerializeField] float jumpForce = 5.0f;
     [SerializeField] Transform GroundChk;
     [SerializeField] LayerMask WhatIsGround;
-
-    [SerializeField] BallManager ball;
-    [SerializeField] Transform LeftHand;
-
-    [SerializeField] RacketManager racket;
-
     public bool onGround = true;
-    public bool PrepareServe = true;
 
-    public float move = 0.0f;
-    public bool jump = false;
-    public bool swinUp = false;
-    public bool swinDown = false;
-
-    bool facingRight = false;
-
+    // Swin
     [SerializeField] float hitCoolDown;
     float hitCoolDownCounter = 0;
+
+    [SerializeField] BallManager ball;
+    [SerializeField] RacketManager racket;
+
+    public bool PrepareServe = true;
+    bool facingRight = false;
+
+    // Input Flag
+    public float moveInputFlag = 0.0f;
+    public bool jumpInputFlag = false;
+    public bool swinUpInputFlag = false;
+    public bool swinDownInputFlag = false;
 
     void Start()
     {
@@ -53,20 +56,14 @@ public class PlayerMovement : MonoBehaviour
         hitCoolDownCounter -= Time.deltaTime;
 
         // Jump
-        if (Physics.Raycast(GroundChk.position, Vector3.down, 0.05f, WhatIsGround))
-        {
-            onGround = true;
-        }
-        else
-        {
-            onGround = false;
-        }
+        onGround = Physics.Raycast(GroundChk.position, Vector3.down, 0.05f, WhatIsGround);
         animator.SetBool("OnGround", onGround);
 
-        if (!PrepareServe && jump && onGround)
+        // Serving Can't Jump
+        if (!PrepareServe && jumpInputFlag && onGround)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            jump = false;
+            jumpInputFlag = false;
         }
 
         // Serve
@@ -78,18 +75,16 @@ public class PlayerMovement : MonoBehaviour
             }
             ball.transform.position = LeftHand.position;
             ball.transform.rotation = LeftHand.rotation;
-            ball.isServing = true;
 
-            if (swinDown && hitCoolDownCounter <= 0)
+            if (swinDownInputFlag && hitCoolDownCounter <= 0)
             {
                 SwooshSound.Play();
                 animator.SetTrigger("Serve");
 
                 StartCoroutine(ball.Serve(0f, facingRight, racket.ServeForce));
 
-                ball.isServing = false;
                 PrepareServe = false;
-                swinDown = false;
+                swinDownInputFlag = false;
 
                 hitCoolDownReset();
             }
@@ -97,21 +92,23 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Swing
-        if (swinUp && hitCoolDownCounter <= 0)
+        if (swinUpInputFlag && hitCoolDownCounter <= 0)
         {
+            swinUpInputFlag = false;
+
             SwooshSound.Play();
             animator.SetTrigger("SwingUp");
             racket.swinUp();
-            swinUp = false;
 
             hitCoolDownReset();
         }
-        if (swinDown && hitCoolDownCounter <= 0)
+        if (swinDownInputFlag && hitCoolDownCounter <= 0)
         {
+            swinDownInputFlag = false;
+
             SwooshSound.Play();
             animator.SetTrigger("SwingDown");
             racket.swinDown();
-            swinDown = false;
 
             hitCoolDownReset();
         }
@@ -120,66 +117,66 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         // Movement
-        float movementX = move;
+        float movementX = moveInputFlag;
 
         if (Mathf.Abs(movementX) > 0f)
             animator.SetBool("Move", true);
         else
             animator.SetBool("Move", false);
 
-        transform.position = transform.position + Vector3.right * movementX * speed;
+        rb.velocity = new Vector3(movementX * movementSpeed, rb.velocity.y, 0);
     }
 
-    public void SetRacketColliderOn()
-    {
-        racket.boxColliderEnable();
-    }
+    // This SetRacketColliderOff is for animation event
     public void SetRacketColliderOff()
     {
         racket.boxColliderDisable();
     }
 
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-            move = context.ReadValue<float>();
-
-        if (context.canceled)
-            move = 0f;
-    }
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-            jump = true;
-
-        if (context.canceled)
-            jump = false;
-    }
-    public void OnSwinUp(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-            swinUp = true;
-
-        if (context.canceled)
-            swinUp = false;
-    }
-    public void OnSwinDown(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-            swinDown = true;
-
-        if (context.canceled)
-            swinDown = false;
-    }
-    public void ResetInputFlag()
-    {
-        move = 0.0f;
-        jump = false;
-        swinUp = false;
-        swinDown = false;
-    }
     void hitCoolDownReset()
     {
         hitCoolDownCounter = hitCoolDown;
     }
+    public void ResetInputFlag()
+    {
+        moveInputFlag = 0.0f;
+        jumpInputFlag = false;
+        swinUpInputFlag = false;
+        swinDownInputFlag = false;
+    }
+
+    #region Input Handler
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            moveInputFlag = context.ReadValue<float>();
+
+        if (context.canceled)
+            moveInputFlag = 0f;
+    }
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            jumpInputFlag = true;
+
+        if (context.canceled)
+            jumpInputFlag = false;
+    }
+    public void OnSwinUp(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            swinUpInputFlag = true;
+
+        if (context.canceled)
+            swinUpInputFlag = false;
+    }
+    public void OnSwinDown(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            swinDownInputFlag = true;
+
+        if (context.canceled)
+            swinDownInputFlag = false;
+    }
+    #endregion
 }
