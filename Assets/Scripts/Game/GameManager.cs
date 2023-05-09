@@ -99,6 +99,10 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene(0);
+        }
         if (!Player1Movement.PrepareServe && !Player2Movement.PrepareServe)
         {
             ServeBorderActive(false);
@@ -120,7 +124,7 @@ public class GameManager : MonoBehaviour
 
         // Set Player State 
         SetServePlayer(Players.Player1);
-        playerPositionReset();
+        playerPosAndVelocityReset();
         StartCoroutine(PlayerMovementDisableForAWhile(0.2f));
 
         // Set ball Serve State to true
@@ -145,7 +149,7 @@ public class GameManager : MonoBehaviour
 
         // Set Player State 
         SetServePlayer(Players.Player2);
-        playerPositionReset();
+        playerPosAndVelocityReset();
         StartCoroutine(PlayerMovementDisableForAWhile(0.2f));
 
         // Set ball Serve State to true
@@ -180,10 +184,13 @@ public class GameManager : MonoBehaviour
         ServeBorderR.SetActive(active);
     }
 
-    public void playerPositionReset()
+    public void playerPosAndVelocityReset()
     {
         Player1Movement.transform.localPosition = new Vector3(-3, 1.25f, 0);
         Player2Movement.transform.localPosition = new Vector3(3, 1.25f, 0);
+
+        Player1Movement.rb.velocity = new Vector3(0, 0f, 0);
+        Player2Movement.rb.velocity = new Vector3(0, 0f, 0);
     }
 
     public void GameOver()
@@ -222,11 +229,13 @@ public class GameManager : MonoBehaviour
     IEnumerator PlayerMovementDisableForAWhile(float delay)
     {
         Player1Movement.enabled = Player2Movement.enabled = false;
-
-        yield return new WaitForSeconds(delay);
         Player1Movement.ResetInputFlag();
         Player2Movement.ResetInputFlag();
+
+        yield return new WaitForSeconds(delay);
         Player1Movement.enabled = Player2Movement.enabled = true;
+        Player1Movement.ResetInputFlag();
+        Player2Movement.ResetInputFlag();
     }
 
     #region Button_Event

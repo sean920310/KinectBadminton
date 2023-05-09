@@ -8,7 +8,7 @@ using UnityEngine.VFX;
 
 public class PlayerMovement : MonoBehaviour
 {
-    Rigidbody rb;
+    public Rigidbody rb;
     public Animator animator;
     [SerializeField] Transform LeftHand;
     [SerializeField] AudioSource SwooshSound;
@@ -107,7 +107,28 @@ public class PlayerMovement : MonoBehaviour
             swinDownInputFlag = false;
 
             SwooshSound.Play();
-            animator.SetTrigger("SwingDown");
+            if (facingRight)
+            {
+                if (ball.transform.position.x - transform.position.x <= 0.2f)
+                {
+                    animator.SetTrigger("SwingDownBack");
+                }
+                else
+                {
+                    animator.SetTrigger("SwingDownFront");
+                }
+            }
+            else
+            {
+                if (ball.transform.position.x - transform.position.x >= 0.2f)
+                {
+                    animator.SetTrigger("SwingDownBack");
+                }
+                else
+                {
+                    animator.SetTrigger("SwingDownFront");
+                }
+            }
             racket.swinDown();
 
             hitCoolDownReset();

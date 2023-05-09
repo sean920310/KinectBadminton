@@ -101,6 +101,7 @@ public class BallManager : MonoBehaviour
         ballStates = BallStates.NormalHit;
 
         rb.velocity = Vector3.zero;
+
         if (faceRight)
             rb.AddForce( LeftPlayerServeDirection.normalized * ServeForce, ForceMode.Impulse);
         else

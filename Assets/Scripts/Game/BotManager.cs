@@ -376,7 +376,7 @@ public class BotManager : MonoBehaviour
                 swinUpRange.y -= swinUpRangeYRandomRange;
 
             if(swinUpRange.y < 0)
-                swinUpRange.y = swinUpRangeYRandomRange;
+                swinUpRange.y = swinUpRangeDefault.y;
         }
         if (swinUpRangeXRandom)
         {
@@ -385,7 +385,7 @@ public class BotManager : MonoBehaviour
             else
                 swinUpRange.x -= swinUpRangeXRandomRange;
             if (swinUpRange.x < 0)
-                swinUpRange.x = swinUpRangeXRandomRange;
+                swinUpRange.x = swinUpRangeDefault.x;
         }
 
         if (swinDownRangeYRandom)
@@ -395,7 +395,7 @@ public class BotManager : MonoBehaviour
             else
                 swinDownRange.y -= swinDownRangeYRandomRange;
             if (swinDownRange.y < 0)
-                swinDownRange.y = swinDownRangeYRandomRange;
+                swinDownRange.y = swinDownRangeDefault.y;
         }
         if (swinDownRangeXRandom)
         {
@@ -404,7 +404,7 @@ public class BotManager : MonoBehaviour
             else
                 swinDownRange.x -= swinDownRangeXRandomRange;
             if (swinDownRange.x < 0)
-                swinDownRange.x = swinDownRangeXRandomRange;
+                swinDownRange.x = swinDownRangeDefault.x;
         }
 
         if (JumpHeightRandom)
