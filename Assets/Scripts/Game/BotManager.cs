@@ -153,7 +153,8 @@ public class BotManager : MonoBehaviour
         }
         else
         {
-            if (ball.body.velocity.y < 0 && jumpDelayCounter <= 0f && canJump && Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.4f)
+            if (ball.body.velocity.y < 0 && jumpDelayCounter <= 0f && canJump && 
+                Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.5f)
             {
                 setRandomValue();
                 jumpDelayReset();
