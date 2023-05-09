@@ -30004,6 +30004,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 796490629}
     - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: someBool
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: centerBorder
       value: 
       objectReference: {fileID: 877380383}

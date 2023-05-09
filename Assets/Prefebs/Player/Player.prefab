@@ -623,25 +623,27 @@ MonoBehaviour:
   botPlayer: {fileID: 1117428462548657271}
   ball: {fileID: 0}
   swinUpRangeDefault: {x: 0.6, y: 2.2}
-  swinUpRangeXRandom: 0
-  swinUpRangeXRandomRange: 0
+  swinUpRangeXRandom: 1
+  swinUpRangeXRandomRange: 0.01
   swinUpRangeYRandom: 1
   swinUpRangeYRandomRange: 0.01
   swinUpRange: {x: 0.6, y: 2.2}
   swinDownRangeDefault: {x: 0.6, y: 0.85}
-  swinDownRangeXRandom: 0
-  swinDownRangeXRandomRange: 0
+  swinDownRangeXRandom: 1
+  swinDownRangeXRandomRange: 0.01
   swinDownRangeYRandom: 1
   swinDownRangeYRandomRange: 0.01
   swinDownRange: {x: 0.6, y: 0.85}
   JumpProbability: 0.9
-  JumpHeightRandom: 1
   JumpHeightDefault: 0.51
+  JumpHeightRandom: 1
   JumpHeightRange: 0.01
   JumpHeight: 0.51
   jumpDelay: 0.1
-  DefensePositionX: 5
+  jumpDelayCounter: 0
+  FrontPositionX: 2.6
   CenterPositionX: 3.1
+  DefensePositionX: 5
   hitDelay: 0
   isRightSidePlayer: 0
   whatIsDropPoint:

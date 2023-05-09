@@ -9,33 +9,55 @@ public class BotManager : MonoBehaviour
     [SerializeField] PlayerMovement botPlayer;
     [SerializeField] BallManager ball;
 
+    [Header("SwinUp")]
     [SerializeField] Vector2 swinUpRangeDefault;
     [SerializeField] bool swinUpRangeXRandom;
+    [DrawIf("swinUpRangeXRandom", true, ComparisonType.Equals)]
     [SerializeField] float swinUpRangeXRandomRange;
+
     [SerializeField] bool swinUpRangeYRandom;
+    [DrawIf("swinUpRangeYRandom", true, ComparisonType.Equals)]
     [SerializeField] float swinUpRangeYRandomRange;
+
+    [SerializeField] bool ballXVelImpactsSwinUpRange;
+    [SerializeField] AnimationCurve VelocityXImpactsSwinUpRangeCurve;
+
     [SerializeField] Vector2 swinUpRange;
 
+    [Header("SwinDown")]
     [SerializeField] Vector2 swinDownRangeDefault;
     [SerializeField] bool swinDownRangeXRandom;
+    [DrawIf("swinDownRangeXRandom", true, ComparisonType.Equals)]
     [SerializeField] float swinDownRangeXRandomRange;
+
     [SerializeField] bool swinDownRangeYRandom;
+    [DrawIf("swinDownRangeYRandom", true, ComparisonType.Equals)]
     [SerializeField] float swinDownRangeYRandomRange;
+
+    [SerializeField] bool ballXVelImpactsSwinDownRange;
+    [SerializeField] AnimationCurve VelocityXImpactsSwinDownRangeCurve;
+
     [SerializeField] Vector2 swinDownRange;
 
+    [Header("Jump")]
     [SerializeField] float JumpProbability;
-    [SerializeField] bool JumpHeightRandom;
     [SerializeField] float JumpHeightDefault;
+    [SerializeField] bool JumpHeightRandom;
+    [DrawIf("JumpHeightRandom", true, ComparisonType.Equals)]
     [SerializeField] float JumpHeightRange;
     [SerializeField] float JumpHeight;
 
-    [SerializeField] float jumpDelay;
-    float jumpDelayCounter = 0;
+    [SerializeField] bool ballXVelImpactsJumpHeight;
+    [SerializeField] AnimationCurve VelocityXImpactsJumpHeightCurve;
 
+    [SerializeField] float jumpDelay;
+    [ReadOnly] [SerializeField] float jumpDelayCounter = 0;
     bool isJumpLocked = false;
 
-    [SerializeField] float DefensePositionX;
+    [Header("Defense Position")]
+    [SerializeField] float FrontPositionX;
     [SerializeField] float CenterPositionX;
+    [SerializeField] float DefensePositionX;
 
     [SerializeField] float hitDelay;
     float hitDelayCounter = 0;
@@ -69,7 +91,7 @@ public class BotManager : MonoBehaviour
         }
         else
         {
-
+            // The bot is not allowed to hit the ball until it crosses over to the opponent's side of the court after the serve.
             if (isHitAfterServeLocked)
             {
                 if (isRightSidePlayer && ball.BallInLeftSide || !isRightSidePlayer && !ball.BallInLeftSide)
@@ -87,8 +109,7 @@ public class BotManager : MonoBehaviour
                 if (!isHitAfterServeLocked)
                     HitTheBall();
             }
-            else
-            // Ball is in bot side: find ball
+            else // Ball is in bot side: find ball
             {
                 Movement();
                 Jump();
@@ -129,7 +150,7 @@ public class BotManager : MonoBehaviour
             }
             else if ((3.5 >= ball.rb.velocity.x && ball.rb.velocity.x > 0))
             {
-                MoveBotTo(2.6f, 0.01f);
+                MoveBotTo(FrontPositionX, 0.01f);
             }
             else
             {
@@ -172,7 +193,7 @@ public class BotManager : MonoBehaviour
             }
             else if ((-3.5 >= ball.rb.velocity.x && ball.rb.velocity.x > 0))
             {
-                MoveBotTo(-2.6f, 0.01f);
+                MoveBotTo(-FrontPositionX, 0.01f);
             }
             else
             {
@@ -353,6 +374,9 @@ public class BotManager : MonoBehaviour
                 swinUpRange.y += swinUpRangeYRandomRange;
             else
                 swinUpRange.y -= swinUpRangeYRandomRange;
+
+            if(swinUpRange.y < 0)
+                swinUpRange.y = swinUpRangeYRandomRange;
         }
         if (swinUpRangeXRandom)
         {
@@ -360,6 +384,8 @@ public class BotManager : MonoBehaviour
                 swinUpRange.x += swinUpRangeXRandomRange;
             else
                 swinUpRange.x -= swinUpRangeXRandomRange;
+            if (swinUpRange.x < 0)
+                swinUpRange.x = swinUpRangeXRandomRange;
         }
 
         if (swinDownRangeYRandom)
@@ -368,6 +394,8 @@ public class BotManager : MonoBehaviour
                 swinDownRange.y += swinDownRangeYRandomRange;
             else
                 swinDownRange.y -= swinDownRangeYRandomRange;
+            if (swinDownRange.y < 0)
+                swinDownRange.y = swinDownRangeYRandomRange;
         }
         if (swinDownRangeXRandom)
         {
@@ -375,6 +403,8 @@ public class BotManager : MonoBehaviour
                 swinDownRange.x += swinDownRangeXRandomRange;
             else
                 swinDownRange.x -= swinDownRangeXRandomRange;
+            if (swinDownRange.x < 0)
+                swinDownRange.x = swinDownRangeXRandomRange;
         }
 
         if (JumpHeightRandom)
@@ -383,6 +413,8 @@ public class BotManager : MonoBehaviour
                 JumpHeight += JumpHeightRange;
             else
                 JumpHeight -= JumpHeightRange;
+            if (JumpHeight < 0)
+                JumpHeight = JumpHeightDefault;
         }
     }
 
