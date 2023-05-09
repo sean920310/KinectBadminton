@@ -12,6 +12,7 @@ public class RacketManager : MonoBehaviour
     public float hitForce = 9.5f;
     public float swinDownForce = 10f;
     public float powerHitForce = 11.0f;
+    public float defenceHitForce = 11.0f;
 
     [SerializeField] BoxCollider boxCollider;
     // Start is called before the first frame update

@@ -171,9 +171,9 @@ public class BotManager : MonoBehaviour
     private void Movement()
     {
         // Smash Liner
-        if (!isBallFlyingToYou() && Mathf.Abs(enemyPlayer.transform.position.x) <= 3)
+        if (!isBallFlyingToYou() && Mathf.Abs(enemyPlayer.transform.position.x) <= 5f && Mathf.Abs(ball.body.velocity.x) >= 9f)
         {
-            MoveBotTo(DefensePositionX, 0.01f);
+            MoveBotTo(DropPointInfo.point.x, 0.01f);
         }
         if (ball.isSmashBall && Mathf.Abs(ball.body.velocity.y) < 1f)
         {

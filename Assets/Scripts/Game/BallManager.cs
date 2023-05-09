@@ -25,13 +25,19 @@ public class BallManager : MonoBehaviour
     [SerializeField] float hitForceEnhenceMultiplier = 1.5f;
     bool hitForceEnhenceFlag = false;
 
-    bool isFlyingUp = false;
-    public bool isSmashBall { get; private set; } = false;
-
     [SerializeField] StatesPanel p1StatesPanel;
     [SerializeField] StatesPanel p2StatesPanel;
 
     [SerializeField] Transform centerBorder;
+
+    [SerializeField] Color SmashTrailColor;
+    [SerializeField] Color DefenseTrailColor;
+    [SerializeField] Color NormalTrailColor;
+
+
+    bool isFlyingUp = false;
+    public bool isSmashBall { get; private set; } = false;
+    public bool isDefenseBall { get; private set; } = false;
     public bool BallInLeftSide { get; private set; }
     private void Start()
     {
@@ -54,11 +60,6 @@ public class BallManager : MonoBehaviour
     private void Update()
     {
         BallInLeftSide = (transform.position.x < centerBorder.transform.position.x);
-
-        if (trailRenderer.startColor == Color.red)
-            isSmashBall = true;
-        else
-            isSmashBall = false;
 
         if (hitForceEnhenceFlag && hitForceEnhence)
         {
@@ -85,14 +86,6 @@ public class BallManager : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(0, 0, Quaternion.FromToRotation(Vector3.right, body.velocity).eulerAngles.z);
 
-        if (isServing)
-        {
-            trailRenderer.enabled = false;
-        }
-        else
-        {
-            trailRenderer.enabled = true;
-        }
     }
     public IEnumerator Serve(float delay, bool faceRight, float ServeForce)
     {
@@ -102,6 +95,8 @@ public class BallManager : MonoBehaviour
 
         HitSound.Play();
         HitParticle.Play();
+
+        trailRenderer.enabled = true;
 
         if (faceRight)
             body.AddForce( (new Vector3(1.0f, 1.5f,0.0f)).normalized * ServeForce, ForceMode.Impulse);
@@ -117,6 +112,7 @@ public class BallManager : MonoBehaviour
         RacketManager racketManager = other.transform.GetComponent<RacketManager>();
         if (racketManager)
         {
+            trailRenderer.enabled = true;
             HitParticle.Play();
 
             body.velocity = Vector3.zero;
@@ -124,6 +120,9 @@ public class BallManager : MonoBehaviour
 
             if (isDefence)
             {
+                isDefenseBall = true;
+                trailRenderer.startColor = DefenseTrailColor;
+
                 if (racketManager.transform.root.name == "Player1")
                 {
                     GameManager.instance.player1Defence++;
@@ -135,12 +134,20 @@ public class BallManager : MonoBehaviour
                     p2StatesPanel.ShowMessageRight("Defence!!!");
                 }
             }
-
             if (racketManager.isSwinDown)
             {
+                isDefenseBall = false;
+                isSmashBall = false;
 
-                body.AddForce(racketManager.transform.up.normalized * racketManager.swinDownForce, ForceMode.Impulse);
-                trailRenderer.startColor = Color.white;
+                if (!isDefence)
+                {
+                    trailRenderer.startColor = NormalTrailColor;
+                    body.AddForce(racketManager.transform.up.normalized * racketManager.swinDownForce, ForceMode.Impulse);
+                }
+                else
+                {
+                    body.AddForce(racketManager.transform.up.normalized * racketManager.defenceHitForce, ForceMode.Impulse);
+                }
 
                 HitSound.Play();
 
@@ -155,9 +162,11 @@ public class BallManager : MonoBehaviour
                 Vector3 hittingAngle = Quaternion.FromToRotation(Vector3.right, -racketManager.transform.up).eulerAngles;
                 if ((360 >= hittingAngle.z && hittingAngle.z >= 170 || 10 >= hittingAngle.z && hittingAngle.z >= 0) && !racketManager.transform.root.GetComponent<PlayerMovement>().onGround)
                 {
-                    body.AddForce((-racketManager.transform.up.normalized) * racketManager.powerHitForce, ForceMode.Impulse);
-                    trailRenderer.startColor = Color.red;
+                    isSmashBall = true;
+                    trailRenderer.startColor = SmashTrailColor;
                     SmashSound.Play();
+
+                    body.AddForce((-racketManager.transform.up.normalized) * racketManager.powerHitForce, ForceMode.Impulse);
 
                     if (racketManager.transform.root.name == "Player1")
                     {
@@ -174,8 +183,19 @@ public class BallManager : MonoBehaviour
                 }
                 else
                 {
-                    body.AddForce((-racketManager.transform.up.normalized) * racketManager.hitForce, ForceMode.Impulse);
-                    trailRenderer.startColor = Color.white;
+                    isDefenseBall = false;
+                    isSmashBall = false;
+
+                    if (!isDefence)
+                    {
+                        trailRenderer.startColor = NormalTrailColor;
+                        body.AddForce(-racketManager.transform.up.normalized * racketManager.hitForce, ForceMode.Impulse);
+                    }
+                    else
+                    {
+                        body.AddForce(-racketManager.transform.up.normalized * racketManager.defenceHitForce, ForceMode.Impulse);
+                    }
+
                     HitSound.Play();
 
                     if (racketManager.transform.root.name == "Player1")
@@ -198,8 +218,13 @@ public class BallManager : MonoBehaviour
     {
         if(!isServing && collision.transform.tag == "Ground")
         {
+            isDefenseBall = false;
+            isSmashBall = false;
+
             isServing = true;
-            trailRenderer.startColor = Color.white;
+
+            trailRenderer.enabled = false;
+            trailRenderer.startColor = NormalTrailColor;
 
             if (collision.gameObject.name == "Player2Floor")
             {
