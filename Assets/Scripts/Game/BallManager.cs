@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class BallManager : MonoBehaviour
 {
@@ -34,6 +35,7 @@ public class BallManager : MonoBehaviour
     [SerializeField] Color DefenseTrailColor;
     [SerializeField] Color NormalTrailColor;
 
+    [SerializeField] VisualEffect DefenseVFX;
 
     bool isFlyingUp = false;
     public bool isSmashBall { get; private set; } = false;
@@ -104,6 +106,7 @@ public class BallManager : MonoBehaviour
             body.AddForce((new Vector3(-1.0f, 1.5f, 0.0f)).normalized * ServeForce, ForceMode.Impulse);
 
         //hitForceEnhenceFlag = true;
+
     }
 
     // Hit Racket
@@ -133,6 +136,7 @@ public class BallManager : MonoBehaviour
                     GameManager.instance.player2Defence++;
                     p2StatesPanel.ShowMessageRight("Defence!!!");
                 }
+                DefenseVFX.Play();
             }
             if (racketManager.isSwinDown)
             {
