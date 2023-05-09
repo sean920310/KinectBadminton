@@ -13,6 +13,7 @@ public class RacketManager : MonoBehaviour
     public float swinDownForce = 10f;
     public float powerHitForce = 11.0f;
 
+    [SerializeField] TrailRenderer RacketTrail;
 
     [SerializeField] BoxCollider boxCollider;
     // Start is called before the first frame update
@@ -41,6 +42,7 @@ public class RacketManager : MonoBehaviour
 
     public void boxColliderDisable()
     {
+        RacketTrail.enabled = false;
         boxCollider.enabled = false;
         isSwinUp = false;
         isSwinDown = false;
@@ -48,6 +50,7 @@ public class RacketManager : MonoBehaviour
 
     public void boxColliderEnable()
     {
+        RacketTrail.enabled = true;
         boxCollider.enabled = true;
     }
 
