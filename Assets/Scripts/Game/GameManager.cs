@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance { get; private set; }
 
     [Header("Game Information")]
+    [SerializeField] GameStartManager gameStarManager;
     [ReadOnly] [SerializeField] GameStates gameState;
     [SerializeField] int winScore;
     [SerializeField] bool neverFinish; // Endless if true
@@ -67,13 +68,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] RectTransform GameoverPanel;
     [SerializeField] HUDPanel HUD;
     [SerializeField] RectTransform PausePanel;
-
     [SerializeField] RectTransform GameStartPanel;
-    [SerializeField] Toggle P1BotToggle;
-    [SerializeField] Toggle P2BotToggle;
-    [SerializeField] TMP_Dropdown scoreToWin;
-    [SerializeField] TMP_InputField Player1NameInput;
-    [SerializeField] TMP_InputField Player2NameInput;
 
     [Header("Audio")]
     [SerializeField] AudioSource PlayerOneWinSound;
@@ -281,30 +276,30 @@ public class GameManager : MonoBehaviour
     private void GameStart()
     {
         // Get Bot Enable.
-        if (P1BotToggle.isOn)
+        if (gameStarManager.P1BotToggle.isOn)    
             Player1Movement.GetComponent<BotManager>().enabled = true;
-        if (P2BotToggle.isOn)
+        if (gameStarManager.P2BotToggle.isOn)
             Player2Movement.GetComponent<BotManager>().enabled = true;
 
         // Get Info From Game Start Setting.
-        Player1Info.name = Player1NameInput.text;
-        Player2Info.name = Player2NameInput.text;
+        Player1Info.name = gameStarManager.Player1NameInput.text;
+        Player2Info.name = gameStarManager.Player2NameInput.text;
 
         // Set Hat.
-        if (CharacterSlot.HatList[CharacterSlot.player1currentIdx].hatData.HatPrefab != null)
+        if (CharacterSlot.HatList[CharacterSlot.player1currentHatIdx].hatData.HatPrefab != null)
         {
-            GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player1currentIdx].hatData.HatPrefab);
+            GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player1currentHatIdx].hatData.HatPrefab);
             tmpHatPrefab.transform.SetParent(Player1HatPoint, false);
         }
-        if (CharacterSlot.HatList[CharacterSlot.player2currentIdx].hatData.HatPrefab != null)
+        if (CharacterSlot.HatList[CharacterSlot.player2currentHatIdx].hatData.HatPrefab != null)
         {
-            GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player2currentIdx].hatData.HatPrefab);
+            GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player2currentHatIdx].hatData.HatPrefab);
             tmpHatPrefab.transform.SetParent(Player2HatPoint, false);
         }
 
         // Ser Winning Score.
-        if (scoreToWin.options.ToArray()[scoreToWin.value].text != "Endless")
-            int.TryParse(scoreToWin.options.ToArray()[scoreToWin.value].text, out winScore);
+        if (gameStarManager.scoreToWin.options.ToArray()[gameStarManager.scoreToWin.value].text != "Endless")
+            int.TryParse(gameStarManager.scoreToWin.options.ToArray()[gameStarManager.scoreToWin.value].text, out winScore);
         else
             neverFinish = true;
 

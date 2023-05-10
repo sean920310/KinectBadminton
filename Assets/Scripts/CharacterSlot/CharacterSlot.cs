@@ -7,8 +7,8 @@ public class CharacterSlot : MonoBehaviour
     [SerializeField] HatSO[] hatList;
     public static HatSO[] HatList;
 
-    [SerializeField] public static int player1currentIdx;
-    [SerializeField] public static int player2currentIdx;
+    [SerializeField] public static int player1currentHatIdx;
+    [SerializeField] public static int player2currentHatIdx;
 
     [SerializeField] CharacterSlotUI p1SlotUI;
     [SerializeField] CharacterSlotUI p2SlotUI;
@@ -17,26 +17,45 @@ public class CharacterSlot : MonoBehaviour
     {
         HatList = hatList;
 
-        player1currentIdx = 0;
-        player2currentIdx = 0;
+        LoadSettings();
 
-        p1SlotUI.UIUpdate(0);
-        p2SlotUI.UIUpdate(0);
+        p1SlotUI.UIUpdate(player1currentHatIdx);
+        p2SlotUI.UIUpdate(player2currentHatIdx);
+    }
+    public void LoadSettings()
+    {
+        player1currentHatIdx = PlayerPrefs.HasKey("player1HatIdx") ? PlayerPrefs.GetInt("P1Bot") : 0;
+        player2currentHatIdx = PlayerPrefs.HasKey("player2HatIdx") ? PlayerPrefs.GetInt("P2Bot") : 0;
+        PlayerPrefs.Save();
+    }
+    public void ResetSettings()
+    {
+        player1currentHatIdx = 0;
+        player2currentHatIdx = 0;
+
+        p1SlotUI.UIUpdate(player1currentHatIdx);
+        p2SlotUI.UIUpdate(player2currentHatIdx);
     }
 
+    public void SaveSettings()
+    {
+        PlayerPrefs.SetInt("player1HatIdx", player1currentHatIdx);
+        PlayerPrefs.SetInt("player2HatIdx", player2currentHatIdx);
+        PlayerPrefs.Save();
+    }
     public void OnLeftBtnClick(int player)
     {
         if (player == 1)
         {
-            player1currentIdx--;
-            Mathf.Clamp(player2currentIdx, 0, HatList.Length - 1);
-            p1SlotUI.UIUpdate(player1currentIdx);
+            player1currentHatIdx--;
+            Mathf.Clamp(player2currentHatIdx, 0, HatList.Length - 1);
+            p1SlotUI.UIUpdate(player1currentHatIdx);
         }
         else if (player == 2)
         {
-            player2currentIdx--;
-            Mathf.Clamp(player2currentIdx, 0, HatList.Length - 1);
-            p2SlotUI.UIUpdate(player2currentIdx);
+            player2currentHatIdx--;
+            Mathf.Clamp(player2currentHatIdx, 0, HatList.Length - 1);
+            p2SlotUI.UIUpdate(player2currentHatIdx);
         }
 
     }
@@ -44,15 +63,15 @@ public class CharacterSlot : MonoBehaviour
     {
         if (player == 1)
         {
-            player1currentIdx++;
-            Mathf.Clamp(player1currentIdx, 0, HatList.Length - 1);
-            p1SlotUI.UIUpdate(player1currentIdx);
+            player1currentHatIdx++;
+            Mathf.Clamp(player1currentHatIdx, 0, HatList.Length - 1);
+            p1SlotUI.UIUpdate(player1currentHatIdx);
         }
         else if (player == 2)
         {
-            player2currentIdx++;
-            Mathf.Clamp(player2currentIdx, 0 , HatList.Length - 1);
-            p2SlotUI.UIUpdate(player2currentIdx);
+            player2currentHatIdx++;
+            Mathf.Clamp(player2currentHatIdx, 0 , HatList.Length - 1);
+            p2SlotUI.UIUpdate(player2currentHatIdx);
         }
 
     }
