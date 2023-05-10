@@ -12,16 +12,15 @@ public class GameManager : MonoBehaviour
     {
         GamePreparing,
         InGame,
+        GamePause,
         GameOver,
     }
-
     public enum Players
     {
         Player1,
         Player2,
         None,
     }
-
     [Serializable]
     public struct PlayerInfo
     {
@@ -42,22 +41,32 @@ public class GameManager : MonoBehaviour
             this.underhandCount = 0;
         }
     }
+
     public static GameManager instance { get; private set; }
 
-    GameStates gameState;
-
+    [Header("Game Information")]
+    [ReadOnly] [SerializeField] GameStates gameState;
     [SerializeField] int winScore;
     [SerializeField] bool neverFinish; // Endless if true
 
+    [Header("GameObject")]
     [SerializeField] PlayerMovement Player1Movement;
     [SerializeField] PlayerMovement Player2Movement;
     [SerializeField] BallManager Ball;
 
+    [SerializeField] Transform Player1HatPoint;
+    [SerializeField] Transform Player2HatPoint;
+
     [SerializeField] GameObject ServeBorderL;
     [SerializeField] GameObject ServeBorderR;
 
-    [SerializeField] GameObject GameoverPanel;
+    public PlayerInfo Player1Info = new PlayerInfo("Player1");
+    public PlayerInfo Player2Info = new PlayerInfo("Player2");
+
+    [Header("UI")]
+    [SerializeField] RectTransform GameoverPanel;
     [SerializeField] HUDPanel HUD;
+    [SerializeField] RectTransform PausePanel;
 
     [SerializeField] RectTransform GameStartPanel;
     [SerializeField] Toggle P1BotToggle;
@@ -66,15 +75,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_InputField Player1NameInput;
     [SerializeField] TMP_InputField Player2NameInput;
 
+    [Header("Audio")]
     [SerializeField] AudioSource PlayerOneWinSound;
     [SerializeField] AudioSource PlayerTwoWinSound;
     [SerializeField] AudioSource GameoverCheeringSound;
-
-    [SerializeField] Transform Player1HatPoint;
-    [SerializeField] Transform Player2HatPoint;
-
-    public PlayerInfo Player1Info = new PlayerInfo("Player1");
-    public PlayerInfo Player2Info = new PlayerInfo("Player2");
 
     public Players Winner { get; private set; } = Players.None;
 
@@ -91,6 +95,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 0.0f;
         gameState = GameStates.GamePreparing;
         neverFinish = false;
         SetServePlayer(Players.Player1);
@@ -101,8 +106,10 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            SceneManager.LoadScene(0);
+            if(gameState == GameStates.GamePause) Resume();
+            else Pause();
         }
+
         if (!Player1Movement.PrepareServe && !Player2Movement.PrepareServe)
         {
             ServeBorderActive(false);
@@ -201,29 +208,48 @@ public class GameManager : MonoBehaviour
         Player1Movement.animator.updateMode = AnimatorUpdateMode.UnscaledTime;
         Player2Movement.animator.updateMode = AnimatorUpdateMode.UnscaledTime;
 
-        if (Player1Info.score >= winScore)
+        if (Player1Info.score > Player2Info.score)
         {
             PlayerOneWinSound.Play();
             Winner = Players.Player1;
             Player1Movement.animator.SetTrigger("Dancing1");
             Player2Movement.animator.SetTrigger("Lose");
-
         }
-        else
+        else if (Player1Info.score < Player2Info.score)
         {
             PlayerTwoWinSound.Play();
             Winner = Players.Player2;
             Player1Movement.animator.SetTrigger("Lose");
             Player2Movement.animator.SetTrigger("Dancing1");
         }
+        else
+        {
+            Winner = Players.None;
+            Player1Movement.animator.SetTrigger("Dancing1");
+            Player2Movement.animator.SetTrigger("Dancing1");
+        }
 
         GameoverCheeringSound.Play();
         Time.timeScale = 0.0f;
         HUD.gameObject.SetActive(false);
-        GameoverPanel.SetActive(true);
+        GameoverPanel.gameObject.SetActive(true);
 
         Player1Movement.enabled = false;
         Player2Movement.enabled = false;
+    }
+
+    public void Pause()
+    {
+        gameState = GameStates.GamePause;
+        Time.timeScale = 0.0f;
+        PausePanel.gameObject.SetActive(true);
+    }
+
+    private void Resume()
+    {
+        gameState = GameStates.InGame;
+        Time.timeScale = 1.0f;
+        PausePanel.gameObject.SetActive(false);
     }
 
     IEnumerator PlayerMovementDisableForAWhile(float delay)
@@ -247,8 +273,12 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(0);
     }
-
     public void OnStartClick()
+    {
+        GameStart();
+    }
+
+    private void GameStart()
     {
         // Get Bot Enable.
         if (P1BotToggle.isOn)
@@ -287,6 +317,18 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1.0f;
 
         gameState = GameStates.InGame;
+    }
+
+    // Pause Panel
+    public void OnResumeClick()
+    {
+        Resume();
+    }
+
+    public void OnEndGameClick()
+    {
+        PausePanel.gameObject.SetActive(false);
+        GameOver();
     }
     #endregion
 }
