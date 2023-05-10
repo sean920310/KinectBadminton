@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public class GameManager : MonoBehaviour
 {
@@ -75,6 +76,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioSource PlayerTwoWinSound;
     [SerializeField] AudioSource GameoverCheeringSound;
 
+    [Header("Light")]
+    [SerializeField] Light directionalLight;
+    [SerializeField] Light spotLight;
+
     public Players Winner { get; private set; } = Players.None;
 
     private void Awake()
@@ -121,6 +126,7 @@ public class GameManager : MonoBehaviour
         Player1Info.score++;
 
         // UI Update
+        HUD.P1IsAboutToWin = (Player1Info.score == winScore - 1); 
         HUD.ScorePanelUpdate(Player1Info.score, Player2Info.score);
         HUD.SetServeHint(true, false);
 
@@ -146,6 +152,7 @@ public class GameManager : MonoBehaviour
         Player2Info.score++;
 
         // UI Update
+        HUD.P2IsAboutToWin = (Player2Info.score == winScore - 1);
         HUD.ScorePanelUpdate(Player1Info.score, Player2Info.score);
         HUD.SetServeHint(false, true);
 
@@ -180,6 +187,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Serve Border will active whenever player is prepare to serve.
     private void ServeBorderActive(bool active)
     {
         ServeBorderL.SetActive(active);
@@ -198,6 +206,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         gameState = GameStates.GameOver;
+
 
         // Set Animator UpdateMode to UnscaledTime inorder to play dance animation.
         Player1Movement.animator.updateMode = AnimatorUpdateMode.UnscaledTime;
@@ -224,9 +233,26 @@ public class GameManager : MonoBehaviour
             Player2Movement.animator.SetTrigger("Dancing1");
         }
 
+        // Set Light
+        directionalLight.gameObject.SetActive(false);
+        spotLight.gameObject.SetActive(true);
+        switch (Winner)
+        {
+            case Players.Player1:
+                spotLight.transform.position = new Vector3( Player1Movement.transform.position.x, spotLight.transform.position.y, spotLight.transform.position.z);
+                break;
+            case Players.Player2:
+                spotLight.transform.position = new Vector3(Player2Movement.transform.position.x, spotLight.transform.position.y, spotLight.transform.position.z);
+                break;
+            case Players.None:
+                break;
+            default:
+                break;
+        }
+
         GameoverCheeringSound.Play();
         Time.timeScale = 0.0f;
-        HUD.gameObject.SetActive(false);
+        HUD.GetComponent<Animator>().SetTrigger("GameEnd");
         GameoverPanel.gameObject.SetActive(true);
 
         Player1Movement.enabled = false;
