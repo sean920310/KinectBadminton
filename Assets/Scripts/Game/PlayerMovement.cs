@@ -92,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Swing
-        if (swinUpInputFlag && hitCoolDownCounter <= 0)
+        if (swinUpInputFlag && hitCoolDownCounter <= 0 && !animator.GetCurrentAnimatorStateInfo(0).IsName("AirSwingUp"))
         {
             swinUpInputFlag = false;
 
@@ -105,8 +105,9 @@ public class PlayerMovement : MonoBehaviour
         if (swinDownInputFlag && hitCoolDownCounter <= 0)
         {
             swinDownInputFlag = false;
-
             SwooshSound.Play();
+
+            // SwinDown Type Detection: Front Ball SwingDownFront, vice versa.
             if (facingRight)
             {
                 if (ball.transform.position.x - transform.position.x <= 0.2f)

@@ -383,6 +383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ba488f35b29822408c7e6ac632ed3fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
   animator: {fileID: 909109874194044289}
   LeftHand: {fileID: 4377193212131577387}
   SwooshSound: {fileID: 1700846048299065563}
@@ -624,26 +625,47 @@ MonoBehaviour:
   ball: {fileID: 0}
   swinUpRangeDefault: {x: 0.6, y: 2.2}
   swinUpRangeXRandom: 1
-  swinUpRangeXRandomRange: 0.01
+  swinUpRangeXRandomRange: 0.02
   swinUpRangeYRandom: 1
-  swinUpRangeYRandomRange: 0.01
+  swinUpRangeYRandomRange: 0.02
+  ballXVelImpactsSwinUpRange: 0
+  VelocityXImpactsSwinUpRangeCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   swinUpRange: {x: 0.6, y: 2.2}
-  swinDownRangeDefault: {x: 0.6, y: 0.85}
+  swinDownRangeDefault: {x: 1.6, y: 1}
   swinDownRangeXRandom: 1
   swinDownRangeXRandomRange: 0.01
   swinDownRangeYRandom: 1
   swinDownRangeYRandomRange: 0.01
+  ballXVelImpactsSwinDownRange: 0
+  VelocityXImpactsSwinDownRangeCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   swinDownRange: {x: 0.6, y: 0.85}
   JumpProbability: 0.9
   JumpHeightDefault: 0.51
   JumpHeightRandom: 1
   JumpHeightRange: 0.01
   JumpHeight: 0.51
+  ballXVelImpactsJumpHeight: 0
+  VelocityXImpactsJumpHeightCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   jumpDelay: 0.1
   jumpDelayCounter: 0
-  FrontPositionX: 2.6
-  CenterPositionX: 3.1
-  DefensePositionX: 5
+  FrontPositionX: 2.8
+  CenterPositionX: 4
+  DefensePositionX: 5.5
   hitDelay: 0
   isRightSidePlayer: 0
   whatIsDropPoint:

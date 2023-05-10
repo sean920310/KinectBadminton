@@ -375,7 +375,7 @@ public class BotManager : MonoBehaviour
             else
                 swinUpRange.y -= swinUpRangeYRandomRange;
 
-            if(swinUpRange.y < 0)
+            if(swinUpRange.y < swinUpRangeDefault.y - swinUpRangeYRandomRange * 10 || swinUpRange.y > swinUpRangeDefault.y + swinUpRangeYRandomRange * 10)
                 swinUpRange.y = swinUpRangeDefault.y;
         }
         if (swinUpRangeXRandom)
@@ -384,7 +384,8 @@ public class BotManager : MonoBehaviour
                 swinUpRange.x += swinUpRangeXRandomRange;
             else
                 swinUpRange.x -= swinUpRangeXRandomRange;
-            if (swinUpRange.x < 0)
+
+            if (swinUpRange.x < swinUpRangeDefault.x - swinUpRangeXRandomRange * 10 || swinUpRange.x > swinUpRangeDefault.x + swinUpRangeXRandomRange * 10)
                 swinUpRange.x = swinUpRangeDefault.x;
         }
 
@@ -394,7 +395,8 @@ public class BotManager : MonoBehaviour
                 swinDownRange.y += swinDownRangeYRandomRange;
             else
                 swinDownRange.y -= swinDownRangeYRandomRange;
-            if (swinDownRange.y < 0)
+
+            if (swinDownRange.y < swinDownRangeDefault.y - swinDownRangeYRandomRange * 10 || swinDownRange.y > swinDownRangeDefault.y + swinDownRangeYRandomRange * 10)
                 swinDownRange.y = swinDownRangeDefault.y;
         }
         if (swinDownRangeXRandom)
@@ -403,7 +405,8 @@ public class BotManager : MonoBehaviour
                 swinDownRange.x += swinDownRangeXRandomRange;
             else
                 swinDownRange.x -= swinDownRangeXRandomRange;
-            if (swinDownRange.x < 0)
+
+            if (swinDownRange.x < swinDownRangeDefault.x - swinDownRangeXRandomRange * 10 || swinDownRange.x > swinDownRangeDefault.x + swinDownRangeXRandomRange * 10)
                 swinDownRange.x = swinDownRangeDefault.x;
         }
 
@@ -413,7 +416,7 @@ public class BotManager : MonoBehaviour
                 JumpHeight += JumpHeightRange;
             else
                 JumpHeight -= JumpHeightRange;
-            if (JumpHeight < 0)
+            if (JumpHeight < JumpHeightDefault - JumpHeightRange * 10 || JumpHeight > JumpHeightDefault + JumpHeightRange * 10)
                 JumpHeight = JumpHeightDefault;
         }
     }
