@@ -144,7 +144,7 @@ public class BotManager : MonoBehaviour
                     MoveBotTo(ball.transform.position.x, 0.01f);
                 }
             }
-            else if (Mathf.Abs(enemyPlayer.transform.position.x) <= 3)
+            else if (Mathf.Abs(enemyPlayer.transform.position.x) <= 4.5f && !enemyPlayer.onGround)
             {
                 MoveBotTo(DefensePositionX, 0.01f);
             }
@@ -212,14 +212,18 @@ public class BotManager : MonoBehaviour
     }
     private void Movement()
     {
+        //if (!isBallFlyingToYou() && Mathf.Abs(enemyPlayer.transform.position.x) <= 5f && Mathf.Abs(ball.rb.velocity.x) >= 9f)
+        //{
+        //    MoveBotTo(DropPointInfo.point.x, 0.01f);
+        //}
         // Smash Liner
-        if (!isBallFlyingToYou() && Mathf.Abs(enemyPlayer.transform.position.x) <= 5f && Mathf.Abs(ball.rb.velocity.x) >= 9f)
+        if (ball.ballStates == BallManager.BallStates.Smash)
         {
-            MoveBotTo(DropPointInfo.point.x, 0.01f);
-        }
-        if (ball.ballStates == BallManager.BallStates.Smash && Mathf.Abs(ball.rb.velocity.y) < 1f)
-        {
-            if (3.5f > DropPointInfo.point.y && DropPointInfo.point.y > 0)
+            if(Mathf.Abs(ball.rb.velocity.x) < 5f && ball.rb.velocity.y < 0f)
+            {
+                MoveBotTo(ball.transform.position.x, 0.01f);
+            }
+            else if (4.5f > DropPointInfo.point.y && DropPointInfo.point.y > 0)
             {
                 MoveBotTo(DropPointInfo.point.x, 0.01f);
             }
@@ -232,16 +236,16 @@ public class BotManager : MonoBehaviour
                     {
                         if (ball.transform.position.x < botPlayer.transform.position.x)
                         {
-                            MoveBotTo(5f, 0.1f);
+                            MoveBotTo(DefensePositionX, 0.05f);
                         }
                         else
                         {
-                            MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
+                            MoveBotTo(ball.transform.position.x - 0.2f, 0.05f);
                         }
                     }
                     else
                     {
-                        MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
+                        MoveBotTo(ball.transform.position.x - 0.2f, 0.05f);
                     }
                 }
                 else
@@ -251,16 +255,16 @@ public class BotManager : MonoBehaviour
                     {
                         if (ball.transform.position.x > botPlayer.transform.position.x)
                         {
-                            MoveBotTo(-5f, 0.1f);
+                            MoveBotTo(-DefensePositionX, 0.05f);
                         }
                         else
                         {
-                            MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
+                            MoveBotTo(ball.transform.position.x + 0.2f, 0.05f);
                         }
                     }
                     else
                     {
-                        MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
+                        MoveBotTo(ball.transform.position.x + 0.2f, 0.05f);
                     }
                 }
             }
@@ -268,39 +272,48 @@ public class BotManager : MonoBehaviour
         else
         {
             if (isRightSidePlayer)
-                MoveBotTo(ball.transform.position.x - 0.2f, 0.1f);
+                MoveBotTo(ball.transform.position.x - 0.3f, 0.05f);
             else
-                MoveBotTo(ball.transform.position.x + 0.2f, 0.1f);
+                MoveBotTo(ball.transform.position.x + 0.3f, 0.05f);
         }
     }
     private void Jump()
     {
-        if (!canJump && ball.transform.position.y >= JumpHeight)
+        if( Mathf.Abs( ball.rb.velocity.x ) <= 18f &&
+            (isRightSidePlayer && ball.transform.position.x < transform.position.x + 0.3f ||
+            !isRightSidePlayer && ball.transform.position.x > transform.position.x - 0.3f))
         {
-            canJump = true;
-            if (Random.Range(0f, 1f) <= JumpProbability)
+            if (!canJump && ball.transform.position.y - transform.position.y >= JumpHeight)
             {
-                isJumpLocked = false;
+                canJump = true;
+                if (Random.Range(0f, 1f) <= JumpProbability)
+                {
+                    isJumpLocked = false;
+                }
+                else
+                {
+                    isJumpLocked = true;
+                }
             }
             else
             {
-                isJumpLocked = true;
+                if (ball.rb.velocity.y < 0 && jumpDelayCounter <= 0f && canJump &&
+                    Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.5f)
+                {
+                    setRandomValue();
+                    jumpDelayReset();
+
+                    if (!isJumpLocked)
+                        botPlayer.jumpInputFlag = true;
+
+                    isJumpLocked = false;
+                    canJump = false;
+                }
             }
         }
         else
         {
-            if (ball.rb.velocity.y < 0 && jumpDelayCounter <= 0f && canJump && 
-                Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x) <= 0.5f)
-            {
-                setRandomValue();
-                jumpDelayReset();
-
-                if (!isJumpLocked)
-                    botPlayer.jumpInputFlag = true;
-
-                isJumpLocked = false;
-                canJump = false;
-            }
+            canJump = false;
         }
     }
     private void HitTheBall()
@@ -322,6 +335,11 @@ public class BotManager : MonoBehaviour
                 setRandomValue();
                 botPlayer.swinUpInputFlag = true;
             }
+        }
+        else
+        {
+            botPlayer.swinDownInputFlag = false;
+            botPlayer.swinUpInputFlag = false;
         }
     }
     private void MoveBotTo(float x, float stopRange)

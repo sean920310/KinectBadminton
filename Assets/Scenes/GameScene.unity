@@ -1003,8 +1003,8 @@ GameObject:
   - component: {fileID: 234814728}
   - component: {fileID: 234814734}
   - component: {fileID: 234814735}
-  - component: {fileID: 234814730}
   - component: {fileID: 234814731}
+  - component: {fileID: 234814730}
   - component: {fileID: 234814733}
   - component: {fileID: 234814732}
   m_Layer: 0
@@ -1178,7 +1178,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 234814727}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: a8f10f37790aeb5488b18a83fb24ba64, type: 3}
@@ -17496,12 +17496,20 @@ PrefabInstance:
       objectReference: {fileID: 796490629}
     - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: centerBorder
       value: 
       objectReference: {fileID: 877380383}
+    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: DefensePositionX
+      value: 5.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: jumpDelayCounter
+      value: -2.3205771
+      objectReference: {fileID: 0}
     - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: isRightSidePlayer
       value: 1
@@ -31177,6 +31185,14 @@ PrefabInstance:
       propertyPath: centerBorder
       value: 
       objectReference: {fileID: 877380383}
+    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: isRightSidePlayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: swinUpRangeDefault.y
+      value: 2.6
+      objectReference: {fileID: 0}
     - target: {fileID: 7877557833770331660, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_Name
       value: HatPoint
