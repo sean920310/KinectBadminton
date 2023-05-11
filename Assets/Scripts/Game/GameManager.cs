@@ -132,8 +132,8 @@ public class GameManager : MonoBehaviour
 
         // Set Player State 
         SetServePlayer(Players.Player1);
-        playerPosAndVelocityReset();
-        StartCoroutine(PlayerMovementDisableForAWhile(0.2f));
+        playerStatesReset();
+        StartCoroutine(PlayerMovementDisableForAWhile(0.5f));
 
         // Set ball Serve State to true
         Ball.ballStates = BallManager.BallStates.Serving;
@@ -158,7 +158,7 @@ public class GameManager : MonoBehaviour
 
         // Set Player State 
         SetServePlayer(Players.Player2);
-        playerPosAndVelocityReset();
+        playerStatesReset();
         StartCoroutine(PlayerMovementDisableForAWhile(0.2f));
 
         // Set ball Serve State to true
@@ -177,13 +177,11 @@ public class GameManager : MonoBehaviour
     {
         if(ServePlayer == Players.Player1)
         {
-            Player1Movement.PrepareServe = true;
-            Player2Movement.PrepareServe = false;
+            Player1Movement.SetPlayerServe();
         }
         else
         {
-            Player1Movement.PrepareServe = false;
-            Player2Movement.PrepareServe = true;
+            Player2Movement.SetPlayerServe();
         }
     }
 
@@ -194,13 +192,19 @@ public class GameManager : MonoBehaviour
         ServeBorderR.SetActive(active);
     }
 
-    public void playerPosAndVelocityReset()
+    public void playerStatesReset()
     {
-        Player1Movement.transform.localPosition = new Vector3(-3, 1.25f, 0);
-        Player2Movement.transform.localPosition = new Vector3(3, 1.25f, 0);
+        Player1Movement.animator.Play("Idle", -1, 0.0f);
+        Player2Movement.animator.Play("Idle", -1, 0.0f);
+
+        Player1Movement.transform.localPosition = new Vector3(-3, 1.06f, 0);
+        Player2Movement.transform.localPosition = new Vector3(3, 1.06f, 0);
 
         Player1Movement.rb.velocity = new Vector3(0, 0f, 0);
         Player2Movement.rb.velocity = new Vector3(0, 0f, 0);
+
+        Player1Movement.ResetInputFlag();
+        Player2Movement.ResetInputFlag();
     }
 
     public void GameOver()

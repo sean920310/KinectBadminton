@@ -15,14 +15,12 @@ public class BallManager : MonoBehaviour
     }
 
     public Rigidbody rb;
+    [SerializeField] Transform centerOfMass;
 
     [SerializeField] StatesPanel p1StatesPanel;
     [SerializeField] StatesPanel p2StatesPanel;
 
     [SerializeField] Transform centerBorder;
-
-    [SerializeField] Vector3 LeftPlayerServeDirection = new Vector3(1.0f, 1.5f, 0.0f);
-    [SerializeField] Vector3 RightPlayerServeDirection = new Vector3(-1.0f, 1.5f, 0.0f);
 
     [SerializeField] bool badmintonSimulation = false;
     [SerializeField] float velocityDecayMultiplier = 0.99f;
@@ -56,6 +54,7 @@ public class BallManager : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         trailRenderer = GetComponent<TrailRenderer>();
+        rb.centerOfMass = centerOfMass.position;
 
         Physics.IgnoreLayerCollision(7, 8, true); // Border
         Physics.IgnoreLayerCollision(7, 9, true); // Player
@@ -94,18 +93,24 @@ public class BallManager : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, Quaternion.FromToRotation(Vector3.right, rb.velocity).eulerAngles.z);
 
     }
-    public IEnumerator Serve(float delay, bool faceRight, float ServeForce)
+    public void Serve(bool faceRight, Vector2 ServeDirection, float ServeForce)
     {
-        yield return new WaitForSeconds(delay);
 
         ballStates = BallStates.NormalHit;
 
         rb.velocity = Vector3.zero;
 
         if (faceRight)
-            rb.AddForce( LeftPlayerServeDirection.normalized * ServeForce, ForceMode.Impulse);
+        {
+            ServeDirection = new Vector2(Mathf.Abs(ServeDirection.x), Mathf.Abs(ServeDirection.y));
+            rb.AddForce( ServeDirection.normalized * ServeForce, ForceMode.Impulse);
+        }
         else
-            rb.AddForce( RightPlayerServeDirection.normalized * ServeForce, ForceMode.Impulse);
+        {
+            ServeDirection = new Vector2(-Mathf.Abs(ServeDirection.x), Mathf.Abs(ServeDirection.y));
+            rb.AddForce( ServeDirection.normalized * ServeForce, ForceMode.Impulse);
+
+        }
 
 
         trailRenderer.enabled = true;
