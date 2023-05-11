@@ -133,7 +133,7 @@ public class GameManager : MonoBehaviour
         // Set Player State 
         SetServePlayer(Players.Player1);
         playerStatesReset();
-        StartCoroutine(PlayerMovementDisableForAWhile(0.2f));
+        StartCoroutine(PlayerMovementDisableForAWhile(0.5f));
 
         // Set ball Serve State to true
         Ball.ballStates = BallManager.BallStates.Serving;
@@ -194,8 +194,11 @@ public class GameManager : MonoBehaviour
 
     public void playerStatesReset()
     {
-        Player1Movement.transform.localPosition = new Vector3(-3, 1.25f, 0);
-        Player2Movement.transform.localPosition = new Vector3(3, 1.25f, 0);
+        Player1Movement.animator.Play("Idle", -1, 0.0f);
+        Player2Movement.animator.Play("Idle", -1, 0.0f);
+
+        Player1Movement.transform.localPosition = new Vector3(-3, 1.06f, 0);
+        Player2Movement.transform.localPosition = new Vector3(3, 1.06f, 0);
 
         Player1Movement.rb.velocity = new Vector3(0, 0f, 0);
         Player2Movement.rb.velocity = new Vector3(0, 0f, 0);

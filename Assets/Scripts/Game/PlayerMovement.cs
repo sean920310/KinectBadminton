@@ -233,6 +233,16 @@ public class PlayerMovement : MonoBehaviour
         racket.boxColliderDisable();
     }
 
+    public void SetRacketTrailOn()
+    {
+        racket.setTrailOn();
+    }
+
+    public void SetRacketTrailOff()
+    {
+        racket.setTrailOff();
+    }
+
     public void SetPlayerServe()
     {
         PrepareServe = true;

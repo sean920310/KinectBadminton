@@ -19,6 +19,13 @@ public class RacketManager : MonoBehaviour
 
     [SerializeField] BoxCollider boxCollider;
 
+    [SerializeField] float trailDestoryTime;
+    [SerializeField] float trailSpawnTime;
+
+    [SerializeField] GameObject RacketModel;
+
+    bool trailEnd = false;
+
     public void swinUp()
     {
         isSwinUp = true;
@@ -54,4 +61,45 @@ public class RacketManager : MonoBehaviour
         boxCollider.enabled = true;
     }
 
+    public void setTrailOn()
+    {
+        trailEnd = false;
+        StartCoroutine(slideTrail());
+    }
+    public void setTrailOff()
+    {
+        trailEnd = true;
+    }
+
+
+    IEnumerator slideTrail()
+    {
+        while (!trailEnd)
+        {
+            GameObject tempObject = Instantiate(RacketModel);
+            tempObject.transform.SetPositionAndRotation(transform.position, transform.rotation);
+            //tempObject.transform.localScale = transform.localScale;
+            GameObject.Destroy(tempObject, trailDestoryTime);
+
+            //StartCoroutine(trailAlphaChange(tempObject));
+
+            yield return new WaitForSeconds(trailSpawnTime);
+        }
+    }
+    IEnumerator trailAlphaChange(GameObject trailObj)
+    {
+        SpriteRenderer sr = trailObj.GetComponent<SpriteRenderer>();
+        float aliveTime = 0, alpha = 1.0f;
+        float maxAliveTime = trailDestoryTime;
+
+        while (trailObj != null)
+        {
+            aliveTime += 0.01f;
+            alpha = Mathf.Lerp(0.8f, 0f, aliveTime / maxAliveTime);
+            sr.color = new Color(1.0f, 1.0f, 1.0f, alpha);
+
+            yield return new WaitForSeconds(0.01f);
+        }
+
+    }
 }
