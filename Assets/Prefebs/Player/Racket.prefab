@@ -100,11 +100,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce7de569fd28b343b0e7d61c0bc1c4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ServeForce: 11
+  LongServeForce: 11
+  LongServeDirection: {x: 1, y: 1.5}
+  ShortServeForce: 6
+  ShortServeDirection: {x: 2, y: 1.4}
   hitForce: 9.5
   swinDownForce: 10
   powerHitForce: 11
-  RacketTrail: {fileID: 0}
+  defenceHitForce: 11
   boxCollider: {fileID: 2077467932716607264}
 --- !u!65 &2077467932716607264
 BoxCollider:

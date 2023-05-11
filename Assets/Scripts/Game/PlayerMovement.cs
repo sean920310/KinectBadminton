@@ -8,46 +8,52 @@ using UnityEngine.VFX;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Rigidbody rb;
-    public Animator animator;
+    [ReadOnly] public Rigidbody rb;
+    [ReadOnly] public Animator animator;
     [SerializeField] Transform LeftHand;
     [SerializeField] AudioSource SwooshSound;
 
     // Player Parameter
     // Move
+    [Header("Movement")]
     [SerializeField] float movementSpeed = 1.0f;
 
     // Jump
+    [Header("Jump")]
     [SerializeField] float jumpForce = 5.0f;
     [SerializeField] Transform GroundChk;
     [SerializeField] LayerMask WhatIsGround;
     public bool onGround = true;
 
     // Swin
+    [Header("Swin")]
     [SerializeField] float hitCoolDown;
     float hitCoolDownCounter = 0;
 
     [SerializeField] BallManager ball;
     [SerializeField] RacketManager racket;
 
-    public bool PrepareServe = true;
+    [SerializeField] public bool PrepareServe { get; private set; } = false;
     bool facingRight = false;
 
     // Input Flag
-    public float moveInputFlag = 0.0f;
-    public bool jumpInputFlag = false;
-    public bool swinUpInputFlag = false;
-    public bool swinDownInputFlag = false;
+    [ReadOnly] public float moveInputFlag = 0.0f;
+    [ReadOnly] public bool jumpInputFlag = false;
+    [ReadOnly] public bool swinUpInputFlag = false;
+    [ReadOnly] public bool swinDownInputFlag = false;
 
     void Start()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
 
-        if (transform.rotation.y == 0f)
-        {
-            facingRight = true;
-        }
+        facingRight = (transform.rotation.y == 0f);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(GroundChk.position, GroundChk.position + Vector3.down * 0.02f);
     }
 
     // Update is called once per frame
@@ -55,10 +61,41 @@ public class PlayerMovement : MonoBehaviour
     {
         hitCoolDownCounter -= Time.deltaTime;
 
-        // Jump
-        onGround = Physics.Raycast(GroundChk.position, Vector3.down, 0.05f, WhatIsGround);
+        // Check On Ground
+        onGround = Physics.Raycast(GroundChk.position, Vector3.down, 0.02f, WhatIsGround);
         animator.SetBool("OnGround", onGround);
 
+        // Swoop
+        //if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Swoop"))
+        //{
+        //    if (!PrepareServe && onGround)
+        //    {
+        //        if (facingRight && Input.GetKeyDown(KeyCode.Z))
+        //        {
+        //            racket.swoop();
+        //            animator.SetTrigger("Swoop");
+        //            racket.boxColliderEnable();
+        //            rb.velocity = Vector3.zero;
+        //            rb.AddForce(new Vector3(1f, 0.05f, 0f).normalized * 11f, ForceMode.Impulse);
+
+        //        }
+        //        else if(!facingRight && Input.GetKeyDown(KeyCode.M))
+        //        {
+        //            racket.swoop();
+        //            animator.SetTrigger("Swoop");
+        //            racket.boxColliderEnable();
+        //            rb.velocity = Vector3.zero;
+        //            rb.AddForce(new Vector3(-1f, 0.05f, 0f).normalized * 11f, ForceMode.Impulse);
+
+        //        }
+        //    }
+        //}
+        //else
+        //{
+        //    return;
+        //}
+
+        // Jump
         // Serving Can't Jump
         if (!PrepareServe && jumpInputFlag && onGround)
         {
@@ -69,38 +106,50 @@ public class PlayerMovement : MonoBehaviour
         // Serve
         if (PrepareServe)
         {
+            // Set Serve Animation
             if (!animator.GetCurrentAnimatorStateInfo(0).IsName("ServePrepare"))
             {
                 animator.SetTrigger("ServePrepare");
             }
+
             ball.transform.position = LeftHand.position;
             ball.transform.rotation = LeftHand.rotation;
 
-            if (swinDownInputFlag && hitCoolDownCounter <= 0)
+            if (swinUpInputFlag && hitCoolDownCounter <= 0)
             {
-                SwooshSound.Play();
-                animator.SetTrigger("Serve");
+                racket.boxColliderDisable();
 
-                StartCoroutine(ball.Serve(0f, facingRight, racket.ServeForce));
+                SwooshSound.Play();
+                animator.SetTrigger("LongServe");
+
+                ball.Serve(facingRight, racket.LongServeDirection, racket.LongServeForce);
 
                 PrepareServe = false;
-                swinDownInputFlag = false;
+                swinUpInputFlag = false;
+            }
+            else if (swinDownInputFlag && hitCoolDownCounter <= 0)
+            {
+                racket.boxColliderDisable();
 
-                hitCoolDownReset();
+                SwooshSound.Play();
+                animator.SetTrigger("ShortServe");
+
+                ball.Serve(facingRight, racket.ShortServeDirection, racket.ShortServeForce);
+
+                PrepareServe = false;
+                swinUpInputFlag = false;
             }
             return;
         }
-
+        
         // Swing
-        if (swinUpInputFlag && hitCoolDownCounter <= 0 && !animator.GetCurrentAnimatorStateInfo(0).IsName("AirSwingUp"))
+        if (swinUpInputFlag && hitCoolDownCounter <= 0)
         {
             swinUpInputFlag = false;
 
             SwooshSound.Play();
             animator.SetTrigger("SwingUp");
             racket.swinUp();
-
-            hitCoolDownReset();
         }
         if (swinDownInputFlag && hitCoolDownCounter <= 0)
         {
@@ -131,13 +180,14 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
             racket.swinDown();
-
-            hitCoolDownReset();
         }
     }
 
     private void FixedUpdate()
     {
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Swoop"))
+            return;
+
         // Movement
         float movementX = moveInputFlag;
 
@@ -145,6 +195,7 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("Move", true);
         else
             animator.SetBool("Move", false);
+
 
         rb.velocity = new Vector3(movementX * movementSpeed, rb.velocity.y, 0);
     }
@@ -155,9 +206,23 @@ public class PlayerMovement : MonoBehaviour
         racket.boxColliderDisable();
     }
 
+    public void SetPlayerServe()
+    {
+        PrepareServe = true;
+    }
+
     void hitCoolDownReset()
     {
         hitCoolDownCounter = hitCoolDown;
+    }
+    public void setHitCoolDown(float value)
+    {
+        hitCoolDownCounter = value;
+    }
+    public void ResetSwinInputFlag()
+    {
+        swinUpInputFlag = false;
+        swinDownInputFlag = false;
     }
     public void ResetInputFlag()
     {
@@ -178,7 +243,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.started)
             jumpInputFlag = true;
 
         if (context.canceled)
@@ -186,7 +251,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void OnSwinUp(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.started)
             swinUpInputFlag = true;
 
         if (context.canceled)
@@ -194,7 +259,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void OnSwinDown(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.started)
             swinDownInputFlag = true;
 
         if (context.canceled)
