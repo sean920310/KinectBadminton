@@ -388,12 +388,16 @@ MonoBehaviour:
   LeftHand: {fileID: 4377193212131577387}
   SwooshSound: {fileID: 1700846048299065563}
   movementSpeed: 4.9
+  airMovementSpeed: 3.5
   jumpForce: 6
   GroundChk: {fileID: 6496281337871292043}
   WhatIsGround:
     serializedVersion: 2
     m_Bits: 64
-  onGround: 1
+  onGround: 0
+  normalGravityScale: 1
+  enableFallGravityScale: 1
+  fallGravityScale: 1.3
   hitCoolDown: 0.35
   ball: {fileID: 0}
   racket: {fileID: 2523875935646291306}

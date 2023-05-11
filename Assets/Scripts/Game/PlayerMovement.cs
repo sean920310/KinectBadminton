@@ -16,14 +16,20 @@ public class PlayerMovement : MonoBehaviour
     // Player Parameter
     // Move
     [Header("Movement")]
-    [SerializeField] float movementSpeed = 1.0f;
+    [SerializeField] float movementSpeed = 4.9f;
+    [SerializeField] float airMovementSpeed = 2.4f;
 
     // Jump
     [Header("Jump")]
     [SerializeField] float jumpForce = 5.0f;
     [SerializeField] Transform GroundChk;
     [SerializeField] LayerMask WhatIsGround;
-    public bool onGround = true;
+    [ReadOnly] public bool onGround = true;
+    [SerializeField] float normalGravityScale = 1.0f;
+    public bool enableFallGravityScale;
+    [DrawIf("enableFallGravityScale", true, ComparisonType.Equals)]
+    [SerializeField] float fallGravityScale = 1.5f;
+
 
     // Swin
     [Header("Swin")]
@@ -46,7 +52,10 @@ public class PlayerMovement : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
-
+        if (enableFallGravityScale)
+        {
+            rb.useGravity = false;
+        }
         facingRight = (transform.rotation.y == 0f);
     }
 
@@ -109,11 +118,12 @@ public class PlayerMovement : MonoBehaviour
             // Set Serve Animation
             if (!animator.GetCurrentAnimatorStateInfo(0).IsName("ServePrepare"))
             {
-                animator.SetTrigger("ServePrepare");
+                animator.SetBool("ServePrepare", true);
             }
 
             ball.transform.position = LeftHand.position;
             ball.transform.rotation = LeftHand.rotation;
+            ball.rb.velocity = Vector3.zero;
 
             if (swinUpInputFlag && hitCoolDownCounter <= 0)
             {
@@ -126,6 +136,7 @@ public class PlayerMovement : MonoBehaviour
 
                 PrepareServe = false;
                 swinUpInputFlag = false;
+                animator.SetBool("ServePrepare", false);
             }
             else if (swinDownInputFlag && hitCoolDownCounter <= 0)
             {
@@ -138,6 +149,7 @@ public class PlayerMovement : MonoBehaviour
 
                 PrepareServe = false;
                 swinUpInputFlag = false;
+                animator.SetBool("ServePrepare", false);
             }
             return;
         }
@@ -185,8 +197,20 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Swoop"))
-            return;
+        //if (animator.GetCurrentAnimatorStateInfo(0).IsName("Swoop"))
+        //    return;
+
+
+        // Fall Gravity
+        if(enableFallGravityScale)
+        {
+            Vector3 gravity = gravity = -9.81f * normalGravityScale * Vector3.up;
+            if(!onGround && rb.velocity.y <= 0)
+            {
+                gravity = -9.81f * fallGravityScale * Vector3.up;
+            }
+            rb.AddForce(gravity, ForceMode.Acceleration);
+        }
 
         // Movement
         float movementX = moveInputFlag;
@@ -197,7 +221,10 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("Move", false);
 
 
-        rb.velocity = new Vector3(movementX * movementSpeed, rb.velocity.y, 0);
+        if(onGround)
+            rb.velocity = new Vector3(movementX * movementSpeed, rb.velocity.y, 0);
+        else
+            rb.velocity = new Vector3(movementX * airMovementSpeed, rb.velocity.y, 0);
     }
 
     // This SetRacketColliderOff is for animation event

@@ -102,8 +102,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LongServeForce: 11
   LongServeDirection: {x: 1, y: 1.5}
-  ShortServeForce: 6
-  ShortServeDirection: {x: 2, y: 1.4}
+  ShortServeForce: 6.3
+  ShortServeDirection: {x: 2, y: 1.5}
   hitForce: 9.5
   swinDownForce: 10
   powerHitForce: 11

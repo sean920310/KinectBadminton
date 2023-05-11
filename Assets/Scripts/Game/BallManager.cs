@@ -15,6 +15,7 @@ public class BallManager : MonoBehaviour
     }
 
     public Rigidbody rb;
+    [SerializeField] Transform centerOfMass;
 
     [SerializeField] StatesPanel p1StatesPanel;
     [SerializeField] StatesPanel p2StatesPanel;
@@ -53,6 +54,7 @@ public class BallManager : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         trailRenderer = GetComponent<TrailRenderer>();
+        rb.centerOfMass = centerOfMass.position;
 
         Physics.IgnoreLayerCollision(7, 8, true); // Border
         Physics.IgnoreLayerCollision(7, 9, true); // Player
