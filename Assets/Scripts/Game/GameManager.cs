@@ -98,7 +98,6 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0.0f;
         gameState = GameStates.GamePreparing;
         neverFinish = false;
-        SetServePlayer(Players.Player1);
     }
 
     // Update is called once per frame
@@ -106,8 +105,11 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if(gameState == GameStates.GamePause) Resume();
-            else Pause();
+            if(gameState != GameStates.GamePreparing)
+            {
+                if (gameState == GameStates.GamePause) Resume();
+                else Pause();
+            }
         }
 
         if (!Player1Movement.PrepareServe && !Player2Movement.PrepareServe)
@@ -338,6 +340,25 @@ public class GameManager : MonoBehaviour
         Player1Movement.gameObject.SetActive(true);
         Player2Movement.gameObject.SetActive(true);
         Ball.gameObject.SetActive(true);
+
+        // Set Player State 
+        SetServePlayer(Players.Player1);
+
+        Player1Movement.transform.localPosition = new Vector3(-3, 1.06f, 0);
+        Player2Movement.transform.localPosition = new Vector3(3, 1.06f, 0);
+
+        StartCoroutine(PlayerMovementDisableForAWhile(0.5f));
+
+        // Set ball Serve State to true
+        Ball.ballStates = BallManager.BallStates.Serving;
+
+        ServeBorderActive(true);
+
+        // Check if the game over condition has been satisfied.
+        if (CheckIsGameover())
+        {
+            GameOver();
+        }
 
         Time.timeScale = 1.0f;
 
