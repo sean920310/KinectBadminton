@@ -302,5 +302,17 @@ public class PlayerMovement : MonoBehaviour
         if (context.canceled)
             swinDownInputFlag = false;
     }
+    public void OnKinectSwinDown()
+    {
+        swinDownInputFlag = true;
+    }
+    public void OnKinectSwinUp()
+    {
+        swinUpInputFlag = true;
+    }
+    public void OnKinectPositionMapping(double pos)
+    {
+        transform.position = new Vector3 ((float)pos, transform.position.y, transform.position.z);
+    }
     #endregion
 }
