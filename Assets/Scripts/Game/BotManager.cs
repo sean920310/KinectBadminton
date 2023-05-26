@@ -1,33 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Net;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class BotManager : MonoBehaviour
 {
-    public enum OpponentBallStates
-    {
-        ServingUp,
-        ServingDown,
-        FlatBall,
-        SmashFront,
-        SmashBack,
-        OverHand,
-        UnderHandFront,
-        UnderHandBack,
-    }
-
     [SerializeField] PlayerMovement enemyPlayer;
     [SerializeField] PlayerMovement botPlayer;
     [SerializeField] BallManager ball;
-
-    [Header("Ball")]
-    [SerializeField] Vector2 ballPosition;
-    [SerializeField] Vector2 ballVelocity;
-    [SerializeField] bool previousBallInLeftSide;
-    [DrawIf("previousBallInLeftSide", true, ComparisonType.Equals)]
 
     [Header("SwinUp")]
     [SerializeField] Vector2 swinUpRangeDefault;
@@ -93,46 +73,12 @@ public class BotManager : MonoBehaviour
 
     void Start()
     {
-        previousBallInLeftSide = ball.BallInLeftSide;
         swinUpRange = swinUpRangeDefault;
         swinDownRange = swinDownRangeDefault;
         JumpHeight = JumpHeightDefault;
     }
     void Update()
     {
-        ballPosition = ball.transform.position;
-        ballVelocity = ball.rb.velocity;
-
-        if (previousBallInLeftSide != ball.BallInLeftSide)
-        {
-            //ball on ground
-            if (Mathf.Abs(ballVelocity.x) < 0.000000001 || ballPosition.y < 1)
-            {
-
-            }
-            else
-            {
-                //Debug.Log("Change");
-                //Debug.Log("Pos : " + ballPosition.x + " " + ballPosition.y +
-                //    " Vel : " + ballVelocity.x + " " + ballVelocity.y);
-                if (Mathf.Abs(ballVelocity.x) > 15f)
-                {
-                    Debug.Log("Smash" + ballPosition.y + " " + ballVelocity.x + " " + ballVelocity.y);
-                }
-                else if (ballVelocity.y < 2.5f)
-                {
-                    Debug.Log("flat" + ballPosition.y + " " + ballVelocity.x + " " + ballVelocity.y);
-                }
-                else
-                {
-                    Debug.Log("highball " + ballPosition.y + " "+  ballVelocity.x + " " + ballVelocity.y);
-                }
-            }
-           
-
-
-        }
-
         // Drop Point Compute
         Physics.Raycast(ball.transform.position, ball.transform.right, out DropPointInfo, 100, whatIsDropPoint);
 
@@ -154,13 +100,10 @@ public class BotManager : MonoBehaviour
                 }
             }
 
-
-
             // Ball is in enemy side
             if (isRightSidePlayer && ball.BallInLeftSide ||
                 !isRightSidePlayer && !ball.BallInLeftSide)
             {
-                Movement();
                 BallInEnemySideMovement();
                 Jump();
                 if (!isHitAfterServeLocked)
@@ -175,11 +118,6 @@ public class BotManager : MonoBehaviour
                     HitTheBall();
             }
         }
-        previousBallInLeftSide = ball.BallInLeftSide;
-    }
-    private int JudgeBallStates()
-    {
-        return 0;
     }
 
     private void Serve()
@@ -334,7 +272,7 @@ public class BotManager : MonoBehaviour
         else
         {
             if (isRightSidePlayer)
-                MoveBotTo(ball.transform.position.x - 0.3f, 0.01f);
+                MoveBotTo(ball.transform.position.x - 0.3f, 0.05f);
             else
                 MoveBotTo(ball.transform.position.x + 0.3f, 0.05f);
         }
