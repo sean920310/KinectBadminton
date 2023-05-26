@@ -314,5 +314,10 @@ public class PlayerMovement : MonoBehaviour
     {
         transform.position = new Vector3 ((float)pos, transform.position.y, transform.position.z);
     }
+
+    public void OnKinectJump()
+    {
+        jumpInputFlag = true;
+    }
     #endregion
 }
