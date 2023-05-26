@@ -7,6 +7,9 @@ public class BodySourceView : MonoBehaviour
 {
     [SerializeField] PlayerMovement playerMovement1;
     [SerializeField] PlayerMovement playerMovement2;
+    private KinectStateMachine player1StateMachine;
+    private KinectStateMachine player2StateMachine;
+
     public Material BoneMaterial;
     public GameObject BodySourceManager;
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
@@ -43,7 +46,13 @@ public class BodySourceView : MonoBehaviour
         { Kinect.JointType.SpineShoulder, Kinect.JointType.Neck },
         { Kinect.JointType.Neck, Kinect.JointType.Head },
     };
-    
+
+    void Start()
+    {
+        player1StateMachine = new KinectStateMachine();
+        player2StateMachine = new KinectStateMachine();
+    }
+
     void Update () 
     {
         if (BodySourceManager == null)
@@ -62,7 +71,7 @@ public class BodySourceView : MonoBehaviour
         {
             return;
         }
-        
+        //print(data.Length);
         List<ulong> trackedIds = new List<ulong>();
         foreach(var body in data)
         {
@@ -101,19 +110,49 @@ public class BodySourceView : MonoBehaviour
                 if(!_Bodies.ContainsKey(body.TrackingId))
                 {
                     _Bodies[body.TrackingId] = CreateBodyObject(body.TrackingId);
+
+                    if (body.Joints[Kinect.JointType.HandRight].Position.X < 0) //  右手座標在左邊
+                    {
+                        player1Id = body.TrackingId;
+                        if (player1Id == player2Id)
+                        {
+                            player2Id = 0;
+                        }
+                    }
+                    else
+                    {
+                        player2Id = body.TrackingId;
+                        if (player1Id == player2Id)
+                        {
+                            player1Id = 0;
+                        }
+                    }
                 }
-                
+                if (body.TrackingId == player1Id)
+                {
+                    //print(body.TrackingId);
+                    player1StateMachine.CheckSwitchState(body, playerMovement1);
+                    //attackDetection(body, playerMovement1, 1);
+                    movementDetection(body, playerMovement1, 1);
+                }
+                if (body.TrackingId == player2Id)
+                {
+                    //print(body.TrackingId);
+                    player2StateMachine.CheckSwitchState(body, playerMovement2);
+                    //attackDetection(body, playerMovement2, 2);
+                    movementDetection(body, playerMovement2, 2);
+                }
                 RefreshBodyObject(body, _Bodies[body.TrackingId]);
-                attackDetection(body);
-                movementDetection(body, playerMovement1);
+                Kinect.Joint jointHandRight = body.Joints[Kinect.JointType.HandRight];
+                print(jointHandRight.Position.X < 0);
             }
         }
     }
-    
+    private ulong player1Id;
+    private ulong player2Id;
     private GameObject CreateBodyObject(ulong id)
     {
         GameObject body = new GameObject("Body:" + id);
-        
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
             GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -185,55 +224,50 @@ public class BodySourceView : MonoBehaviour
     private bool rightHigher = false;
     private bool rightLower = true;
     private bool attackState = false;
-    private void attackDetection(Kinect.Body body)
+    
+
+    private void attackDetection(Kinect.Body body, PlayerMovement player, int playerNum)
     {
-        Kinect.Joint jointHandRight = body.Joints[Kinect.JointType.HandRight];
-        Kinect.Joint jointShoulderRight = body.Joints[Kinect.JointType.ShoulderRight];
-        if (jointHandRight.Position.Y > jointShoulderRight.Position.Y)
+        if (playerNum == 1)
         {
-            rightHigher = true;
+            // Player1
+            if(player1StateMachine.OverHand)
+                player.OnKinectSwinDown();
+            if(player1StateMachine.UnderHand)
+                player.OnKinectSwinUp();
         }
         else
         {
-            rightHigher = false;
+            // Player2
+            if (player2StateMachine.OverHand)
+                player.OnKinectSwinDown();
+            if (player2StateMachine.UnderHand)
+                player.OnKinectSwinUp();
         }
-        if (body.HandRightState == Kinect.HandState.Open || body.HandRightState == Kinect.HandState.Lasso)
-        {
-            attackState = false;
-        }
-        if (body.HandRightState == Kinect.HandState.Closed)
-        {
-            attackState = true;
-        }
-        if (rightHigher && lastHigher != rightHigher && attackState)
-        {
-            playerMovement1.OnKinectSwinDown();
-        }
-        else
-        {
-            if (lastHigher != rightHigher && attackState)
-            {
-                playerMovement1.OnKinectSwinUp();
-            }
-        }
-        lastHigher = rightHigher;
     }
 
-    private static double frontEdge = 1.0, backEdge = 2.2; // 實際的
+    private static double frontEdge = 1.0, backEdge = 1.5; // 實際的
     private static double realRange = backEdge - frontEdge;
 
     private static double playerLeft = 0.5;
     private static double playerRight = 7.0;
 
     //private static double courtRange = rightEdge; // 遊戲場景的
-    private void movementDetection(Kinect.Body body, PlayerMovement player)
+    private void movementDetection(Kinect.Body body, PlayerMovement player, int playerNum)
     {
         double bodyPos = (body.Joints[Kinect.JointType.HipRight].Position.Z + body.Joints[Kinect.JointType.HipLeft].Position.Z) / 2;
 
         Mathf.Clamp((float)bodyPos, (float)frontEdge, (float)backEdge);
-        double playerPos = -1 * Mathf.Lerp((float)playerLeft, (float)playerRight, (float)((bodyPos - frontEdge) / (backEdge - frontEdge)));
-        print(playerPos);
-        // TODO: 把 playerPos 回傳給指定的 PlayerMovemont player
+        double playerPos;
+        if (playerNum == 1)
+        {
+            playerPos = -1 * Mathf.Lerp((float)playerLeft, (float)playerRight, (float)((bodyPos - frontEdge) / (backEdge - frontEdge)));
+        }
+        else
+        {
+            playerPos = 1 * Mathf.Lerp((float)playerLeft, (float)playerRight, (float)((bodyPos - frontEdge) / (backEdge - frontEdge)));
+        }
+            // TODO: 把 playerPos 回傳給指定的 PlayerMovemont player
         player.OnKinectPositionMapping(playerPos);
     }
 
