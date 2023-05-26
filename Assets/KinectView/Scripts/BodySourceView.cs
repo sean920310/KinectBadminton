@@ -148,9 +148,7 @@ public class BodySourceView : MonoBehaviour
                     movementDetection(body, playerMovement2, 2);
                     player2JumpState.CheckSwitchState(body, playerMovement2);
                 }
-                RefreshBodyObject(body, _Bodies[body.TrackingId]);
-                Kinect.Joint jointHandRight = body.Joints[Kinect.JointType.HandRight];
-                print(jointHandRight.Position.X < 0);
+                //RefreshBodyObject(body, _Bodies[body.TrackingId]);
             }
         }
     }
@@ -252,7 +250,7 @@ public class BodySourceView : MonoBehaviour
         }
     }
 
-    private static double frontEdge = 1.0, backEdge = 1.5; // 實際的
+    private static double frontEdge = 1.75, backEdge = 3; // 實際的 1.75 - 3
     private static double realRange = backEdge - frontEdge;
 
     private static double playerLeft = 0.5;
@@ -276,12 +274,6 @@ public class BodySourceView : MonoBehaviour
             // TODO: 把 playerPos 回傳給指定的 PlayerMovemont player
         player.OnKinectPositionMapping(playerPos);
     }
-
-    //private void jumpDetection(Kinect.Body body, PlayerMovement player, int playerNum)
-    //{
-
-    //    body.Joints == Kinect.JointType.
-    //}
     private class JumpState
     {
         public enum States
