@@ -7,11 +7,34 @@ public class BodySourceView : MonoBehaviour
 {
     [SerializeField] PlayerMovement playerMovement1;
     [SerializeField] PlayerMovement playerMovement2;
-    private KinectStateMachine player1StateMachine;
-    private KinectStateMachine player2StateMachine;
-    private JumpState player1JumpState;
-    private JumpState player2JumpState;
+    private AttackStateMachine player1StateMachine;
+    private AttackStateMachine player2StateMachine;
+    private JumpStateMachine player1JumpState;
+    private JumpStateMachine player2JumpState;
 
+    public enum FlowStates
+    {
+        Positioning,
+        Ready,
+        GameStart,
+        GameOver
+    }
+
+    [SerializeField] private float frontEdge = 1.75f, backEdge = 3f; // 實際的 1.75 - 3
+    [SerializeField] private float depthRange = 0.1f;
+    [SerializeField] private float soloLeftBoundary = -0.05f;
+    [SerializeField] private float soloRightBoundary = 0.05f;
+    [SerializeField] private float dualPlayer1LeftBoundary = -0.45f;
+    [SerializeField] private float dualPlayer1RightBoundary = -0.55f;
+    [SerializeField] private float dualPlayer2LeftBoundary = 0.45f;
+    [SerializeField] private float dualPlayer2RightBoundary = 0.55f;
+    // 深度要在 2.15 ~ 2.35
+    // player Solo x = -0.05 ~ 0.05
+    // player1 x = -0.45 ~ -0.55
+    // player2 x = 0.45 ~ 0.55
+
+    private FlowStates flowManager;
+    private PositioningManager.PlayerCount m_GameMode;
     public Material BoneMaterial;
     public GameObject BodySourceManager;
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
@@ -51,11 +74,11 @@ public class BodySourceView : MonoBehaviour
 
     void Start()
     {
-        player1StateMachine = new KinectStateMachine();
-        player2StateMachine = new KinectStateMachine();
-        player1JumpState = new JumpState();
-        player2JumpState = new JumpState();
-        PositioningManager.instance.SoloPlayerInfo.resetPlayerPosState();
+        player1StateMachine = new AttackStateMachine();
+        player2StateMachine = new AttackStateMachine();
+        player1JumpState = new JumpStateMachine();
+        player2JumpState = new JumpStateMachine();
+        m_GameMode = PositioningManager.instance.playerCount;
     }
 
     void Update () 
@@ -116,41 +139,178 @@ public class BodySourceView : MonoBehaviour
                 {
                     _Bodies[body.TrackingId] = CreateBodyObject(body.TrackingId);
 
-                    if (body.Joints[Kinect.JointType.HandRight].Position.X < 0) //  右手座標在左邊
+                    if (flowManager == FlowStates.Positioning)
                     {
-                        player1Id = body.TrackingId;
-                        if (player1Id == player2Id)
+                        switch (m_GameMode)
                         {
-                            player2Id = 0;
-                        }
-                    }
-                    else
-                    {
-                        player2Id = body.TrackingId;
-                        if (player1Id == player2Id)
-                        {
-                            player1Id = 0;
+                            case PositioningManager.PlayerCount.Solo:
+                                player1Id = body.TrackingId;
+                                break;
+                            case PositioningManager.PlayerCount.Dual:
+                                if (body.Joints[Kinect.JointType.HandRight].Position.X < 0) //  右手座標在左邊
+                                {
+                                    player1Id = body.TrackingId;
+                                    if (player1Id == player2Id)
+                                    {
+                                        player2Id = 0;
+                                    }
+                                }
+                                else
+                                {
+                                    player2Id = body.TrackingId;
+                                    if (player1Id == player2Id)
+                                    {
+                                        player1Id = 0;
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
                         }
                     }
                 }
-                
-                PositioningManager.instance.SoloPlayerInfo.setState(PositioningManager.PlayerPosState.Corrcet, true);
 
-                if (body.TrackingId == player1Id)
+
+                float spineMidX = body.Joints[Kinect.JointType.SpineMid].Position.X;
+                float spineMidY = body.Joints[Kinect.JointType.SpineMid].Position.Y;
+                float spineMidZ = body.Joints[Kinect.JointType.SpineMid].Position.Z;
+                float middlePosition = (frontEdge + backEdge) / 2;
+                //PositioningManager.instance.SoloPlayerInfo.setState(PositioningManager.PlayerPosState.Corrcet, true);
+                if (flowManager == FlowStates.Positioning)
                 {
-                    //print(body.TrackingId);
-                    player1StateMachine.CheckSwitchState(body, playerMovement1); // attack state machine
-                    //attackDetection(body, playerMovement1, 1);
-                    movementDetection(body, playerMovement1, 1);
-                    player1JumpState.CheckSwitchState(body, playerMovement1);
+
+                    // 確認是否定位成功
+                    switch (m_GameMode)
+                    {
+                        case PositioningManager.PlayerCount.Solo:
+                            PositioningManager.instance.SoloPlayerInfo.resetPlayerPosState();
+                            if (spineMidZ < middlePosition - depthRange) 
+                                PositioningManager.instance.SoloPlayerInfo.setState(PositioningManager.PlayerPosState.TooClose, true);
+                            if (spineMidZ > middlePosition + depthRange)
+                                PositioningManager.instance.SoloPlayerInfo.setState(PositioningManager.PlayerPosState.TooFar, true);
+                            if (spineMidX < soloLeftBoundary)
+                                PositioningManager.instance.SoloPlayerInfo.setState(PositioningManager.PlayerPosState.TooLeft, true);
+                            if (spineMidX > soloRightBoundary)
+                                PositioningManager.instance.SoloPlayerInfo.setState(PositioningManager.PlayerPosState.TooRight, true);
+                            if (spineMidZ > (middlePosition - depthRange) && spineMidZ < (middlePosition + depthRange) && spineMidX > soloLeftBoundary && spineMidX < soloRightBoundary)
+                            {
+                                PositioningManager.instance.SoloPlayerInfo.setState(PositioningManager.PlayerPosState.Correct, true);
+                                flowManager = FlowStates.Ready;
+                            }
+                            break;
+                        case PositioningManager.PlayerCount.Dual:
+                            if (body.TrackingId == player1Id)
+                            {
+                                PositioningManager.instance.DualLeftPlayerInfo.resetPlayerPosState();
+                                print(spineMidX);
+                                if (spineMidZ < middlePosition - depthRange)
+                                    PositioningManager.instance.DualLeftPlayerInfo.setState(PositioningManager.PlayerPosState.TooClose, true);
+                                if (spineMidZ > middlePosition + depthRange)
+                                    PositioningManager.instance.DualLeftPlayerInfo.setState(PositioningManager.PlayerPosState.TooFar, true);
+                                if (spineMidX < dualPlayer1LeftBoundary)
+                                    PositioningManager.instance.DualLeftPlayerInfo.setState(PositioningManager.PlayerPosState.TooLeft, true);
+                                if (spineMidX > dualPlayer1RightBoundary)
+                                    PositioningManager.instance.DualLeftPlayerInfo.setState(PositioningManager.PlayerPosState.TooRight, true);
+                                if (spineMidZ > (middlePosition - depthRange) && spineMidZ < (middlePosition + depthRange) && spineMidX > dualPlayer1LeftBoundary && spineMidX < dualPlayer1RightBoundary)
+                                    PositioningManager.instance.DualLeftPlayerInfo.setState(PositioningManager.PlayerPosState.Correct, true);
+
+                            }
+                            if (body.TrackingId == player2Id)
+                            {
+                                PositioningManager.instance.DualRightPlayerInfo.resetPlayerPosState();
+                                if (spineMidZ < middlePosition - depthRange)
+                                    PositioningManager.instance.DualRightPlayerInfo.setState(PositioningManager.PlayerPosState.TooClose, true);
+                                if (spineMidZ > middlePosition + depthRange)
+                                    PositioningManager.instance.DualRightPlayerInfo.setState(PositioningManager.PlayerPosState.TooFar, true);
+                                if (spineMidX < dualPlayer2LeftBoundary)
+                                    PositioningManager.instance.DualRightPlayerInfo.setState(PositioningManager.PlayerPosState.TooLeft, true);
+                                if (spineMidX > dualPlayer2RightBoundary)
+                                    PositioningManager.instance.DualRightPlayerInfo.setState(PositioningManager.PlayerPosState.TooRight, true);
+                                if (spineMidZ > (middlePosition - depthRange) && spineMidZ < (middlePosition + depthRange) && spineMidX > dualPlayer2LeftBoundary && spineMidX < dualPlayer2RightBoundary)
+                                    PositioningManager.instance.DualRightPlayerInfo.setState(PositioningManager.PlayerPosState.Correct, true);
+                            }
+                            if (PositioningManager.instance.DualLeftPlayerInfo.getState(PositioningManager.PlayerPosState.Correct) == true && 
+                                PositioningManager.instance.DualRightPlayerInfo.getState(PositioningManager.PlayerPosState.Correct) == true)
+                                    flowManager = FlowStates.Ready;
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                if (body.TrackingId == player2Id)
+                if (flowManager == FlowStates.Ready)
                 {
-                    //print(body.TrackingId);
-                    player2StateMachine.CheckSwitchState(body, playerMovement2);
-                    //attackDetection(body, playerMovement2, 2);
-                    movementDetection(body, playerMovement2, 2);
-                    player2JumpState.CheckSwitchState(body, playerMovement2);
+                    switch (m_GameMode)
+                    {
+                        case PositioningManager.PlayerCount.Solo:
+                            if (spineMidZ < (middlePosition - depthRange) || spineMidZ > (middlePosition + depthRange) || spineMidX < soloLeftBoundary || spineMidX > soloRightBoundary)
+                            {
+                                PositioningManager.instance.SoloPlayerInfo.setState(PositioningManager.PlayerPosState.Correct, false);
+                                flowManager = FlowStates.Positioning;
+                            }
+                            if (PositioningManager.instance.positioningStates == PositioningManager.PositioningStates.PositioningEnd)
+                            {
+                                flowManager = FlowStates.GameStart;
+                            }
+                            break;
+                        case PositioningManager.PlayerCount.Dual:
+                            if (body.TrackingId == player1Id)
+                            {
+                                if (spineMidZ < (middlePosition - depthRange) || spineMidZ > (middlePosition + depthRange) || spineMidX < dualPlayer1LeftBoundary || spineMidX > dualPlayer1RightBoundary)
+                                {
+                                    PositioningManager.instance.DualLeftPlayerInfo.setState(PositioningManager.PlayerPosState.Correct, false);
+                                    flowManager = FlowStates.Positioning;
+                                }
+                            }
+                            if (body.TrackingId == player2Id)
+                            {
+                                if (spineMidZ < (middlePosition - depthRange) || spineMidZ > (middlePosition + depthRange) || spineMidX < dualPlayer2LeftBoundary || spineMidX > dualPlayer2RightBoundary)
+                                {
+                                    PositioningManager.instance.DualRightPlayerInfo.setState(PositioningManager.PlayerPosState.Correct, false);
+                                    flowManager = FlowStates.Positioning;
+                                }
+                            }
+                            if (PositioningManager.instance.positioningStates == PositioningManager.PositioningStates.PositioningEnd)
+                            {
+                                flowManager = FlowStates.GameStart;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (flowManager == FlowStates.GameStart)
+                {
+
+                    switch (m_GameMode)
+                    {
+                        case PositioningManager.PlayerCount.Solo:
+                            if (body.TrackingId == player1Id)
+                            {
+                                //print(body.TrackingId);
+                                player1StateMachine.CheckSwitchState(body, playerMovement1); // attack state machine
+                                movementDetection(body, playerMovement1, 1);
+                                player1JumpState.CheckSwitchState(body, playerMovement1);
+                            }
+                            break;
+                        case PositioningManager.PlayerCount.Dual:
+                            if (body.TrackingId == player1Id)
+                            {
+                                //print(body.TrackingId);
+                                player1StateMachine.CheckSwitchState(body, playerMovement1); // attack state machine
+                                movementDetection(body, playerMovement1, 1);
+                                player1JumpState.CheckSwitchState(body, playerMovement1);
+                            }
+                            if (body.TrackingId == player2Id)
+                            {
+                                //print(body.TrackingId);
+                                player2StateMachine.CheckSwitchState(body, playerMovement2);
+                                movementDetection(body, playerMovement2, 2);
+                                player2JumpState.CheckSwitchState(body, playerMovement2);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 RefreshBodyObject(body, _Bodies[body.TrackingId]);
             }
@@ -254,8 +414,6 @@ public class BodySourceView : MonoBehaviour
         }
     }
 
-    private static double frontEdge = 1.75, backEdge = 3; // 實際的 1.75 - 3
-    private static double realRange = backEdge - frontEdge;
 
     private static double playerLeft = 0.5;
     private static double playerRight = 7.0;
@@ -277,57 +435,5 @@ public class BodySourceView : MonoBehaviour
         }
             // TODO: 把 playerPos 回傳給指定的 PlayerMovemont player
         player.OnKinectPositionMapping(playerPos);
-    }
-    private class JumpState
-    {
-        public enum States
-        {
-            Idle,
-            SquatDown,
-            Jump,
-        }
-
-        private States m_State;
-        private bool m_jump;
-
-        public States state { get => m_State; }
-        public bool OverHand { get => m_jump; }
-
-        public void CheckSwitchState(Kinect.Body body, PlayerMovement player)
-        {
-            Kinect.Joint jointHipRight = body.Joints[Kinect.JointType.HipRight];
-            Kinect.Joint jointKneeRight = body.Joints[Kinect.JointType.KneeRight];
-            Kinect.Joint jointSpineMid = body.Joints[Kinect.JointType.SpineMid];
-            float bodyProportion = (jointHipRight.Position.Y - jointKneeRight.Position.Y) / (jointSpineMid.Position.Y - jointHipRight.Position.Y);
-            float hipKneeDis;
-            hipKneeDis = jointHipRight.Position.Y - jointKneeRight.Position.Y;
-            print(hipKneeDis);
-
-            switch (m_State)
-            {
-                case States.Idle:
-                    //TODO: On Idle 
-                    if (hipKneeDis < 0.2f/*(jointSpineMid.Position.Y - jointHipRight.Position.Y) * bodyProportion*/)
-                    {
-                        m_State = States.SquatDown;
-                    }
-                    break;
-                case States.SquatDown:
-                    //TODO: On HandOverElbow 
-                    hipKneeDis = jointHipRight.Position.Y - jointKneeRight.Position.Y;
-                    if (hipKneeDis > 0.3f/*(jointSpineMid.Position.Y - jointHipRight.Position.Y) * bodyProportion*/)
-                    {
-                        m_State = States.Jump;
-                    }
-                    break;
-                case States.Jump:
-                    //TODO: On HandUnderElbow 
-                    player.OnKinectJump();
-                    m_State = States.Idle;
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 }

@@ -25,7 +25,7 @@ public class PositioningManager : MonoBehaviour
     [Serializable]
     public enum PlayerPosState
     {
-        Corrcet     = 1 << 0,
+        Correct     = 1 << 0,
         TooLeft     = 1 << 1,
         TooRight    = 1 << 2,
         TooClose    = 1 << 3,
@@ -158,7 +158,7 @@ public class PositioningManager : MonoBehaviour
             switch (playerCount)
             {
                 case PlayerCount.Solo:
-                    if (SoloPlayerInfo.getState(PlayerPosState.Corrcet) == true)
+                    if (SoloPlayerInfo.getState(PlayerPosState.Correct) == true)
                     {
                         // switch state to PositioningCorrect
                         positioningStates = PositioningStates.PositioningCorrect;
@@ -169,8 +169,8 @@ public class PositioningManager : MonoBehaviour
                     UpdatePlayerStateUI(SoloPlayerInfo, SoloPlayerPositioningUI);
                     break;
                 case PlayerCount.Dual:
-                    if (DualLeftPlayerInfo.getState(PlayerPosState.Corrcet) == true && 
-                        DualRightPlayerInfo.getState(PlayerPosState.Corrcet) == true)
+                    if (DualLeftPlayerInfo.getState(PlayerPosState.Correct) == true && 
+                        DualRightPlayerInfo.getState(PlayerPosState.Correct) == true)
                     {
                         // switch state to PositioningCorrect
                         positioningStates = PositioningStates.PositioningCorrect;
@@ -191,7 +191,7 @@ public class PositioningManager : MonoBehaviour
             switch (playerCount)
             {
                 case PlayerCount.Solo:
-                    if (SoloPlayerInfo.getState(PlayerPosState.Corrcet) == true)
+                    if (SoloPlayerInfo.getState(PlayerPosState.Correct) == true)
                     {
                         // if positioning correct: count down, when counter reach zero, switch state to "PositioningEnd"
                         CorrectTimeCounter -= Time.deltaTime;
@@ -210,8 +210,8 @@ public class PositioningManager : MonoBehaviour
                     UpdatePlayerStateUI(SoloPlayerInfo, SoloPlayerPositioningUI);
                     break;
                 case PlayerCount.Dual:
-                    if (DualLeftPlayerInfo.getState(PlayerPosState.Corrcet) == true &&
-                        DualRightPlayerInfo.getState(PlayerPosState.Corrcet) == true)
+                    if (DualLeftPlayerInfo.getState(PlayerPosState.Correct) == true &&
+                        DualRightPlayerInfo.getState(PlayerPosState.Correct) == true)
                     {
                         // if positioning correct: count down, when counter reach zero, switch state to "PositioningEnd"
                         CorrectTimeCounter -= Time.deltaTime;
@@ -245,7 +245,7 @@ public class PositioningManager : MonoBehaviour
 
     private void UpdatePlayerStateUI(PlayerInfo playerInfo, PositioningUI positioningUI)
     {
-        if (playerInfo.getState(PlayerPosState.Corrcet) == true)
+        if (playerInfo.getState(PlayerPosState.Correct) == true)
         {
             // Update Correct UI
             positioningUI.BodyImage.color = BodyPosCorrectColor;
