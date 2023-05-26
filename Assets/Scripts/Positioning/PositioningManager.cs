@@ -144,6 +144,8 @@ public class PositioningManager : MonoBehaviour
             default:
                 break;
         }
+
+        Time.timeScale = 1.0f;
     }
 
     // Update is called once per frame
@@ -176,7 +178,8 @@ public class PositioningManager : MonoBehaviour
                         CorrectCountDownPanel.gameObject.SetActive(true);
 
                     }
-                    UpdatePlayerStateUI(SoloPlayerInfo, SoloPlayerPositioningUI);
+                    UpdatePlayerStateUI(DualLeftPlayerInfo, DualLeftPlayerPositioningUI);
+                    UpdatePlayerStateUI(DualRightPlayerInfo, DualRightPlayerPositioningUI);
                     break;
                 default:
                     break;
@@ -224,7 +227,8 @@ public class PositioningManager : MonoBehaviour
                         CorrectCountDownPanel.gameObject.SetActive(false);
                     }
                     CorrectCountDownText.text = ((int)CorrectTimeCounter).ToString();
-                    UpdatePlayerStateUI(SoloPlayerInfo, SoloPlayerPositioningUI);
+                    UpdatePlayerStateUI(DualLeftPlayerInfo, DualLeftPlayerPositioningUI);
+                    UpdatePlayerStateUI(DualRightPlayerInfo, DualRightPlayerPositioningUI);
                     break;
                 default:
                     break;

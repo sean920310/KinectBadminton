@@ -55,6 +55,7 @@ public class BodySourceView : MonoBehaviour
         player2StateMachine = new KinectStateMachine();
         player1JumpState = new JumpState();
         player2JumpState = new JumpState();
+        PositioningManager.instance.SoloPlayerInfo.resetPlayerPosState();
     }
 
     void Update () 
@@ -132,6 +133,9 @@ public class BodySourceView : MonoBehaviour
                         }
                     }
                 }
+                
+                PositioningManager.instance.SoloPlayerInfo.setState(PositioningManager.PlayerPosState.Corrcet, true);
+
                 if (body.TrackingId == player1Id)
                 {
                     //print(body.TrackingId);
@@ -148,7 +152,7 @@ public class BodySourceView : MonoBehaviour
                     movementDetection(body, playerMovement2, 2);
                     player2JumpState.CheckSwitchState(body, playerMovement2);
                 }
-                //RefreshBodyObject(body, _Bodies[body.TrackingId]);
+                RefreshBodyObject(body, _Bodies[body.TrackingId]);
             }
         }
     }
