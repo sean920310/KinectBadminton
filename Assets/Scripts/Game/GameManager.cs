@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] int winScore;
     [SerializeField] bool neverFinish; // Endless if true
 
+    [SerializeField] float PlayingTimeScale = 0.7f;
+
     [Header("GameObject")]
     [SerializeField] PlayerMovement Player1Movement;
     [SerializeField] PlayerMovement Player2Movement;
@@ -70,6 +72,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] HUDPanel HUD;
     [SerializeField] RectTransform PausePanel;
     [SerializeField] RectTransform GameStartPanel;
+    [SerializeField] RectTransform PositioningPanel;
 
     [Header("Audio")]
     [SerializeField] AudioSource PlayerOneWinSound;
@@ -275,7 +278,7 @@ public class GameManager : MonoBehaviour
     private void Resume()
     {
         gameState = GameStates.InGame;
-        Time.timeScale = 1.0f;
+        Time.timeScale = PlayingTimeScale;
         PausePanel.gameObject.SetActive(false);
     }
 
@@ -302,11 +305,26 @@ public class GameManager : MonoBehaviour
     }
     public void OnStartClick()
     {
-        GameStart();
+        GameStartPanel.gameObject.SetActive(false);
+        PositioningPanel.gameObject.SetActive(true);
+
+        if(gameStarManager.P1BotToggle.isOn && gameStarManager.P2BotToggle.isOn)
+        {
+            PositioningManager.instance.Init(PositioningManager.PlayerCount.AllBots);
+        }else if (!gameStarManager.P1BotToggle.isOn && !gameStarManager.P2BotToggle.isOn)
+        {
+            PositioningManager.instance.Init(PositioningManager.PlayerCount.Dual);
+        }
+        else
+        {
+            PositioningManager.instance.Init(PositioningManager.PlayerCount.Solo);
+        }
     }
 
-    private void GameStart()
+    public void GameStart()
     {
+        PositioningPanel.gameObject.SetActive(false);
+
         // Get Bot Enable.
         if (gameStarManager.P1BotToggle.isOn)    
             Player1Movement.GetComponent<BotManager>().enabled = true;
@@ -335,8 +353,6 @@ public class GameManager : MonoBehaviour
         else
             neverFinish = true;
 
-        GameStartPanel.gameObject.SetActive(false);
-
         Player1Movement.gameObject.SetActive(true);
         Player2Movement.gameObject.SetActive(true);
         Ball.gameObject.SetActive(true);
@@ -360,7 +376,7 @@ public class GameManager : MonoBehaviour
             GameOver();
         }
 
-        Time.timeScale = 1.0f;
+        Time.timeScale = PlayingTimeScale;
 
         gameState = GameStates.InGame;
     }
