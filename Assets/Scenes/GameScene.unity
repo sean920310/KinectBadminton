@@ -1311,6 +1311,7 @@ MonoBehaviour:
   GameoverCheeringSound: {fileID: 234814730}
   directionalLight: {fileID: 1161708845}
   spotLight: {fileID: 2101688609}
+  useKinect: 0
 --- !u!4 &234814729
 Transform:
   m_ObjectHideFlags: 0
