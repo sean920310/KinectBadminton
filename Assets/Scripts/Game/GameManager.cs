@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] int winScore;
     [SerializeField] bool neverFinish; // Endless if true
 
+    [SerializeField] float PlayingTimeScale = 0.7f;
+
     [Header("GameObject")]
     [SerializeField] PlayerMovement Player1Movement;
     [SerializeField] PlayerMovement Player2Movement;
@@ -70,6 +72,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] HUDPanel HUD;
     [SerializeField] RectTransform PausePanel;
     [SerializeField] RectTransform GameStartPanel;
+    [SerializeField] RectTransform PositioningPanel;
 
     [Header("Audio")]
     [SerializeField] AudioSource PlayerOneWinSound;
@@ -98,7 +101,6 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0.0f;
         gameState = GameStates.GamePreparing;
         neverFinish = false;
-        SetServePlayer(Players.Player1);
     }
 
     // Update is called once per frame
@@ -106,8 +108,11 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if(gameState == GameStates.GamePause) Resume();
-            else Pause();
+            if(gameState != GameStates.GamePreparing)
+            {
+                if (gameState == GameStates.GamePause) Resume();
+                else Pause();
+            }
         }
 
         if (!Player1Movement.PrepareServe && !Player2Movement.PrepareServe)
@@ -132,8 +137,8 @@ public class GameManager : MonoBehaviour
 
         // Set Player State 
         SetServePlayer(Players.Player1);
-        playerPosAndVelocityReset();
-        StartCoroutine(PlayerMovementDisableForAWhile(0.2f));
+        playerStatesReset();
+        StartCoroutine(PlayerMovementDisableForAWhile(0.5f));
 
         // Set ball Serve State to true
         Ball.ballStates = BallManager.BallStates.Serving;
@@ -158,7 +163,7 @@ public class GameManager : MonoBehaviour
 
         // Set Player State 
         SetServePlayer(Players.Player2);
-        playerPosAndVelocityReset();
+        playerStatesReset();
         StartCoroutine(PlayerMovementDisableForAWhile(0.2f));
 
         // Set ball Serve State to true
@@ -177,13 +182,11 @@ public class GameManager : MonoBehaviour
     {
         if(ServePlayer == Players.Player1)
         {
-            Player1Movement.PrepareServe = true;
-            Player2Movement.PrepareServe = false;
+            Player1Movement.SetPlayerServe();
         }
         else
         {
-            Player1Movement.PrepareServe = false;
-            Player2Movement.PrepareServe = true;
+            Player2Movement.SetPlayerServe();
         }
     }
 
@@ -194,13 +197,19 @@ public class GameManager : MonoBehaviour
         ServeBorderR.SetActive(active);
     }
 
-    public void playerPosAndVelocityReset()
+    public void playerStatesReset()
     {
-        Player1Movement.transform.localPosition = new Vector3(-3, 1.25f, 0);
-        Player2Movement.transform.localPosition = new Vector3(3, 1.25f, 0);
+        Player1Movement.animator.Play("Idle", -1, 0.0f);
+        Player2Movement.animator.Play("Idle", -1, 0.0f);
+
+        Player1Movement.transform.localPosition = new Vector3(-3, 1.06f, 0);
+        Player2Movement.transform.localPosition = new Vector3(3, 1.06f, 0);
 
         Player1Movement.rb.velocity = new Vector3(0, 0f, 0);
         Player2Movement.rb.velocity = new Vector3(0, 0f, 0);
+
+        Player1Movement.ResetInputFlag();
+        Player2Movement.ResetInputFlag();
     }
 
     public void GameOver()
@@ -269,7 +278,7 @@ public class GameManager : MonoBehaviour
     private void Resume()
     {
         gameState = GameStates.InGame;
-        Time.timeScale = 1.0f;
+        Time.timeScale = PlayingTimeScale;
         PausePanel.gameObject.SetActive(false);
     }
 
@@ -296,11 +305,26 @@ public class GameManager : MonoBehaviour
     }
     public void OnStartClick()
     {
-        GameStart();
+        GameStartPanel.gameObject.SetActive(false);
+        PositioningPanel.gameObject.SetActive(true);
+
+        if(gameStarManager.P1BotToggle.isOn && gameStarManager.P2BotToggle.isOn)
+        {
+            PositioningManager.instance.Init(PositioningManager.PlayerCount.AllBots);
+        }else if (!gameStarManager.P1BotToggle.isOn && !gameStarManager.P2BotToggle.isOn)
+        {
+            PositioningManager.instance.Init(PositioningManager.PlayerCount.Dual);
+        }
+        else
+        {
+            PositioningManager.instance.Init(PositioningManager.PlayerCount.Solo);
+        }
     }
 
-    private void GameStart()
+    public void GameStart()
     {
+        PositioningPanel.gameObject.SetActive(false);
+
         // Get Bot Enable.
         if (gameStarManager.P1BotToggle.isOn)    
             Player1Movement.GetComponent<BotManager>().enabled = true;
@@ -329,13 +353,30 @@ public class GameManager : MonoBehaviour
         else
             neverFinish = true;
 
-        GameStartPanel.gameObject.SetActive(false);
-
         Player1Movement.gameObject.SetActive(true);
         Player2Movement.gameObject.SetActive(true);
         Ball.gameObject.SetActive(true);
 
-        Time.timeScale = 1.0f;
+        // Set Player State 
+        SetServePlayer(Players.Player1);
+
+        Player1Movement.transform.localPosition = new Vector3(-3, 1.06f, 0);
+        Player2Movement.transform.localPosition = new Vector3(3, 1.06f, 0);
+
+        StartCoroutine(PlayerMovementDisableForAWhile(0.5f));
+
+        // Set ball Serve State to true
+        Ball.ballStates = BallManager.BallStates.Serving;
+
+        ServeBorderActive(true);
+
+        // Check if the game over condition has been satisfied.
+        if (CheckIsGameover())
+        {
+            GameOver();
+        }
+
+        Time.timeScale = PlayingTimeScale;
 
         gameState = GameStates.InGame;
     }
