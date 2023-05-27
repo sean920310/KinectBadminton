@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -70,6 +71,9 @@ public class BotManager : MonoBehaviour
     bool newPrepareServe = false;
     bool canJump = false;
     bool isHitAfterServeLocked = false;
+
+    public float testHeight;
+    public BallTrackDraw.TrackPointInfo[] trackPointInfos;
 
     void Start()
     {
@@ -360,12 +364,13 @@ public class BotManager : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position, 2f, Time.fixedDeltaTime);
+        Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position);
 
-        for(int i = 0; i < track.Length - 1; i++) {
+        for (int i = 0; i < track.Length - 1; i++) {
             Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(track[i], track[i+1]);
+            Gizmos.DrawLine(track[i], track[i + 1]);
         }
+
     }
 
     void hitDelayReset()

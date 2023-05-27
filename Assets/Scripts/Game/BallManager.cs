@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.VFX;
 
@@ -62,6 +64,7 @@ public class BallManager : MonoBehaviour
 
     private void FixedUpdate()
     {
+
         if (badmintonSimulation && isFlyingUp)
         {
             rb.velocity *= velocityDecayMultiplier;
@@ -268,6 +271,18 @@ public class BallManager : MonoBehaviour
 
 public class BallTrackDraw
 {
+    [Serializable]
+    public struct TrackPointInfo
+    {
+        public Vector3 position;
+        public float time;
+
+        public TrackPointInfo(Vector3 position, float time) {
+            this.position = position;
+            this.time = time;
+        }
+    }
+
     public static Vector3[] getTrack(Rigidbody rb, Vector3 originPos, float time, float timeStep)
     {
         List<Vector3> tracksPos = new List<Vector3>();
@@ -282,13 +297,134 @@ public class BallTrackDraw
         // velocityNew = velocity0 * ( 1 - deltaTime * drag);
         for (float i = 0f; i <= time; i += timeStep)
         {
-            tracksVel.Add(tracksVel[tracksVel.Count - 1] + Physics.gravity * timeStep);
-            tracksVel[tracksVel.Count - 1] *= (1 - timeStep * drag);
+            tracksVel.Add( (tracksVel[tracksVel.Count - 1] + Physics.gravity * timeStep) * (1 - timeStep * drag));
 
             tracksPos.Add(tracksVel[tracksVel.Count - 1] * timeStep + tracksPos[tracksPos.Count - 1]);
 
             tracksPos.Add(tracksPos[tracksPos.Count - 1]);
+
         }
         return tracksPos.ToArray();
+    }
+    public static Vector3[] getTrack(Rigidbody rb, Vector3 originPos)
+    {
+        List<Vector3> tracksPos = new List<Vector3>();
+        List<Vector3> tracksVel = new List<Vector3>();
+
+        Vector3 velocity0 = rb.velocity;
+        float drag = rb.drag;
+
+        tracksPos.Add(originPos);
+        tracksVel.Add(velocity0);
+
+        while (tracksPos[tracksPos.Count - 1].y > 0)
+        {
+            tracksVel.Add((tracksVel[tracksVel.Count - 1] + Physics.gravity * Time.fixedDeltaTime) * (1 - Time.fixedDeltaTime * drag));
+
+            tracksPos.Add(tracksVel[tracksVel.Count - 1] * Time.fixedDeltaTime + tracksPos[tracksPos.Count - 1]);
+        }
+
+        return tracksPos.ToArray();
+    }
+
+    // if return false, then the ball will not reach the height,
+    // otherwise, the ball will reach, and return a trackPointInfos by reference.
+    public static bool isBallReachHeight(Rigidbody rb, Vector3 originPos, float height, float currentTime, ref TrackPointInfo[] trackPointInfos)
+    {
+
+        bool reackFlag = false;
+
+        List<Vector3> tracksPos = new List<Vector3>();
+        List<Vector3> tracksVel = new List<Vector3>();
+        float accT = 0;
+
+        List<TrackPointInfo> tpInfos = new List<TrackPointInfo>();
+
+        Vector3 velocity0 = rb.velocity;
+        float drag = rb.drag;
+
+        tracksPos.Add(originPos);
+        tracksVel.Add(velocity0);
+        trackPointInfos = tpInfos.ToArray();
+
+        while (tracksPos[tracksPos.Count - 1].y > 0)
+        {
+            tracksVel.Add((tracksVel[tracksVel.Count - 1] + Physics.gravity * Time.fixedDeltaTime) * (1 - Time.fixedDeltaTime * drag));
+
+            tracksPos.Add(tracksVel[tracksVel.Count - 1] * Time.fixedDeltaTime + tracksPos[tracksPos.Count - 1]);
+
+            accT += Time.fixedDeltaTime;
+
+            if (tracksPos[tracksPos.Count - 1].y >= tracksPos[tracksPos.Count - 2].y)
+            {
+                if (tracksPos[tracksPos.Count - 1].y >= height && height >= tracksPos[tracksPos.Count - 2].y)
+                {
+                    reackFlag = true;
+                    tpInfos.Add(new TrackPointInfo(tracksPos[tracksPos.Count - 1], currentTime + accT));
+
+                    trackPointInfos = tpInfos.ToArray();
+                }
+            }
+            else
+            {
+                if (tracksPos[tracksPos.Count - 2].y >= height && height >= tracksPos[tracksPos.Count - 1].y)
+                {
+                    reackFlag = true;
+                    tpInfos.Add(new TrackPointInfo(tracksPos[tracksPos.Count - 1], currentTime + accT));
+
+                    trackPointInfos = tpInfos.ToArray();
+                }
+
+                // Optimize: Dpecific height only encounter 0, 1 or 2 time(s),
+                //              so if it reach 2 times, then break;
+                if (tpInfos.Count >= 2)
+                {
+                    break;
+                }
+            }
+        }
+        return reackFlag;
+    }
+    public static bool isBallReachHeight(Vector3[] BallPositions, float height, float currentTime, ref TrackPointInfo[] trackPointInfos)
+    {
+        List<TrackPointInfo> tpInfos = new List<TrackPointInfo>();
+        trackPointInfos = tpInfos.ToArray();
+
+        bool reackFlag = false;
+        float accT = 0;
+
+        for(int i = 1; i < BallPositions.Length; i++)
+        {
+            accT += Time.fixedDeltaTime;
+
+            if (BallPositions[BallPositions.Length - 1].y >= BallPositions[BallPositions.Length - 2].y)
+            {
+                if (BallPositions[BallPositions.Length - 1].y >= height && height >= BallPositions[BallPositions.Length - 2].y)
+                {
+                    reackFlag = true;
+                    tpInfos.Add(new TrackPointInfo(BallPositions[BallPositions.Length - 1], currentTime + accT));
+
+                    trackPointInfos = tpInfos.ToArray();
+                }
+            }
+            else
+            {
+                if (BallPositions[BallPositions.Length - 2].y >= height && height >= BallPositions[BallPositions.Length - 1].y)
+                {
+                    reackFlag = true;
+                    tpInfos.Add(new TrackPointInfo(BallPositions[BallPositions.Length - 1], currentTime + accT));
+
+                    trackPointInfos = tpInfos.ToArray();
+                }
+
+                // Optimize: Dpecific height only encounter 0, 1 or 2 time(s),
+                //              so if it reach 2 times, then break;
+                if (tpInfos.Count >= 2)
+                {
+                    break;
+                }
+            }
+        }
+        return reackFlag;
     }
 }
