@@ -265,3 +265,30 @@ public class BallManager : MonoBehaviour
         }
     }
 }
+
+public class BallTrackDraw
+{
+    public static Vector3[] getTrack(Rigidbody rb, Vector3 originPos, float time, float timeStep)
+    {
+        List<Vector3> tracksPos = new List<Vector3>();
+        List<Vector3> tracksVel = new List<Vector3>();
+
+        Vector3 velocity0 = rb.velocity;
+        float drag = rb.drag;
+
+        tracksPos.Add(originPos);
+        tracksVel.Add(velocity0);
+
+        // velocityNew = velocity0 * ( 1 - deltaTime * drag);
+        for (float i = 0f; i <= time; i += timeStep)
+        {
+            tracksVel.Add(tracksVel[tracksVel.Count - 1] + Physics.gravity * timeStep);
+            tracksVel[tracksVel.Count - 1] *= (1 - timeStep * drag);
+
+            tracksPos.Add(tracksVel[tracksVel.Count - 1] * timeStep + tracksPos[tracksPos.Count - 1]);
+
+            tracksPos.Add(tracksPos[tracksPos.Count - 1]);
+        }
+        return tracksPos.ToArray();
+    }
+}

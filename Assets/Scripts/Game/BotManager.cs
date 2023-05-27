@@ -358,13 +358,15 @@ public class BotManager : MonoBehaviour
         }
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = new Color(1.0f, 0.0f, 0.0f);
-    //    Gizmos.DrawCube(new Vector3(DropPointInfo.point.x, DropPointInfo.point.y, 0), new Vector3(0.05f, 0.05f, 0.05f));
-    //    Gizmos.color = new Color(0.0f, 1.0f, 0.0f);
-    //    Gizmos.DrawLine(ball.transform.position, ball.transform.position + ball.transform.right.normalized * 10);
-    //}
+    private void OnDrawGizmos()
+    {
+        Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position, 2f, Time.fixedDeltaTime);
+
+        for(int i = 0; i < track.Length - 1; i++) {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(track[i], track[i+1]);
+        }
+    }
 
     void hitDelayReset()
     {
