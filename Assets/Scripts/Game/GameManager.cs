@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Experimental.GlobalIllumination;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -82,6 +83,8 @@ public class GameManager : MonoBehaviour
     [Header("Light")]
     [SerializeField] Light directionalLight;
     [SerializeField] Light spotLight;
+
+    [SerializeField] bool useKinect = true;
 
     public Players Winner { get; private set; } = Players.None;
 
@@ -278,7 +281,10 @@ public class GameManager : MonoBehaviour
     private void Resume()
     {
         gameState = GameStates.InGame;
-        Time.timeScale = PlayingTimeScale;
+        if(useKinect)
+            Time.timeScale = PlayingTimeScale;
+        else
+            Time.timeScale = 1.0f;
         PausePanel.gameObject.SetActive(false);
     }
 
@@ -305,25 +311,40 @@ public class GameManager : MonoBehaviour
     }
     public void OnStartClick()
     {
-        GameStartPanel.gameObject.SetActive(false);
-        PositioningPanel.gameObject.SetActive(true);
+        if(useKinect)
+        {
+            GameStartPanel.gameObject.SetActive(false);
+            PositioningPanel.gameObject.SetActive(true);
 
-        if(gameStarManager.P1BotToggle.isOn && gameStarManager.P2BotToggle.isOn)
-        {
-            PositioningManager.instance.Init(PositioningManager.PlayerCount.AllBots);
-        }else if (!gameStarManager.P1BotToggle.isOn && !gameStarManager.P2BotToggle.isOn)
-        {
-            PositioningManager.instance.Init(PositioningManager.PlayerCount.Dual);
+            if (gameStarManager.P1BotToggle.isOn && gameStarManager.P2BotToggle.isOn)
+            {
+                PositioningManager.instance.Init(PositioningManager.PlayerCount.AllBots);
+            }
+            else if (!gameStarManager.P1BotToggle.isOn && !gameStarManager.P2BotToggle.isOn)
+            {
+                PositioningManager.instance.Init(PositioningManager.PlayerCount.Dual);
+            }
+            else
+            {
+                PositioningManager.instance.Init(PositioningManager.PlayerCount.Solo);
+            }
         }
         else
         {
-            PositioningManager.instance.Init(PositioningManager.PlayerCount.Solo);
+            GameStartPanel.gameObject.SetActive(false);
+            GameStart();
         }
     }
 
     public void GameStart()
     {
         PositioningPanel.gameObject.SetActive(false);
+
+        if (!useKinect)
+        {
+            Player1Movement.GetComponent<PlayerInput>().enabled = true;
+            Player2Movement.GetComponent<PlayerInput>().enabled = true;
+        }
 
         // Get Bot Enable.
         if (gameStarManager.P1BotToggle.isOn)    
@@ -376,7 +397,10 @@ public class GameManager : MonoBehaviour
             GameOver();
         }
 
-        Time.timeScale = PlayingTimeScale;
+        if(useKinect)
+            Time.timeScale = PlayingTimeScale;
+        else
+            Time.timeScale = 1.0f;
 
         gameState = GameStates.InGame;
     }

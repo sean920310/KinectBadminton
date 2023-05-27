@@ -1311,6 +1311,7 @@ MonoBehaviour:
   GameoverCheeringSound: {fileID: 234814730}
   directionalLight: {fileID: 1161708845}
   spotLight: {fileID: 2101688609}
+  useKinect: 0
 --- !u!4 &234814729
 Transform:
   m_ObjectHideFlags: 0
@@ -18187,6 +18188,10 @@ PrefabInstance:
       value: 5.9
       objectReference: {fileID: 0}
     - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: JumpHeightRandom
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: jumpDelayCounter
       value: -2.3205771
       objectReference: {fileID: 0}
@@ -18194,6 +18199,26 @@ PrefabInstance:
       propertyPath: isRightSidePlayer
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: swinDownRangeXRandom
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: swinDownRangeYRandom
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: ballXVelImpactsSwinDownRange
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7284554762845451978, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: ball
+      value: 
+      objectReference: {fileID: 796490629}
+    - target: {fileID: 7284554762845451978, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: enemyPlayer
+      value: 
+      objectReference: {fileID: 909109875199266210}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
 --- !u!4 &758331620 stripped
@@ -33622,6 +33647,14 @@ PrefabInstance:
     - target: {fileID: 7264972860974448660, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.y
       value: 15.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7284554762845451978, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: ball
+      value: 
+      objectReference: {fileID: 796490629}
+    - target: {fileID: 7284554762845451978, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7334668747297657830, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.x
