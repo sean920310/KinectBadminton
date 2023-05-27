@@ -362,17 +362,6 @@ public class BotManager : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
-    {
-        Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position);
-
-        for (int i = 0; i < track.Length - 1; i++) {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(track[i], track[i + 1]);
-        }
-
-    }
-
     void hitDelayReset()
     {
         hitDelayCounter = hitDelay;

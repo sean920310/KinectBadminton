@@ -348,9 +348,9 @@ public class GameManager : MonoBehaviour
 
         // Get Bot Enable.
         if (gameStarManager.P1BotToggle.isOn)    
-            Player1Movement.GetComponent<BotManager>().enabled = true;
+            Player1Movement.GetComponent<HUABotManager>().enabled = true;
         if (gameStarManager.P2BotToggle.isOn)
-            Player2Movement.GetComponent<BotManager>().enabled = true;
+            Player2Movement.GetComponent<HUABotManager>().enabled = true;
 
         // Get Info From Game Start Setting.
         Player1Info.name = gameStarManager.Player1NameInput.text;
