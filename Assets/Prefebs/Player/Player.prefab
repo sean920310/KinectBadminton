@@ -624,6 +624,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f31c50f947c77de4b825f1a5be35bed7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyPlayer: {fileID: 1117428462548657271}
+  botPlayer: {fileID: 1117428462548657271}
+  ball: {fileID: 0}
+  ballPos: {x: 0, y: 0}
+  ballVel: {x: 0, y: 0}
 --- !u!114 &6562552481887273289
 MonoBehaviour:
   m_ObjectHideFlags: 0
