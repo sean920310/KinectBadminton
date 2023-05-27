@@ -10,63 +10,46 @@ public class HUABotManager : MonoBehaviour
     [SerializeField] PlayerMovement botPlayer;
     [SerializeField] BallManager ball;
 
-    [Header("Ball")]
-    [SerializeField] Vector2 ballPos;
-    [SerializeField] Vector2 ballVel;
 
-    bool preBallInLeftSide;
-    float preRangeInBotAndBall;
+    public BallTrackDraw.TrackPointInfo[] trackPointInfos;
 
-    bool detectBallIsBack;
+    Vector3 preBallVel;
 
+    bool botMove = false;
 
-    const float RightBottomLine = 7.0f;
-    const float LeftBottomLine = -7.0f;
-    const float RightSiteCenter = 3.5f;
-    const float LeftSiteCenter = -3.5f;
-    const float SiteCener = -3.5f;
-
-    bool isJump = false;
 
     void Start()
     {
-        preRangeInBotAndBall = 0;
 
-        ballPos = ball.transform.position;
-        ballVel = ball.rb.velocity;
-        preBallInLeftSide = ball.BallInLeftSide;
     }
 
     // Update is called once per frame
     void Update()
     {
-        ballPos = ball.transform.position;
-        ballVel = ball.rb.velocity;
 
-
-        if (preBallInLeftSide != ball.BallInLeftSide)
+        botPlayer.moveInputFlag = 0;
+        //ball is fly to bot's sides
+        if (ball.BallInLeftSide && botPlayer.transform.position.x > 0 
+            && preBallVel.x * ball.rb.velocity.x <= 0)
         {
-            if (Mathf.Abs(ballVel.x) > 0.000001 && ballPos.y != 0)
-            {
-                detectBallIsBack = Mathf.Abs(ballVel.x) > 7;
-                isJump = false;
-                //Debug.Log(ballPos.y + " " + ballVel.x + " " + ballVel.y);
-            }
-        }
+            Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position);
+            if (BallTrackDraw.isBallReachHeight(ball.rb, ball.transform.position, 0.5f, Time.time, ref trackPointInfos))
+                botMove = true;
 
-        //ball is not in bot's side
-        if ((ball.BallInLeftSide && botPlayer.transform.position.x > 0) ||
-            (!ball.BallInLeftSide && botPlayer.transform.position.x < 0))
-        {
-            preRangeInBotAndBall = 0;
-            MoveBotTo(3.5f, 0.05f);
         }
         else
         {
-            Movement();
-            
+            //Movement();
+
         }
-        preBallInLeftSide = ball.BallInLeftSide;
+        if(botMove)
+        {
+            MoveBotTo(trackPointInfos[trackPointInfos.Length - 1].position.x, 0.1f);
+            if (botPlayer.moveInputFlag == 0)
+                botMove = false;
+        }
+            
+        preBallVel = ball.rb.velocity;
 
     }
 
@@ -88,39 +71,20 @@ public class HUABotManager : MonoBehaviour
 
     private void Movement()
     {
-        float rangeInBotAndBall = Mathf.Abs(ball.transform.position.x - botPlayer.transform.position.x);
-        if (rangeInBotAndBall < 0.5)
-        {
-            MoveBotTo(ball.transform.position.x, 0.2f);
-
-            Jump();
-            botPlayer.jumpInputFlag = true;
-            isJump = true;
-        }
-        else
-        {
-
-            if (rangeInBotAndBall > preRangeInBotAndBall)
-                detectBallIsBack = !detectBallIsBack;
-            if (detectBallIsBack)
-                MoveBotTo(RightBottomLine, 0.2f);
-            else
-                MoveBotTo(SiteCener, -0.2f);
-        }
-        preRangeInBotAndBall = rangeInBotAndBall;
+        
+        MoveBotTo(ball.transform.position.x, 0.2f);
     }
 
     private void Jump()
     {
 
         if (
-            !isJump &&
-            (ball.transform.position.y - botPlayer.transform.position.y > 1) && 
+            (ball.transform.position.y - botPlayer.transform.position.y > 1) &&
             (ball.transform.position.y - botPlayer.transform.position.y < 3)
            )
         {
             botPlayer.jumpInputFlag = true;
         }
-        
+
     }
 }

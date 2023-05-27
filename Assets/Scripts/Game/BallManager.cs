@@ -397,22 +397,22 @@ public class BallTrackDraw
         {
             accT += Time.fixedDeltaTime;
 
-            if (BallPositions[BallPositions.Length - 1].y >= BallPositions[BallPositions.Length - 2].y)
+            if (BallPositions[i - 1].y >= BallPositions[i - 2].y)
             {
-                if (BallPositions[BallPositions.Length - 1].y >= height && height >= BallPositions[BallPositions.Length - 2].y)
+                if (BallPositions[i - 1].y >= height && height >= BallPositions[i - 2].y)
                 {
                     reackFlag = true;
-                    tpInfos.Add(new TrackPointInfo(BallPositions[BallPositions.Length - 1], currentTime + accT));
+                    tpInfos.Add(new TrackPointInfo(BallPositions[i - 1], currentTime + accT));
 
                     trackPointInfos = tpInfos.ToArray();
                 }
             }
             else
             {
-                if (BallPositions[BallPositions.Length - 2].y >= height && height >= BallPositions[BallPositions.Length - 1].y)
+                if (BallPositions[i - 2].y >= height && height >= BallPositions[i - 1].y)
                 {
                     reackFlag = true;
-                    tpInfos.Add(new TrackPointInfo(BallPositions[BallPositions.Length - 1], currentTime + accT));
+                    tpInfos.Add(new TrackPointInfo(BallPositions[i - 1], currentTime + accT));
 
                     trackPointInfos = tpInfos.ToArray();
                 }

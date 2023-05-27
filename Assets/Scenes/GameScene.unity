@@ -18217,7 +18217,7 @@ PrefabInstance:
       objectReference: {fileID: 796490629}
     - target: {fileID: 7284554762845451978, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7284554762845451978, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: enemyPlayer
