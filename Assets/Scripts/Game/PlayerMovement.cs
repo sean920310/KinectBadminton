@@ -171,7 +171,7 @@ public class PlayerMovement : MonoBehaviour
             // SwinDown Type Detection: Front Ball SwingDownFront, vice versa.
             if (facingRight)
             {
-                if (ball.transform.position.x - transform.position.x <= 0.2f)
+                if (ball.transform.position.x - transform.position.x <= 0.3f)
                 {
                     animator.SetTrigger("SwingDownBack");
                 }
@@ -182,7 +182,7 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                if (ball.transform.position.x - transform.position.x >= 0.2f)
+                if (ball.transform.position.x - transform.position.x >= 0.3f)
                 {
                     animator.SetTrigger("SwingDownBack");
                 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -10,56 +11,95 @@ public class HUABotManager : MonoBehaviour
     [SerializeField] PlayerMovement botPlayer;
     [SerializeField] BallManager ball;
 
+    [Serializable]
+    public struct HitPointInfo
+    {
+        public Transform transform;
+        public float time;
+    };
+
+    [SerializeField] HitPointInfo[] UnderHandBack;
+    [SerializeField] HitPointInfo[] UnderHandFront;
+    [SerializeField] HitPointInfo[] OverHand;
+    [SerializeField] HitPointInfo[] Smash;
 
     public BallTrackDraw.TrackPointInfo[] trackPointInfos;
 
     Vector3 preBallVel;
 
     bool botMove = false;
+    bool botSwing = false;
 
+    bool botServed = false;
+    HitPointInfo botSwingStyle;
 
     void Start()
     {
-
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        botPlayer.moveInputFlag = 0;
-        //ball is fly to bot's sides
-        if (ball.BallInLeftSide && botPlayer.transform.position.x > 0 
-            && preBallVel.x * ball.rb.velocity.x <= 0)
+        ResetInputflag();
+        if (botPlayer.PrepareServe)
         {
-            Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position);
-            if (BallTrackDraw.isBallReachHeight(ball.rb, ball.transform.position, 0.5f, Time.time, ref trackPointInfos))
-                botMove = true;
-
+            Serve();
         }
         else
         {
-            //Movement();
-
-        }
-        if(botMove)
-        {
-            MoveBotTo(trackPointInfos[trackPointInfos.Length - 1].position.x, 0.1f);
-            if (botPlayer.moveInputFlag == 0)
-                botMove = false;
-        }
             
+            //ball turn around
+            if (preBallVel.x * ball.rb.velocity.x <= 0)
+            {
+                botSwingStyle = RandomChooseSwingStyle();
+                Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position);
+
+                //if ball fall position is in bot side then move and swing
+                if (track[track.Length - 1].x * botPlayer.transform.position.x >= 0)
+                {
+                    if (BallTrackDraw.isBallReachHeight(ball.rb, ball.transform.position, botSwingStyle.transform.position.y , Time.time, ref trackPointInfos))
+                    {
+                        botMove = true;
+                    }
+                }
+            }
+
+            if(trackPointInfos.Length > 0)
+            {
+               
+                if (botMove)
+                {
+                    MoveHitPointTo(trackPointInfos[trackPointInfos.Length - 1].position.x, 0.09f, botSwingStyle);
+                    if (botPlayer.moveInputFlag == 0)
+                    {
+                        botSwing = true;
+                        botMove = false;
+                    }
+                }
+
+                if (botSwing)
+                {
+                    if (Swing(botSwingStyle))
+                        botSwing = false;
+                }
+                else
+                {
+                    botPlayer.swinDownInputFlag = false;
+                }
+            }
+        }
+
         preBallVel = ball.rb.velocity;
 
     }
 
-    private void MoveBotTo(float x, float moveRange)
+    private void MoveHitPointTo(float x, float moveRange, HitPointInfo hitPoint)
     {
-        if (botPlayer.transform.position.x > x + moveRange)
+        if (hitPoint.transform.position.x > x + moveRange)
         {
             botPlayer.moveInputFlag = -1;
         }
-        else if (botPlayer.transform.position.x < x - moveRange)
+        else if (hitPoint.transform.position.x < x - moveRange)
         {
             botPlayer.moveInputFlag = 1;
         }
@@ -69,22 +109,32 @@ public class HUABotManager : MonoBehaviour
         }
     }
 
-    private void Movement()
+    private bool Swing(HitPointInfo hitPoint)
     {
-        
-        MoveBotTo(ball.transform.position.x, 0.2f);
-    }
-
-    private void Jump()
-    {
-
-        if (
-            (ball.transform.position.y - botPlayer.transform.position.y > 1) &&
-            (ball.transform.position.y - botPlayer.transform.position.y < 3)
-           )
+        float offsetRange = 0.00f;
+        float offsetTime = trackPointInfos[trackPointInfos.Length - 1].time - Time.time;
+        if (offsetTime <= hitPoint.time + offsetRange)
         {
-            botPlayer.jumpInputFlag = true;
+            botPlayer.swinDownInputFlag = true;
+            return true;
         }
-
+        else
+        {
+            return false;
+        }
+    }
+    private void Serve()
+    {
+        botPlayer.swinUpInputFlag = true;
+    }
+    private void ResetInputflag()
+    {
+        botPlayer.swinUpInputFlag = false;
+        botPlayer.swinDownInputFlag = false;
+        botPlayer.moveInputFlag = 0;
+    }
+    private HitPointInfo RandomChooseSwingStyle()
+    {
+        return UnderHandBack[UnityEngine.Random.Range(0, 2)];
     }
 }

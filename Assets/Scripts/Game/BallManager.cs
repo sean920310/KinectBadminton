@@ -360,7 +360,10 @@ public class BallTrackDraw
                 if (tracksPos[tracksPos.Count - 1].y >= height && height >= tracksPos[tracksPos.Count - 2].y)
                 {
                     reackFlag = true;
-                    tpInfos.Add(new TrackPointInfo(tracksPos[tracksPos.Count - 1], currentTime + accT));
+
+                    float percentage = (height - tracksPos[tracksPos.Count - 2].y) / (tracksPos[tracksPos.Count - 1].y - tracksPos[tracksPos.Count - 2].y);
+                    tpInfos.Add(new TrackPointInfo((tracksPos[tracksPos.Count - 1] - tracksPos[tracksPos.Count - 2]) * percentage + tracksPos[tracksPos.Count - 2],
+                        currentTime + accT - Time.fixedDeltaTime + Time.fixedDeltaTime * percentage));
 
                     trackPointInfos = tpInfos.ToArray();
                 }
@@ -370,7 +373,10 @@ public class BallTrackDraw
                 if (tracksPos[tracksPos.Count - 2].y >= height && height >= tracksPos[tracksPos.Count - 1].y)
                 {
                     reackFlag = true;
-                    tpInfos.Add(new TrackPointInfo(tracksPos[tracksPos.Count - 1], currentTime + accT));
+
+                    float percentage = (height - tracksPos[tracksPos.Count - 1].y) / (tracksPos[tracksPos.Count - 2].y - tracksPos[tracksPos.Count - 1].y);
+                    tpInfos.Add(new TrackPointInfo((tracksPos[tracksPos.Count - 2] - tracksPos[tracksPos.Count - 1]) * percentage + tracksPos[tracksPos.Count - 1],
+                        currentTime + accT - Time.fixedDeltaTime + Time.fixedDeltaTime * (1 - percentage)));
 
                     trackPointInfos = tpInfos.ToArray();
                 }
@@ -393,16 +399,20 @@ public class BallTrackDraw
         bool reackFlag = false;
         float accT = 0;
 
-        for(int i = 1; i < BallPositions.Length; i++)
+        for (int i = 1; i < BallPositions.Length; i++)
         {
             accT += Time.fixedDeltaTime;
 
+            // If height is between current position and previous position.
             if (BallPositions[i - 1].y >= BallPositions[i - 2].y)
             {
                 if (BallPositions[i - 1].y >= height && height >= BallPositions[i - 2].y)
                 {
                     reackFlag = true;
-                    tpInfos.Add(new TrackPointInfo(BallPositions[i - 1], currentTime + accT));
+
+                    float percentage = (height - BallPositions[i - 2].y) / (BallPositions[i - 1].y - BallPositions[i - 2].y);
+                    tpInfos.Add(new TrackPointInfo((BallPositions[i - 1] - BallPositions[i - 2]) * percentage + BallPositions[i - 2],
+                        currentTime + accT - Time.fixedDeltaTime + Time.fixedDeltaTime * percentage));
 
                     trackPointInfos = tpInfos.ToArray();
                 }
@@ -412,7 +422,10 @@ public class BallTrackDraw
                 if (BallPositions[i - 2].y >= height && height >= BallPositions[i - 1].y)
                 {
                     reackFlag = true;
-                    tpInfos.Add(new TrackPointInfo(BallPositions[i - 1], currentTime + accT));
+
+                    float percentage = (height - BallPositions[i - 1].y) / (BallPositions[i - 2].y - BallPositions[i - 1].y);
+                    tpInfos.Add(new TrackPointInfo((BallPositions[i - 2] - BallPositions[i - 1]) * percentage + BallPositions[i - 1],
+                        currentTime + accT - Time.fixedDeltaTime + Time.fixedDeltaTime * (1 - percentage)));
 
                     trackPointInfos = tpInfos.ToArray();
                 }
