@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
 
     // Jump
     [Header("Jump")]
-    [SerializeField] float jumpForce = 5.0f;
+    [SerializeField] public float jumpForce = 5.0f;
     [SerializeField] Transform GroundChk;
     [SerializeField] LayerMask WhatIsGround;
     [ReadOnly] public bool onGround = true;
