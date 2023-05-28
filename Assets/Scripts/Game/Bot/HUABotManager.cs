@@ -31,6 +31,7 @@ public class HUABotManager : MonoBehaviour
 
     bool botMove = false;
     bool botSwing = false;
+    [SerializeField] private float testHeight;
 
     // Update is called once per frame
     void Update()
@@ -92,12 +93,20 @@ public class HUABotManager : MonoBehaviour
     {
         Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position);
 
-        for (int i = 0; i < track.Length - 1; i++)
+        for (int idx = 0; idx < track.Length - 1; idx++)
         {
             Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(track[i], track[i + 1]);
+            Gizmos.DrawLine(track[idx], track[idx + 1]);
         }
 
+        int i = (int)BallTrackDraw.MaxPointTime(ball.rb.velocity, ball.rb.drag);
+        print("I: " + i);
+        print("I(float): " + BallTrackDraw.MaxPointTime(ball.rb.velocity, ball.rb.drag));
+        Gizmos.DrawCube(BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i),Vector3.one * 0.1f);
+
+        i = (int)BallTrackDraw.getPointTimeByHeight(ball.transform.position, ball.rb.velocity, ball.rb.drag, testHeight);
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i), Vector3.one * 0.1f);
     }
 
     private void MoveHitPointTo(float position, float moveRange, HitPointInfo hitPoint)
@@ -316,5 +325,51 @@ public class BallTrackDraw
             }
         }
         return reackFlag;
+    }
+
+    public static float getPointTimeByHeight(Vector3 p0, Vector3 v0, float drag, float height)
+    {
+        float t = MaxPointTime(v0, drag);
+        float maxH = getPointByTime(p0, v0, drag, (int)t).y;
+        if (maxH < height) return -1;
+        else if (maxH == height) return t;
+
+        float targetEV = (height - p0.y) / Time.fixedDeltaTime;
+        int i = ((int)t); // start with the heighest point
+        for (; velocitySumCalculator(v0, drag, i).y > targetEV; i++) ;
+
+        return i;
+    }
+    public static Vector3 getPointByTime(Vector3 p0, Vector3 v0, float drag, int i)
+    {
+        if (i == 0) return p0;
+
+        return p0 + Time.fixedDeltaTime * velocitySumCalculator(v0, drag, i);
+    }
+    public static float MaxPointTime(Vector3 v0, float drag)
+    {
+        if (v0.y <= 0) return 0;
+
+        float K = (1.0f - Time.fixedDeltaTime * drag);
+
+        return -Mathf.Log(1.0f - (v0.y * (1.0f - K) / (Physics.gravity.y * Time.fixedDeltaTime * K))) / Mathf.Log(K);
+    }
+
+    private static Vector3 velocityCalculator(Vector3 v0, float drag, int i)
+    {
+        if (i == 0) return v0;
+
+        float K = (1 - Time.fixedDeltaTime * drag);
+
+        return v0 * Mathf.Pow(K, i) + Physics.gravity * Time.fixedDeltaTime * (K * (1.0f - Mathf.Pow(K, i))) / (1.0f - K);
+    }
+    private static Vector3 velocitySumCalculator(Vector3 v0, float drag, int i)
+    {
+        if (i == 0) return v0;
+
+        float K = (1 - Time.fixedDeltaTime * drag);
+
+        return v0 * ((1.0f - Mathf.Pow(K, i)) / (1.0f - K) * K) + 
+            Physics.gravity * Time.fixedDeltaTime * (K * (-K * i + i + Mathf.Pow(K, i + 1) - K) / Mathf.Pow(1.0f - K, 2));
     }
 }
