@@ -23,6 +23,7 @@ public class HUABotManager : MonoBehaviour
         public float time; // swing time
         public SwingStyle swingStyle;
         public bool needJump;
+
         public void doSwing(PlayerMovement p)
         {
             switch (swingStyle)
@@ -61,7 +62,6 @@ public class HUABotManager : MonoBehaviour
 
     bool botMove = false;
     bool botMoveSiteCenter = false;
-    bool botSwing = false;
     bool botJump = false;
 
     [Header("Jump")]
@@ -92,7 +92,7 @@ public class HUABotManager : MonoBehaviour
             HitPointInfo tmp;
             tmp.transform = item.transform;
             tmp.time = item.time;
-            tmp.swingStyle = item.swingStyle; ;
+            tmp.swingStyle = item.swingStyle;
             tmp.needJump = true;
             allSwingStyle.Add(tmp);
         }
@@ -101,16 +101,17 @@ public class HUABotManager : MonoBehaviour
             HitPointInfo tmp;
             tmp.transform = item.transform;
             tmp.time = item.time;
-            tmp.swingStyle = item.swingStyle; ;
+            tmp.swingStyle = item.swingStyle;
             tmp.needJump = true;
             allSwingStyle.Add(tmp);
         }
+
         foreach (var item in OverHand)
         {
             HitPointInfo tmp;
             tmp.transform = item.transform;
             tmp.time = item.time;
-            tmp.swingStyle = item.swingStyle; ;
+            tmp.swingStyle = item.swingStyle;
             tmp.needJump = true;
             allSwingStyle.Add(tmp);
         }
@@ -137,7 +138,7 @@ public class HUABotManager : MonoBehaviour
                 List<HitPointInfo> tmpSwingStyle = new List<HitPointInfo>(allSwingStyle);
 
                 //when list is empty, then break
-                while (tmpSwingStyle.Count != 0)
+                while (tmpSwingStyle.Count > 0)
                 {
                     WhichStyle = UnityEngine.Random.Range(0, tmpSwingStyle.Count);
                     botSwingStyle = tmpSwingStyle[WhichStyle];
@@ -152,11 +153,12 @@ public class HUABotManager : MonoBehaviour
                             if (BallTrackDraw.isBallReachHeight(ball.rb, ball.transform.position, botSwingStyle.transform.position.y + MaxHeight, Time.time, ref trackPointInfos))
                             {
                                 //if bot can jump to ball,then start move jump swing
-                                if (getTimeToHeight(botSwingStyle.transform.position.y + MaxHeight - botOnGroundY, ref jumpTime))
+                                if (getTimeToHeight(botSwingStyle.transform.position.y + MaxHeight - botOnGroundY/**/, ref jumpTime))
                                 {
                                     botJump = true;
                                     botMove = true;
-                                    botSwing = true;
+                                    StopCoroutine(SwingAction(botSwingStyle));
+                                    StartCoroutine(SwingAction(botSwingStyle));
                                     break;
                                 }
                                 //if not,delete the swingStyle
@@ -167,7 +169,7 @@ public class HUABotManager : MonoBehaviour
                                 }
 
                             }
-                            //if the ball can reach height,delete this swing style
+                            //if the ball can't reach height,delete this swing style
                             else
                             {
                                 tmpSwingStyle.RemoveAt(WhichStyle);
@@ -181,9 +183,11 @@ public class HUABotManager : MonoBehaviour
                             if (BallTrackDraw.isBallReachHeight(ball.rb, ball.transform.position, botSwingStyle.transform.position.y, Time.time, ref trackPointInfos))
                             {
                                 botMove = true;
-                                botSwing = true;
+                                StopCoroutine(SwingAction(botSwingStyle));
+                                StartCoroutine(SwingAction(botSwingStyle));
+                                break;
                             }
-                            //if the ball can reach height,delete this swing style
+                            //if the ball can't reach height,delete this swing style
                             else
                             {
                                 tmpSwingStyle.RemoveAt(WhichStyle);
@@ -195,8 +199,8 @@ public class HUABotManager : MonoBehaviour
                     else
                     {
                         botMoveSiteCenter = true;
-                        tmpSwingStyle.RemoveAt(WhichStyle);
-                        continue;
+                        tmpSwingStyle.Clear();
+                        break;
                     }
                 }
             }
@@ -220,12 +224,6 @@ public class HUABotManager : MonoBehaviour
                     if (Jump())
                         botJump = false;
                 }
-
-                if (botSwing)
-                {
-                    if (Swing(botSwingStyle))
-                        botSwing = false;
-                }
             }
         }
         preBallVel = ball.rb.velocity;
@@ -234,12 +232,12 @@ public class HUABotManager : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawCube(botPlayer.transform.position - new Vector3(0.15f, 0.15f, 0.01f), new Vector3(0.3f, 0.3f, 0.01f));
-        Gizmos.color = Color.blue;
-        Gizmos.DrawCube(trackPointInfos[trackPointInfos.Length - 1].position - new Vector3(0.15f, 0.15f, 0.01f), new Vector3(0.3f, 0.3f, 0.01f));
-        Gizmos.color = Color.green;
-        Gizmos.DrawCube(new Vector3(botSwingStyle.transform.position.x - 0.15f, botSwingStyle.transform.position.y - 0.15f, botSwingStyle.transform.position.z), new Vector3(0.3f, 0.3f, 0.01f));
+        //Gizmos.color = Color.red;
+        //Gizmos.DrawCube(botPlayer.transform.position - new Vector3(0.15f, 0.15f, 0.01f), new Vector3(0.3f, 0.3f, 0.01f));
+        //Gizmos.color = Color.blue;
+        //Gizmos.DrawCube(trackPointInfos[trackPointInfos.Length - 1].position - new Vector3(0.15f, 0.15f, 0.01f), new Vector3(0.3f, 0.3f, 0.01f));
+        //Gizmos.color = Color.green;
+        //Gizmos.DrawCube(new Vector3(botSwingStyle.transform.position.x - 0.15f, botSwingStyle.transform.position.y - 0.15f, botSwingStyle.transform.position.z), new Vector3(0.3f, 0.3f, 0.01f));
         Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position, new Vector3(6.8f, 0, 0));
 
         for (int idx = 0; idx < track.Length - 1; idx++)
@@ -248,14 +246,12 @@ public class HUABotManager : MonoBehaviour
             Gizmos.DrawLine(track[idx], track[idx + 1]);
         }
 
-        int i = (int)BallTrackDraw.MaxPointTime(ball.rb.velocity, ball.rb.drag);
-        print("I: " + i);
-        print("I(float): " + BallTrackDraw.MaxPointTime(ball.rb.velocity, ball.rb.drag));
-        Gizmos.DrawCube(BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i),Vector3.one * 0.1f);
+        //int i = (int)BallTrackDraw.MaxPointTime(ball.rb.velocity, ball.rb.drag);
+        //Gizmos.DrawCube(BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i),Vector3.one * 0.1f);
 
-        i = (int)BallTrackDraw.getPointTimeByHeight(ball.transform.position, ball.rb.velocity, ball.rb.drag, testHeight);
-        Gizmos.color = Color.red;
-        Gizmos.DrawCube(BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i), Vector3.one * 0.1f);
+        //i = (int)BallTrackDraw.getPointTimeByHeight(ball.transform.position, ball.rb.velocity, ball.rb.drag, testHeight);
+        //Gizmos.color = Color.red;
+        //Gizmos.DrawCube(BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i), Vector3.one * 0.1f);
     }
     private void MoveBotTo(float position, float moveRange)
     {
@@ -302,18 +298,24 @@ public class HUABotManager : MonoBehaviour
             return false;
         }
     }
-    private bool Swing(HitPointInfo hitPoint)
+    //private bool Swing(HitPointInfo hitPoint)
+    //{
+    //    float offsetTime = trackPointInfos[trackPointInfos.Length - 1].time - Time.time;
+    //    if (offsetTime <= hitPoint.time)
+    //    {
+    //        hitPoint.doSwing(botPlayer);
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
+    //}
+    IEnumerator SwingAction(HitPointInfo hitPoint)
     {
         float offsetTime = trackPointInfos[trackPointInfos.Length - 1].time - Time.time;
-        if (offsetTime <= hitPoint.time)
-        {
-            hitPoint.doSwing(botPlayer);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        yield return new WaitForSeconds(offsetTime - hitPoint.time);
+        hitPoint.doSwing(botPlayer);
     }
     private void Serve()
     {
@@ -322,50 +324,38 @@ public class HUABotManager : MonoBehaviour
 
     private bool getTimeToHeight(float height, ref float resultTime)
     {
-        //Height =  initalVelocity * Time + gravity * Time * Time / 2.
-        //
-        float initalVel = (Vector3.up.y * botPlayer.jumpForce) / botPlayer.rb.mass;
-        float a = Physics.gravity.y / 2;
-        float b = initalVel;
-        float c = height * -1;
-        float t0 = (-1 * b + Mathf.Pow((b * b - 4 * a * c), 0.5f)) / (2 * a);
-        float t1 = (-1 * b - Mathf.Pow((b * b - 4 * a * c), 0.5f)) / (2 * a);
-        Debug.Log(b * b - 4 * a * c);
-        if (t0 > 0 && t1 < 0)
-        {
-            resultTime = t0;
-            return true;
-        }
-        else if (t0 < 0 && t1 > 0)
-        {
-            resultTime = t1;
-            return true;
-        }
-        else if (t0 > 0 && t1 > 0)
-        {
-            if (t0 < t1)
-            {
-                resultTime = t0;
-                return true;
-            }
-            else
-            {
-                resultTime = t1;
-                return true;
-            }
+        // Height =  initalVelocity * Time + gravity * Time * Time / 2.
 
-        }
-        else
+        float v0 = botPlayer.jumpForce / botPlayer.rb.mass;
+        float a = Physics.gravity.y / 2;
+        float b = v0;
+        float c = -height;
+
+        float D = b * b - 4 * a * c;
+
+        if(D < 0)
         {
             resultTime = 0f;
             return false;
+
         }
+        else if(D == 0)
+        {
+            resultTime = (-1 * b + Mathf.Pow(D, 0.5f)) / (2 * a);
+            return true;
+        }
+
+        float t0 = (-1 * b + Mathf.Pow((b * b - 4 * a * c), 0.5f)) / (2 * a);
+        float t1 = (-1 * b - Mathf.Pow((b * b - 4 * a * c), 0.5f)) / (2 * a);
+
+        resultTime = t0 > t1 ?  t1 : t0;
+        return true;
     }
     private void ResetInputflag()
     {
-        botPlayer.swinUpInputFlag = false;
-        botPlayer.swinDownInputFlag = false;
-        botPlayer.jumpInputFlag = false;
+        //botPlayer.swinUpInputFlag = false;
+        //botPlayer.swinDownInputFlag = false;
+        //botPlayer.jumpInputFlag = false;
         botPlayer.moveInputFlag = 0;
     }
     private void RandomChooseSwingStyle()
