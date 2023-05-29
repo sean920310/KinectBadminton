@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
     // Player Parameter
     // Move
     [Header("Movement")]
-    [SerializeField] float movementSpeed = 4.9f;
+    [SerializeField] public float movementSpeed = 4.9f;
     [SerializeField] float airMovementSpeed = 2.4f;
 
     // Jump

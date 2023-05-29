@@ -3,7 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.VFX;
+
+[System.Serializable]
+public class CollideEvent : UnityEvent<Collision> { }
+
+[System.Serializable]
+public class HitEvent : UnityEvent<Collider> { }
 
 public class BallManager : MonoBehaviour
 {
@@ -51,6 +58,13 @@ public class BallManager : MonoBehaviour
     public BallStates ballStates = BallStates.Serving;
 
     public bool BallInLeftSide { get; private set; }
+
+    // Object collide with ball.
+    public CollideEvent OnCollideEvent = new CollideEvent();
+    // Ball got hit by racket.
+    public HitEvent OnHitEvent = new HitEvent();
+    // Ball got hit by racket.
+    public UnityEvent OnServeEvent;
 
     private void Start()
     {
@@ -121,6 +135,7 @@ public class BallManager : MonoBehaviour
 
         HitSound.Play();
 
+        OnServeEvent.Invoke();
     }
 
     // Hit Racket
@@ -243,13 +258,15 @@ public class BallManager : MonoBehaviour
 
             trailRenderer.enabled = true;
             HitParticle.Play();
+
+            OnHitEvent.Invoke(other);
         }
     }
 
-    // Hit Floor
     private void OnCollisionEnter(Collision collision)
     {
-        if(ballStates != BallStates.Serving && collision.transform.tag == "Ground")
+        // Hit Floor
+        if (ballStates != BallStates.Serving && collision.transform.tag == "Ground")
         {
             ballStates = BallStates.Serving;
 
@@ -266,5 +283,7 @@ public class BallManager : MonoBehaviour
             trailRenderer.enabled = false;
             HittingFloorSound.Play();
         }
+
+        OnCollideEvent.Invoke(collision);
     }
 }

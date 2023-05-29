@@ -18219,10 +18219,6 @@ PrefabInstance:
       propertyPath: enemyPlayer
       value: 
       objectReference: {fileID: 909109875199266210}
-    - target: {fileID: 7284554762845451978, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: allSwingStyle.Array.data[0].transform
-      value: 
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
 --- !u!4 &758331620 stripped
@@ -18529,6 +18525,15 @@ MonoBehaviour:
   SmashSound: {fileID: 796490632}
   HittingFloorSound: {fileID: 796490631}
   ballStates: 0
+  OnCollideEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHitEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnServeEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!96 &796490630
 TrailRenderer:
   serializedVersion: 2
@@ -32733,8 +32738,20 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.094
+      value: -2.0939999
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -32750,15 +32767,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 909109874194044290, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -32995,10 +33012,6 @@ PrefabInstance:
     - target: {fileID: 1117428462548657271, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: multiAimConstraint
       value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 1117428462548657271, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: enableFallGravityScale
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1179296069839350159, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.x
