@@ -8,13 +8,13 @@ using UnityEngine.UIElements;
 
 public class HUABotManager : MonoBehaviour
 {
+    #region Structure
     [Serializable]
     public enum SwingStyle
     {
         SwingUp,
         SwingDown
     };
-
 
     [Serializable]
     public struct HitPointInfo
@@ -33,7 +33,6 @@ public class HUABotManager : MonoBehaviour
             needJump = hitpoint.needJump;
             skip = hitpoint.skip;
         }
-
         public void doSwing(PlayerMovement p)
         {
             switch (swingStyle)
@@ -48,8 +47,25 @@ public class HUABotManager : MonoBehaviour
                     break;
             }
         }
-    };
 
+        public override bool Equals(object obj)
+        {
+            return obj is HitPointInfo info &&
+                   EqualityComparer<Transform>.Default.Equals(transform, info.transform) &&
+                   time == info.time &&
+                   swingStyle == info.swingStyle &&
+                   needJump == info.needJump &&
+                   skip == info.skip;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(transform, time, swingStyle, needJump, skip);
+        }
+    }
+    #endregion
+
+    #region Variable
     [Header("Game Object")]
     [SerializeField] PlayerMovement enemyPlayer;
     [SerializeField] PlayerMovement botPlayer;
@@ -66,122 +82,94 @@ public class HUABotManager : MonoBehaviour
     [SerializeField][ReadOnly] HitPointInfo botSwingStyle;
     [SerializeField][ReadOnly] BallTrackDraw.TrackPointInfo[] trackPointInfos;
 
-    Vector3 preBallVel;
-
     [Header("Jump")]
     [SerializeField] float MaxHeight;
     [SerializeField] float MinHeight;
     [SerializeField] [ReadOnly] float jumpHeight;
+    [SerializeField][ReadOnly] float jumpTime;
 
-    float jumpTime;
-    float botOnGroundY;
+    [Header("Gizmos")]
+    [SerializeField] bool showBallTracks = true;
+    [SerializeField] Color BallTracksColor = Color.yellow;
+    [SerializeField][ReadOnly] Vector3[] GizmosBallTracks;
 
-    Coroutine jumpCO;
-    Coroutine swinCO;
-    Coroutine moveCO;
-    Coroutine takeActionCO;
+    [SerializeField] bool showHitPoint = true;
+    [SerializeField] Color HitPointColor = Color.red;
+    [SerializeField][ReadOnly] Vector3 GizmosHitPoint = Vector3.zero;
 
+    [SerializeField] bool showSwingPoint = true;
+    [SerializeField] Color SwingPointColor = Color.green;
+    [SerializeField][ReadOnly] HitPointInfo GizmosSwingPoint = default(HitPointInfo);
 
-    Vector3 GizmosHitPoint;
-    void Start()
+    [SerializeField] bool showDropPoint = true;
+    [SerializeField] Color DropPointColor = Color.blue;
+    [SerializeField][ReadOnly] Vector3 GizmosDropPoint = Vector3.zero;
+
+    [Header("Coroutine")]
+    [SerializeField][ReadOnly] Coroutine jumpCO;
+    [SerializeField][ReadOnly] Coroutine swinCO;
+    [SerializeField][ReadOnly] Coroutine moveCO;
+    [SerializeField][ReadOnly] Coroutine takeActionCO;
+
+    #endregion
+
+    private void Start()
     {
-        // Trigger OnBallCollide when ball collide 
         ball.OnCollideEvent.AddListener(OnBallCollide);
         ball.OnHitEvent.AddListener(OnBallHit);
         ball.OnServeEvent.AddListener(OnBallServe);
 
-        botOnGroundY = botPlayer.transform.position.y;
         MaxHeight = MathF.Pow((Vector3.up.y * botPlayer.jumpForce) / botPlayer.rb.mass, 2) * -1 / (2 * Physics.gravity.y);
 
-        foreach (var item in UnderHandBack)
-        {
-            allSwingStyle.Add(item);
-        }
-        foreach (var item in UnderHandFront)
-        {
-            allSwingStyle.Add(item);
-        }
-        foreach (var item in OverHand)
-        {
-            allSwingStyle.Add(item);
-        }
-
-        //foreach (var item in UnderHandBack)
-        //{
-        //    HitPointInfo tmp = new HitPointInfo(item);
-        //    tmp.needJump = true;
-        //    allSwingStyle.Add(tmp);
-        //}
-        //foreach (var item in UnderHandFront)
-        //{
-        //    HitPointInfo tmp = new HitPointInfo(item);
-        //    tmp.needJump = true;
-        //    allSwingStyle.Add(tmp);
-        //}
-
-        //foreach (var item in Smash)
-        //{
-        //    if (item.skip)
-        //        continue;
-        //    HitPointInfo tmp = new HitPointInfo(item);
-        //    tmp.needJump = true;
-        //    allSwingStyle.Add(tmp);
-        //}
+        SwingStyleInit();
+        
     }
-
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        //ResetInputflag();
 
-        ResetInputflag();
         if (botPlayer.PrepareServe)
         {
             Serve();
         }
-        else
-        {
-            // If ball turn around.
-            if (preBallVel.x * ball.rb.velocity.x <= 0 || preBallVel.y <= 0 && ball.rb.velocity.y > 0)
-            {
-                if(takeActionCO != null)
-                    StopCoroutine(takeActionCO);
-                takeActionCO = StartCoroutine(TakeActionCoroutine(1));
-            }
-        }
-        preBallVel = ball.rb.velocity;
-
     }
-
     private void OnDrawGizmos()
     {
-        //Gizmos.color = Color.red;
-        //Gizmos.DrawCube(botPlayer.transform.position - new Vector3(0.15f, 0.15f, 0.01f), new Vector3(0.3f, 0.3f, 0.01f));
         if (Application.isPlaying)
         {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawCube(GizmosHitPoint - new Vector3(0.1f, 0.1f, 0f), new Vector3(0.2f, 0.2f, 0.01f));
-            Gizmos.color = Color.green;
-            Gizmos.DrawCube(new Vector3(botSwingStyle.transform.position.x - 0.1f, botSwingStyle.transform.position.y - 0.1f, 0), new Vector3(0.2f, 0.2f, 0.01f));
-            Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position, new Vector3(6.8f, 0, 0));
-
-            for (int idx = 0; idx < track.Length - 1; idx++)
+            if (showBallTracks && GizmosBallTracks != null)
             {
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(track[idx], track[idx + 1]);
+                Gizmos.color = BallTracksColor;
+                for (int idx = 0; idx < GizmosBallTracks.Length - 1; idx++)
+                {
+                    Gizmos.DrawLine(GizmosBallTracks[idx], GizmosBallTracks[idx + 1]);
+                }
+            }
+
+            if (showHitPoint)
+            {
+                Gizmos.color = HitPointColor;
+                Gizmos.DrawSphere(GizmosHitPoint, 0.08f);
+            }
+
+            if (showSwingPoint)
+            {
+                Gizmos.color = SwingPointColor;
+                if(!GizmosSwingPoint.Equals(default(HitPointInfo)) && GizmosSwingPoint.transform != null)
+                    Gizmos.DrawSphere(GizmosSwingPoint.transform.position, 0.08f);
+            }
+
+            if (showDropPoint)
+            {
+                Gizmos.color = DropPointColor;
+                int i = (int)BallTrackDraw.getPointTimeByHeight(ball.transform.position, ball.rb.velocity, ball.rb.drag, 0.01f);
+                Gizmos.DrawSphere(BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i), 0.08f);
             }
         }
-
-        //int i = (int)BallTrackDraw.MaxPointTime(ball.rb.velocity, ball.rb.drag);
-        //Gizmos.DrawCube(BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i),Vector3.one * 0.1f);
-
-        int i = (int)BallTrackDraw.getPointTimeByHeight(ball.transform.position, ball.rb.velocity, ball.rb.drag, 0.01f);
-        Gizmos.color = Color.red;
-        Gizmos.DrawCube(BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i), Vector3.one * 0.05f);
     }
 
-    #region Bot Action
-
-    IEnumerator TakeActionCoroutine(int delayCount)
+    #region Bot Take Action Logics
+    private IEnumerator TakeActionCoroutine(int delayCount)
     {
         for (int i = 0; i < delayCount; i++)
         {
@@ -189,15 +177,21 @@ public class HUABotManager : MonoBehaviour
         }
         BotTakeAction();
     }
+    // This is where the bot chooses a swing style.
     private void BotTakeAction()
     {
+        GizmosReset();
 
         int i = (int)BallTrackDraw.getPointTimeByHeight(ball.transform.position, ball.rb.velocity, ball.rb.drag, 0.01f);
         float dropPoint = BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i).x;
         if (isPositionXInSameSide(dropPoint))
         {
             Vector3[] track = BallTrackDraw.getTrack(ball.rb, ball.transform.position, new Vector3(6.5f, 0, 0));
+
+            GizmosBallTracks = track;
+
             List<HitPointInfo> tmpSwingStyle = new List<HitPointInfo>(allSwingStyle);
+
             //when list is empty, then break
             while (tmpSwingStyle.Count > 0)
             {
@@ -210,42 +204,28 @@ public class HUABotManager : MonoBehaviour
                     //if ball reach height
                     jumpHeight = UnityEngine.Random.Range(MinHeight, MaxHeight);
                     if (BallTrackDraw.isBallReachHeight(ball.rb, ball.transform.position, botSwingStyle.transform.position.y + jumpHeight,  Time.time, ref trackPointInfos)
-                        && trackPointInfos[trackPointInfos.Length - 1].position.x > 0.1 * Mathf.Sign(transform.position.x))
+                        && trackPointInfos[trackPointInfos.Length - 1].position.x > 0.25 * Mathf.Sign(transform.position.x)
+                        && getTimeToHeight(jumpHeight, ref jumpTime))
                     {
+                        if (jumpCO != null)
+                            StopCoroutine(jumpCO);
+                        jumpCO = StartCoroutine(JumpCoroutine(trackPointInfos[trackPointInfos.Length - 1].time - Time.time - jumpTime));
+
+                        if (swinCO != null)
+                            StopCoroutine(swinCO);
+                        swinCO = StartCoroutine(SwingCoroutine(botSwingStyle, trackPointInfos[trackPointInfos.Length - 1].time - Time.time - botSwingStyle.time));
+
+                        if (moveCO != null)
+                            StopCoroutine(moveCO);
+                        moveCO = StartCoroutine(MoveCoroutine(trackPointInfos[trackPointInfos.Length - 1].position.x, 0.05f, botSwingStyle));
+
                         GizmosHitPoint = trackPointInfos[trackPointInfos.Length - 1].position;
-
-                        //if bot can jump to ball,then start move jump swing
-                        if (getTimeToHeight(jumpHeight, ref jumpTime))
-                        {
-                            if(jumpCO != null)
-                                StopCoroutine(jumpCO);
-                            jumpCO = StartCoroutine(JumpCoroutine(trackPointInfos[trackPointInfos.Length - 1].time - Time.time - jumpTime));
-                            
-                            if (swinCO != null)
-                                StopCoroutine(swinCO);
-                            swinCO = StartCoroutine(SwingCoroutine(botSwingStyle, trackPointInfos[trackPointInfos.Length - 1].time - Time.time - botSwingStyle.time));
-
-                            if(moveCO != null)
-                                StopCoroutine(moveCO);
-                            moveCO = StartCoroutine(MoveCoroutine(trackPointInfos[trackPointInfos.Length - 1].position.x, 0.05f, botSwingStyle));
-
-                            break;
-                        }
-                        //if not,delete the swingStyle
-                        else
-                        {
-                            GizmosHitPoint = Vector3.zero;
-
-                            tmpSwingStyle.RemoveAt(WhichStyle);
-                            continue;
-                        }
-
+                        GizmosSwingPoint = botSwingStyle;
+                        break;
                     }
                     //if the ball can't reach height,delete this swing style
                     else
                     {
-                        GizmosHitPoint = Vector3.zero;
-
                         tmpSwingStyle.RemoveAt(WhichStyle);
                         continue;
                     }
@@ -255,10 +235,8 @@ public class HUABotManager : MonoBehaviour
                 {
                     //if ball reach height
                     if (BallTrackDraw.isBallReachHeight(ball.rb, ball.transform.position, botSwingStyle.transform.position.y, Time.time, ref trackPointInfos)
-                         && trackPointInfos[trackPointInfos.Length - 1].position.x > 0.1 * Mathf.Sign(transform.position.x))
+                         && trackPointInfos[trackPointInfos.Length - 1].position.x > 0.25 * Mathf.Sign(transform.position.x))
                     {
-                        GizmosHitPoint = trackPointInfos[trackPointInfos.Length - 1].position;
-
                         if (jumpCO != null)
                             StopCoroutine(jumpCO);
 
@@ -270,13 +248,14 @@ public class HUABotManager : MonoBehaviour
                             StopCoroutine(moveCO);
                         moveCO = StartCoroutine(MoveCoroutine(trackPointInfos[trackPointInfos.Length - 1].position.x, 0.05f, botSwingStyle));
 
+                        GizmosHitPoint = trackPointInfos[trackPointInfos.Length - 1].position;
+                        GizmosSwingPoint = botSwingStyle;
+
                         break;
                     }
                     //if the ball can't reach height,delete this swing style
                     else
                     {
-                        GizmosHitPoint = Vector3.zero;
-
                         tmpSwingStyle.RemoveAt(WhichStyle);
                         continue;
                     }
@@ -295,7 +274,10 @@ public class HUABotManager : MonoBehaviour
             moveCO = StartCoroutine(MoveCoroutine(3.5f * Mathf.Sign(botPlayer.transform.position.x), 0.1f));
         }
     }
+    #endregion
 
+    // Basic Movement: Move, Jump and Swing
+    #region Bot Action
     private void MoveBotTo(float position, float moveRange)
     {
         if (botPlayer.transform.position.x > position + moveRange)
@@ -311,17 +293,17 @@ public class HUABotManager : MonoBehaviour
             botPlayer.moveInputFlag = 0;
         }
     }
-    IEnumerator JumpCoroutine(float jumpTime)
+    private IEnumerator JumpCoroutine(float jumpTime)
     {
         yield return new WaitForSeconds(jumpTime);
         botPlayer.jumpInputFlag = true;
     }
-    IEnumerator SwingCoroutine(HitPointInfo hitPoint, float delay)
+    private IEnumerator SwingCoroutine(HitPointInfo hitPoint, float delay)
     {
         yield return new WaitForSeconds(delay);
         hitPoint.doSwing(botPlayer);
     }
-    IEnumerator MoveCoroutine(float position, float moveRange, HitPointInfo hitPoint)
+    private IEnumerator MoveCoroutine(float position, float moveRange, HitPointInfo hitPoint)
     {
         bool toGoal = false;
         while (!toGoal)
@@ -342,7 +324,7 @@ public class HUABotManager : MonoBehaviour
             yield return null;
         }
     }
-    IEnumerator MoveCoroutine(float position, float moveRange)
+    private IEnumerator MoveCoroutine(float position, float moveRange)
     {
         bool toGoal = false;
         while (!toGoal)
@@ -369,31 +351,68 @@ public class HUABotManager : MonoBehaviour
     }
     #endregion
 
-    void OnBallCollide(Collision other)
+    // Bot Take Action Event will trigger by Ball, such as Collide, Hit and Serve
+    // The event is registered in Start() function.
+    #region Bot Take Action Event
+    private void OnBallCollide(Collision other)
     {
-        print("Ball collide with something");
-
         if (other.gameObject.tag != "Ground")
         {
             if(takeActionCO != null)
                 StopCoroutine(takeActionCO);
-            takeActionCO = StartCoroutine(TakeActionCoroutine(1));
+            takeActionCO = StartCoroutine(TakeActionCoroutine(2));
         }
     }
-    void OnBallHit(Collider other)
+    private void OnBallHit(Collider other)
     {
-        print("Ball get hit");
         if (takeActionCO != null)
             StopCoroutine(takeActionCO);
-        takeActionCO = StartCoroutine(TakeActionCoroutine(1));
+        takeActionCO = StartCoroutine(TakeActionCoroutine(2));
     }
-    void OnBallServe()
+    private void OnBallServe()
     {
-        print("Ball Serve");
         if (takeActionCO != null)
             StopCoroutine(takeActionCO);
-        takeActionCO = StartCoroutine(TakeActionCoroutine(1));
+        takeActionCO = StartCoroutine(TakeActionCoroutine(2));
     }
+    #endregion
+
+    #region SwingStyle
+    [ContextMenu("SwingStyleInit")]
+    public void SwingStyleInit()
+    {
+        ResetSwingStyle();
+
+        LoadSwingStyle(UnderHandBack, false);
+        LoadSwingStyle(UnderHandFront, false);
+        LoadSwingStyle(OverHand, false);
+
+        LoadSwingStyle(UnderHandBack, true);
+        LoadSwingStyle(UnderHandFront, true);
+        LoadSwingStyle(Smash, true);
+    }
+    private void LoadSwingStyle(HitPointInfo[] hitPointInfo, bool isJump)
+    {
+        foreach (HitPointInfo item in hitPointInfo)
+        {
+            if (item.skip) continue;
+            HitPointInfo tmp = new HitPointInfo(item);
+            tmp.needJump = isJump;
+            allSwingStyle.Add(tmp);
+        }
+    }
+    private void ResetSwingStyle() => allSwingStyle.Clear();
+    #endregion
+
+    #region Gizmos
+    private void GizmosReset()
+    {
+        GizmosBallTracks = null;
+        GizmosHitPoint = Vector3.zero;
+        GizmosSwingPoint = default(HitPointInfo);
+        GizmosDropPoint = Vector3.zero;
+    }
+    #endregion
 
     private float getMoveTimeToPosition(float fromX, float toX)
     {

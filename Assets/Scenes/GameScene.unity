@@ -18171,46 +18171,6 @@ PrefabInstance:
       propertyPath: m_FlipY
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: ball
-      value: 
-      objectReference: {fileID: 796490629}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: centerBorder
-      value: 
-      objectReference: {fileID: 877380383}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: DefensePositionX
-      value: 5.9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: JumpHeightRandom
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: jumpDelayCounter
-      value: -2.3205771
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: isRightSidePlayer
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: swinDownRangeXRandom
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: swinDownRangeYRandom
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: ballXVelImpactsSwinDownRange
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7284554762845451978, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: ball
       value: 
@@ -33588,26 +33548,6 @@ PrefabInstance:
     - target: {fileID: 6452183951834108956, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.y
       value: 15.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: ball
-      value: 
-      objectReference: {fileID: 796490629}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: someBool
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: centerBorder
-      value: 
-      objectReference: {fileID: 877380383}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: isRightSidePlayer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6562552481887273289, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
-      propertyPath: swinUpRangeDefault.y
-      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 6619996136429032728, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: m_LocalPosition.x

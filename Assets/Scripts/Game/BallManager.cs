@@ -258,9 +258,9 @@ public class BallManager : MonoBehaviour
 
             trailRenderer.enabled = true;
             HitParticle.Play();
-
-            OnHitEvent.Invoke(other);
         }
+
+        OnHitEvent.Invoke(other);
     }
 
     private void OnCollisionEnter(Collision collision)
