@@ -85,7 +85,7 @@ public class HUABotManager : MonoBehaviour
     [Header("Jump")]
     [SerializeField] float MaxHeight;
     [SerializeField] float MinHeight;
-    [SerializeField] [ReadOnly] float jumpHeight;
+    [SerializeField][ReadOnly] float jumpHeight;
     [SerializeField][ReadOnly] float jumpTime;
 
     [Header("Gizmos")]
@@ -118,11 +118,12 @@ public class HUABotManager : MonoBehaviour
         ball.OnCollideEvent.AddListener(OnBallCollide);
         ball.OnHitEvent.AddListener(OnBallHit);
         ball.OnServeEvent.AddListener(OnBallServe);
+        ball.OnSkillEvent.AddListener(OnBallSkill);
 
         MaxHeight = MathF.Pow((Vector3.up.y * botPlayer.jumpForce) / botPlayer.rb.mass, 2) * -1 / (2 * Physics.gravity.y);
 
         SwingStyleInit();
-        
+
     }
     private void Update()
     {
@@ -155,7 +156,7 @@ public class HUABotManager : MonoBehaviour
             if (showSwingPoint)
             {
                 Gizmos.color = SwingPointColor;
-                if(!GizmosSwingPoint.Equals(default(HitPointInfo)) && GizmosSwingPoint.transform != null)
+                if (!GizmosSwingPoint.Equals(default(HitPointInfo)) && GizmosSwingPoint.transform != null)
                     Gizmos.DrawSphere(GizmosSwingPoint.transform.position, 0.08f);
             }
 
@@ -203,7 +204,7 @@ public class HUABotManager : MonoBehaviour
                 {
                     //if ball reach height
                     jumpHeight = UnityEngine.Random.Range(MinHeight, MaxHeight);
-                    if (BallTrackDraw.isBallReachHeight(ball.rb, ball.transform.position, botSwingStyle.transform.position.y + jumpHeight,  Time.time, ref trackPointInfos)
+                    if (BallTrackDraw.isBallReachHeight(ball.rb, ball.transform.position, botSwingStyle.transform.position.y + jumpHeight, Time.time, ref trackPointInfos)
                         && trackPointInfos[trackPointInfos.Length - 1].position.x > 0.25 * Mathf.Sign(transform.position.x)
                         && getTimeToHeight(jumpHeight, ref jumpTime))
                     {
@@ -358,7 +359,7 @@ public class HUABotManager : MonoBehaviour
     {
         if (other.gameObject.tag != "Ground")
         {
-            if(takeActionCO != null)
+            if (takeActionCO != null)
                 StopCoroutine(takeActionCO);
             takeActionCO = StartCoroutine(TakeActionCoroutine(2));
         }
@@ -370,6 +371,12 @@ public class HUABotManager : MonoBehaviour
         takeActionCO = StartCoroutine(TakeActionCoroutine(2));
     }
     private void OnBallServe()
+    {
+        if (takeActionCO != null)
+            StopCoroutine(takeActionCO);
+        takeActionCO = StartCoroutine(TakeActionCoroutine(2));
+    }
+    private void OnBallSkill()
     {
         if (takeActionCO != null)
             StopCoroutine(takeActionCO);
@@ -429,13 +436,13 @@ public class HUABotManager : MonoBehaviour
 
         float D = b * b - 4 * a * c;
 
-        if(D < 0)
+        if (D < 0)
         {
             resultTime = 0f;
             return false;
 
         }
-        else if(D == 0)
+        else if (D == 0)
         {
             resultTime = (-1 * b + Mathf.Pow(D, 0.5f)) / (2 * a);
             return true;
@@ -444,7 +451,7 @@ public class HUABotManager : MonoBehaviour
         float t0 = (-1 * b + Mathf.Pow((b * b - 4 * a * c), 0.5f)) / (2 * a);
         float t1 = (-1 * b - Mathf.Pow((b * b - 4 * a * c), 0.5f)) / (2 * a);
 
-        resultTime = t0 > t1 ?  t1 : t0;
+        resultTime = t0 > t1 ? t1 : t0;
         return true;
     }
     private void ResetInputflag()
@@ -645,10 +652,10 @@ public class BallTrackDraw
         float targetEV = (height - p0.y) / Time.fixedDeltaTime;
         int i = ((int)t); // start with the heighest point
 
-        for (; velocitySumCalculator(v0, drag, i).y > targetEV; i++);
+        for (; velocitySumCalculator(v0, drag, i).y > targetEV; i++) ;
 
         float percentage = (targetEV - velocitySumCalculator(v0, drag, i - 1).y) / (velocitySumCalculator(v0, drag, i).y - velocitySumCalculator(v0, drag, i - 1).y);
-       
+
         return (percentage + i);
     }
     public static Vector3 getPointByTime(Vector3 p0, Vector3 v0, float drag, float i)
@@ -680,7 +687,7 @@ public class BallTrackDraw
 
         float K = (1 - Time.fixedDeltaTime * drag);
 
-        return v0 * ((1.0f - Mathf.Pow(K, i)) / (1.0f - K) * K) + 
+        return v0 * ((1.0f - Mathf.Pow(K, i)) / (1.0f - K) * K) +
             Physics.gravity * Time.fixedDeltaTime * (K * (-K * i + i + Mathf.Pow(K, i + 1) - K) / Mathf.Pow(1.0f - K, 2));
     }
 }

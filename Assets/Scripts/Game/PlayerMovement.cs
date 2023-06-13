@@ -4,11 +4,12 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using UnityEngine.VFX;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [ReadOnly] public Rigidbody rb;
+    [ReadOnly] public Rigidbody rb; 
     [ReadOnly] public Animator animator;
     [SerializeField] Transform LeftHand;
     [SerializeField] AudioSource SwooshSound;
@@ -30,7 +31,6 @@ public class PlayerMovement : MonoBehaviour
     [DrawIf("enableFallGravityScale", true, ComparisonType.Equals)]
     [SerializeField] float fallGravityScale = 1.5f;
 
-
     // Swin
     [Header("Swin")]
     [SerializeField] float hitCoolDown;
@@ -42,11 +42,26 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] public bool PrepareServe { get; private set; } = false;
     bool facingRight = false;
 
+    // skill
+    [Header("BlackHole")]
+    [SerializeField] RectTransform SkillImage;
+    [SerializeField] RectTransform SkillCD;
+
+    [SerializeField] Transform skillSpawnPoint;
+    [SerializeField] float skillCoolDown = 60f;
+    [SerializeField] AudioSource blackHoleSound;
+    [SerializeField] AudioSource piuSound;
+    float skillCoolDownCounter = 0f;
+    static bool isPlayingSkill = false;
+
+    public CameraShake cameraShake;
+
     // Input Flag
     [ReadOnly] public float moveInputFlag = 0.0f;
     [ReadOnly] public bool jumpInputFlag = false;
     [ReadOnly] public bool swinUpInputFlag = false;
     [ReadOnly] public bool swinDownInputFlag = false;
+    [ReadOnly] public bool skillInputFlag = false;
 
     void Start()
     {
@@ -104,6 +119,9 @@ public class PlayerMovement : MonoBehaviour
         //    return;
         //}
 
+        if (PlayerMovement.isPlayingSkill)
+            return;
+
         // Jump
         // Serving Can't Jump
         if (!PrepareServe && jumpInputFlag && onGround)
@@ -153,7 +171,7 @@ public class PlayerMovement : MonoBehaviour
             }
             return;
         }
-        
+
         // Swing
         if (swinUpInputFlag && hitCoolDownCounter <= 0)
         {
@@ -193,6 +211,26 @@ public class PlayerMovement : MonoBehaviour
             }
             racket.swinDown();
         }
+
+        skillCoolDownCounter += Time.deltaTime;
+        if (skillCoolDownCounter >= skillCoolDown)
+        {
+            SkillImage.GetComponent<Image>().color = Color.black;
+            SkillCD.sizeDelta = new Vector2(SkillCD.sizeDelta.x, 120f);
+
+        }
+        else
+        {
+            SkillImage.GetComponent<Image>().color = Color.black * 0.78f;
+            SkillCD.sizeDelta = new Vector2(SkillCD.sizeDelta.x, Mathf.Lerp(0f, 120f, Mathf.Clamp01(skillCoolDownCounter / skillCoolDown)));
+        }
+
+        if (skillInputFlag && skillCoolDownCounter >= skillCoolDown)
+        {
+            skillInputFlag = false;
+
+            StartCoroutine(blackHoleCoroutine());
+        }
     }
 
     private void FixedUpdate()
@@ -202,10 +240,10 @@ public class PlayerMovement : MonoBehaviour
 
 
         // Fall Gravity
-        if(enableFallGravityScale)
+        if (enableFallGravityScale)
         {
             Vector3 gravity = gravity = -9.81f * normalGravityScale * Vector3.up;
-            if(!onGround && rb.velocity.y <= 0)
+            if (!onGround && rb.velocity.y <= 0)
             {
                 gravity = -9.81f * fallGravityScale * Vector3.up;
             }
@@ -221,7 +259,7 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("Move", false);
 
 
-        if(onGround)
+        if (onGround)
             rb.velocity = new Vector3(movementX * movementSpeed, rb.velocity.y, 0);
         else
             rb.velocity = new Vector3(movementX * airMovementSpeed, rb.velocity.y, 0);
@@ -269,6 +307,33 @@ public class PlayerMovement : MonoBehaviour
         swinDownInputFlag = false;
     }
 
+    public void isPlayingSkillOn() => isPlayingSkill = true;
+    public void isPlayingSkillOff() => isPlayingSkill = false;
+
+    IEnumerator blackHoleCoroutine()
+    {
+        skillCoolDownCounter = 0.0f;
+        PlayerMovement.isPlayingSkill = true;
+        animator.SetTrigger("playBlackHole");
+        animator.SetBool("BlackHole", true);
+        blackHoleSound.Play();
+        piuSound.PlayScheduled(AudioSettings.dspTime + 1.1f);
+        StartCoroutine(cameraShake.Shake(1.1f, 0.25f));
+        while (isPlayingSkill)
+        {
+            ball.transform.position = skillSpawnPoint.position;
+            ball.transform.rotation = skillSpawnPoint.rotation;
+            ball.rb.velocity = Vector3.zero;
+            yield return null;
+        }
+        blackHoleSound.Pause();
+        ball.rb.AddForce(new Vector3(1.0f, 0.2f, 0.0f).normalized * 10f * Mathf.Sign(transform.position.x) * -1f, ForceMode.Impulse);
+        ball.playSkill();
+        animator.SetBool("BlackHole", false);
+        animator.ResetTrigger("playBlackHole");
+        skillInputFlag = false;
+    }
+
     #region Input Handler
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -302,6 +367,14 @@ public class PlayerMovement : MonoBehaviour
         if (context.canceled)
             swinDownInputFlag = false;
     }
+    public void OnSkill(InputAction.CallbackContext context)
+    {
+        if (context.started)
+            skillInputFlag = true;
+
+        if (context.canceled)
+            skillInputFlag = false;
+    }
     public void OnKinectSwinDown()
     {
         swinDownInputFlag = true;
@@ -309,6 +382,10 @@ public class PlayerMovement : MonoBehaviour
     public void OnKinectSwinUp()
     {
         swinUpInputFlag = true;
+    }
+    public void OnKinectSkill()
+    {
+        skillInputFlag = true;
     }
     public void OnKinectPositionMapping(double pos)
     {

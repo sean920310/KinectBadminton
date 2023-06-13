@@ -65,6 +65,8 @@ public class BallManager : MonoBehaviour
     public HitEvent OnHitEvent = new HitEvent();
     // Ball got hit by racket.
     public UnityEvent OnServeEvent;
+    // Ball got hit by racket.
+    public UnityEvent OnSkillEvent;
 
     private void Start()
     {
@@ -110,6 +112,12 @@ public class BallManager : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, Quaternion.FromToRotation(Vector3.right, rb.velocity).eulerAngles.z);
 
     }
+
+    public void playSkill()
+    {
+        OnSkillEvent.Invoke();
+    }
+
     public void Serve(bool faceRight, Vector2 ServeDirection, float ServeForce)
     {
 
