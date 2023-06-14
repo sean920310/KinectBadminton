@@ -1936,22 +1936,22 @@ AnimationClip:
     floatParameter: 1
     intParameter: 0
     messageOptions: 0
-  - time: 0.2
-    functionName: SetRacketColliderOff
+  - time: 0.23333333
+    functionName: setHitCoolDown
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.21666667
+  - time: 0.23333333
     functionName: ResetSwinInputFlag
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.21666667
-    functionName: setHitCoolDown
+  - time: 0.23333333
+    functionName: SetRacketColliderOff
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

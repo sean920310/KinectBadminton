@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -70,6 +71,9 @@ public class BotManager : MonoBehaviour
     bool newPrepareServe = false;
     bool canJump = false;
     bool isHitAfterServeLocked = false;
+
+    public float testHeight;
+    public BallTrackDraw.TrackPointInfo[] trackPointInfos;
 
     void Start()
     {
@@ -357,14 +361,6 @@ public class BotManager : MonoBehaviour
             botPlayer.moveInputFlag = 0;
         }
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = new Color(1.0f, 0.0f, 0.0f);
-    //    Gizmos.DrawCube(new Vector3(DropPointInfo.point.x, DropPointInfo.point.y, 0), new Vector3(0.05f, 0.05f, 0.05f));
-    //    Gizmos.color = new Color(0.0f, 1.0f, 0.0f);
-    //    Gizmos.DrawLine(ball.transform.position, ball.transform.position + ball.transform.right.normalized * 10);
-    //}
 
     void hitDelayReset()
     {

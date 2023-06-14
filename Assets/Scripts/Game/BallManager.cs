@@ -1,7 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.VFX;
+
+[System.Serializable]
+public class CollideEvent : UnityEvent<Collision> { }
+
+[System.Serializable]
+public class HitEvent : UnityEvent<Collider> { }
 
 public class BallManager : MonoBehaviour
 {
@@ -50,6 +59,15 @@ public class BallManager : MonoBehaviour
 
     public bool BallInLeftSide { get; private set; }
 
+    // Object collide with ball.
+    public CollideEvent OnCollideEvent = new CollideEvent();
+    // Ball got hit by racket.
+    public HitEvent OnHitEvent = new HitEvent();
+    // Ball got hit by racket.
+    public UnityEvent OnServeEvent;
+    // Ball got hit by racket.
+    public UnityEvent OnSkillEvent;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -62,6 +80,7 @@ public class BallManager : MonoBehaviour
 
     private void FixedUpdate()
     {
+
         if (badmintonSimulation && isFlyingUp)
         {
             rb.velocity *= velocityDecayMultiplier;
@@ -93,6 +112,12 @@ public class BallManager : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, Quaternion.FromToRotation(Vector3.right, rb.velocity).eulerAngles.z);
 
     }
+
+    public void playSkill()
+    {
+        OnSkillEvent.Invoke();
+    }
+
     public void Serve(bool faceRight, Vector2 ServeDirection, float ServeForce)
     {
 
@@ -118,6 +143,7 @@ public class BallManager : MonoBehaviour
 
         HitSound.Play();
 
+        OnServeEvent.Invoke();
     }
 
     // Hit Racket
@@ -241,12 +267,14 @@ public class BallManager : MonoBehaviour
             trailRenderer.enabled = true;
             HitParticle.Play();
         }
+
+        OnHitEvent.Invoke(other);
     }
 
-    // Hit Floor
     private void OnCollisionEnter(Collision collision)
     {
-        if(ballStates != BallStates.Serving && collision.transform.tag == "Ground")
+        // Hit Floor
+        if (ballStates != BallStates.Serving && collision.transform.tag == "Ground")
         {
             ballStates = BallStates.Serving;
 
@@ -263,5 +291,7 @@ public class BallManager : MonoBehaviour
             trailRenderer.enabled = false;
             HittingFloorSound.Play();
         }
+
+        OnCollideEvent.Invoke(collision);
     }
 }
