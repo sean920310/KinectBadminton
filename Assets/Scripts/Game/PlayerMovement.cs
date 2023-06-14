@@ -327,7 +327,8 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
         blackHoleSound.Pause();
-        ball.rb.AddForce(new Vector3(1.0f, 0.2f, 0.0f).normalized * 10f * Mathf.Sign(transform.position.x) * -1f, ForceMode.Impulse);
+        ball.rb.velocity = Vector3.zero;
+        ball.rb.AddForce(new Vector3(1.0f * Mathf.Sign(transform.position.x) * -1f, 0.15f, 0.0f).normalized * 11f, ForceMode.Impulse);
         ball.playSkill();
         animator.SetBool("BlackHole", false);
         animator.ResetTrigger("playBlackHole");

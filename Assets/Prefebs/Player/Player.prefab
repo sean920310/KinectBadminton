@@ -708,21 +708,21 @@ MonoBehaviour:
     needJump: 0
     skip: 0
   Smash:
-  - transform: {fileID: 4627467904987129902}
-    time: 0
-    swingStyle: 0
-    needJump: 0
-    skip: 0
-  - transform: {fileID: 4754332760205287037}
-    time: 0.09
-    swingStyle: 0
-    needJump: 0
-    skip: 0
   - transform: {fileID: 2962475316823202546}
     time: 0.11
     swingStyle: 0
     needJump: 0
     skip: 1
+  - transform: {fileID: 4754332760205287037}
+    time: 0.09
+    swingStyle: 0
+    needJump: 0
+    skip: 0
+  - transform: {fileID: 4627467904987129902}
+    time: 0
+    swingStyle: 0
+    needJump: 0
+    skip: 0
   allSwingStyle: []
   WhichStyle: 0
   botSwingStyle:

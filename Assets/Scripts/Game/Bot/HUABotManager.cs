@@ -133,6 +133,17 @@ public class HUABotManager : MonoBehaviour
         {
             Serve();
         }
+
+        int i = (int)BallTrackDraw.getPointTimeByHeight(ball.transform.position, ball.rb.velocity, ball.rb.drag, 0.01f);
+        float dropPoint = BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i).x;
+        if (isPositionXInSameSide(dropPoint) && ball.transform.position.y <= 0.35f)
+        {
+            botPlayer.skillInputFlag = true;
+        }
+        else
+        {
+            botPlayer.skillInputFlag = false;
+        }
     }
     private void OnDrawGizmos()
     {
@@ -308,15 +319,24 @@ public class HUABotManager : MonoBehaviour
     private IEnumerator MoveCoroutine(float position, float moveRange, HitPointInfo hitPoint)
     {
         bool toGoal = false;
+        int moveDirection = hitPoint.transform.position.x > position + moveRange ? -1 : 1;
         while (!toGoal)
         {
             if (hitPoint.transform.position.x > position + moveRange)
             {
                 botPlayer.moveInputFlag = -1;
+                if (moveDirection == 1)
+                {
+                    botPlayer.moveInputFlag = -0.5f;
+                }
             }
             else if (hitPoint.transform.position.x < position - moveRange)
             {
                 botPlayer.moveInputFlag = 1;
+                if (moveDirection == -1)
+                {
+                    botPlayer.moveInputFlag = 0.5f;
+                }
             }
             else
             {
@@ -329,15 +349,24 @@ public class HUABotManager : MonoBehaviour
     private IEnumerator MoveCoroutine(float position, float moveRange)
     {
         bool toGoal = false;
+        int moveDirection = botPlayer.transform.position.x > position + moveRange ? -1 : 1;
         while (!toGoal)
         {
             if (botPlayer.transform.position.x > position + moveRange)
             {
                 botPlayer.moveInputFlag = -1;
+                if (moveDirection == 1)
+                {
+                    botPlayer.moveInputFlag = -0.5f;
+                }
             }
             else if (botPlayer.transform.position.x < position - moveRange)
             {
                 botPlayer.moveInputFlag = 1;
+                if (moveDirection == -1)
+                {
+                    botPlayer.moveInputFlag = 0.5f;
+                }
             }
             else
             {

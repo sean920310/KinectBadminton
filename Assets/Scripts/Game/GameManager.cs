@@ -318,6 +318,12 @@ public class GameManager : MonoBehaviour
         Player2Racket.powerHitForce = 30f;
         Player2Racket.defenceHitForce = 12f;
         Player2Racket.swinDownForce = 12f;
+        directionalLight.enabled = false;
+        var huaLight = Player2Movement.GetComponentsInChildren<Light>();
+        foreach (var item in huaLight)
+        {
+            item.enabled = true;
+        }
     }
 
     #region Button_Event
