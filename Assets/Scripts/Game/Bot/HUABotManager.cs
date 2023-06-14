@@ -196,7 +196,8 @@ public class HUABotManager : MonoBehaviour
             //when list is empty, then break
             while (tmpSwingStyle.Count > 0)
             {
-                WhichStyle = UnityEngine.Random.Range(0, tmpSwingStyle.Count);
+                WhichStyle = 0;
+                //WhichStyle = UnityEngine.Random.Range(0, tmpSwingStyle.Count);
                 botSwingStyle = tmpSwingStyle[WhichStyle];
 
                 //if swing type need jump
@@ -390,13 +391,13 @@ public class HUABotManager : MonoBehaviour
     {
         ResetSwingStyle();
 
+        LoadSwingStyle(Smash, true);
         LoadSwingStyle(UnderHandBack, false);
         LoadSwingStyle(UnderHandFront, false);
-        LoadSwingStyle(OverHand, false);
-
         LoadSwingStyle(UnderHandBack, true);
         LoadSwingStyle(UnderHandFront, true);
-        LoadSwingStyle(Smash, true);
+        LoadSwingStyle(OverHand, false);
+
     }
     private void LoadSwingStyle(HitPointInfo[] hitPointInfo, bool isJump)
     {
@@ -588,6 +589,7 @@ public class BallTrackDraw
                 }
             }
         }
+
         return reackFlag;
     }
     public static bool isBallReachHeight(Vector3[] BallPositions, float height, float currentTime, ref TrackPointInfo[] trackPointInfos)
