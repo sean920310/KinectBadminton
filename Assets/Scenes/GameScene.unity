@@ -1290,8 +1290,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 211650110}
+  - component: {fileID: 211650111}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: ShareMemory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1312,6 +1313,20 @@ Transform:
   m_Father: {fileID: 76471415}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &211650111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 211650109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e3ab2b064c6eac40af6743827e080e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMovement1: {fileID: 909109875199266210}
+  playerMovement2: {fileID: 758331621}
 --- !u!1 &234814727
 GameObject:
   m_ObjectHideFlags: 0
@@ -1384,7 +1399,7 @@ MonoBehaviour:
   GameoverCheeringSound: {fileID: 234814730}
   directionalLight: {fileID: 1161708845}
   spotLight: {fileID: 2101688609}
-  useKinect: 0
+  useKinect: 1
 --- !u!4 &234814729
 Transform:
   m_ObjectHideFlags: 0
@@ -18111,6 +18126,10 @@ PrefabInstance:
       propertyPath: serveBorderR
       value: 
       objectReference: {fileID: 257269076}
+    - target: {fileID: 1117428462548657271, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: skillCoolDown
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2523875935646291306, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: RacketModel
       value: 
@@ -33860,6 +33879,10 @@ PrefabInstance:
       propertyPath: serveBorderR
       value: 
       objectReference: {fileID: 257269076}
+    - target: {fileID: 1117428462548657271, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
+      propertyPath: skillCoolDown
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1117428462548657271, guid: 9e2eed9e40515104c849495e5e39059b, type: 3}
       propertyPath: bodySourceView
       value: 
