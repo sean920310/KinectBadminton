@@ -7,7 +7,6 @@ public class BodySourceManager : MonoBehaviour
     private KinectSensor _Sensor;
     private BodyFrameReader _Reader;
     private Body[] _Data = null;
-    
     public Body[] GetData()
     {
         return _Data;

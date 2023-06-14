@@ -27,7 +27,7 @@ public class KinectImageOutput : MonoBehaviour
             return;
         }
 
-        imageSprite = Sprite.Create(_ColorManager.GetColorTexture(), 
+        imageSprite = Sprite.Create(_ColorManager.GetColorTexture(),  
             new Rect(0, 0, _ColorManager.GetColorTexture().width, _ColorManager.GetColorTexture().height), Vector2.zero);
         image.sprite = imageSprite;
     }
