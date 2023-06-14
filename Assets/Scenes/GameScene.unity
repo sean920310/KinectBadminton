@@ -1093,6 +1093,18 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
+      propertyPath: backEdge
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
+      propertyPath: frontEdge
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
+      propertyPath: depthRange
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
       propertyPath: playerMovement1
       value: 
       objectReference: {fileID: 909109875199266210}
@@ -1101,9 +1113,33 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 758331621}
     - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
+      propertyPath: soloLeftBoundary
+      value: -0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
       propertyPath: BodySourceManager
       value: 
       objectReference: {fileID: 1724979771}
+    - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
+      propertyPath: soloRightBoundary
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
+      propertyPath: dualPlayer1LeftBoundary
+      value: -0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
+      propertyPath: dualPlayer2LeftBoundary
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
+      propertyPath: dualPlayer1RightBoundary
+      value: -0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6502907895655247519, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
+      propertyPath: dualPlayer2RightBoundary
+      value: 0.8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3b19730d3bd917e4b92ddfcb629f03a9, type: 3}
 --- !u!4 &183697155 stripped
@@ -1817,8 +1853,8 @@ MonoBehaviour:
     playerPosState: 0
   DualRightPlayerInfo:
     playerPosState: 0
-  BodyPosCorrectColor: {r: 1, g: 0, b: 0, a: 0.78431374}
-  BodyPosIncorrectColor: {r: 0, g: 1, b: 0, a: 0.78431374}
+  BodyPosCorrectColor: {r: 0, g: 1, b: 0.25882363, a: 0.5882353}
+  BodyPosIncorrectColor: {r: 1, g: 0.00000003973643, b: 0, a: 0.5882353}
 --- !u!1 &242793777
 GameObject:
   m_ObjectHideFlags: 0

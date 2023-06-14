@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Kinect = Windows.Kinect;
 
-public class KinectStateMachine
+public class AttackStateMachine
 {
     public enum States
     {
