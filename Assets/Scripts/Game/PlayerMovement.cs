@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
     // Move
     [Header("Movement")]
     [SerializeField] public float movementSpeed = 4.9f;
-    [SerializeField] float airMovementSpeed = 2.4f;
+    [SerializeField] public float airMovementSpeed = 2.4f;
 
     // Jump
     [Header("Jump")]
@@ -63,6 +63,10 @@ public class PlayerMovement : MonoBehaviour
     [ReadOnly] public bool swinDownInputFlag = false;
     [ReadOnly] public bool skillInputFlag = false;
 
+    [Header("Hua Sound")]
+    [SerializeField] AudioSource HuaSkillSound;
+    [SerializeField] AudioSource HuaIntroSound;
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -72,6 +76,11 @@ public class PlayerMovement : MonoBehaviour
             rb.useGravity = false;
         }
         facingRight = (transform.rotation.y == 0f);
+
+        if (GameManager.instance.Player2Info.name == "Hua" && gameObject.name.Contains("Player2"))
+        {
+            HuaIntroSound.Play();
+        }
     }
 
     private void OnDrawGizmosSelected()
@@ -120,7 +129,10 @@ public class PlayerMovement : MonoBehaviour
         //}
 
         if (PlayerMovement.isPlayingSkill)
+        {
+            skillInputFlag = false;
             return;
+        }
 
         // Jump
         // Serving Can't Jump
@@ -312,12 +324,18 @@ public class PlayerMovement : MonoBehaviour
 
     IEnumerator blackHoleCoroutine()
     {
+
+
+        if (GameManager.instance.Player2Info.name == "Hua" && gameObject.name.Contains("Player2"))
+        {
+            HuaSkillSound.Play();
+        }
         skillCoolDownCounter = 0.0f;
         PlayerMovement.isPlayingSkill = true;
         animator.SetTrigger("playBlackHole");
         animator.SetBool("BlackHole", true);
         blackHoleSound.Play();
-        piuSound.PlayScheduled(AudioSettings.dspTime + 1.1f);
+        piuSound.PlayScheduled(AudioSettings.dspTime + 1.2f);
         StartCoroutine(cameraShake.Shake(1.1f, 0.25f));
         while (isPlayingSkill)
         {
@@ -327,7 +345,8 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
         blackHoleSound.Pause();
-        ball.rb.AddForce(new Vector3(1.0f, 0.2f, 0.0f).normalized * 10f * Mathf.Sign(transform.position.x) * -1f, ForceMode.Impulse);
+        ball.rb.velocity = Vector3.zero;
+        ball.rb.AddForce(new Vector3(1.0f * Mathf.Sign(transform.position.x) * -1f, 0.15f, 0.0f).normalized * 11f, ForceMode.Impulse);
         ball.playSkill();
         animator.SetBool("BlackHole", false);
         animator.ResetTrigger("playBlackHole");

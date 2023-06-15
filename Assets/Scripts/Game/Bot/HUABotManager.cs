@@ -133,6 +133,17 @@ public class HUABotManager : MonoBehaviour
         {
             Serve();
         }
+
+        int i = (int)BallTrackDraw.getPointTimeByHeight(ball.transform.position, ball.rb.velocity, ball.rb.drag, 0.01f);
+        float dropPoint = BallTrackDraw.getPointByTime(ball.transform.position, ball.rb.velocity, ball.rb.drag, i).x;
+        if (isPositionXInSameSide(dropPoint) && ball.transform.position.y <= 0.35f)
+        {
+            botPlayer.skillInputFlag = true;
+        }
+        else
+        {
+            botPlayer.skillInputFlag = false;
+        }
     }
     private void OnDrawGizmos()
     {
@@ -196,7 +207,8 @@ public class HUABotManager : MonoBehaviour
             //when list is empty, then break
             while (tmpSwingStyle.Count > 0)
             {
-                WhichStyle = UnityEngine.Random.Range(0, tmpSwingStyle.Count);
+                WhichStyle = 0;
+                //WhichStyle = UnityEngine.Random.Range(0, tmpSwingStyle.Count);
                 botSwingStyle = tmpSwingStyle[WhichStyle];
 
                 //if swing type need jump
@@ -307,15 +319,24 @@ public class HUABotManager : MonoBehaviour
     private IEnumerator MoveCoroutine(float position, float moveRange, HitPointInfo hitPoint)
     {
         bool toGoal = false;
+        int moveDirection = hitPoint.transform.position.x > position + moveRange ? -1 : 1;
         while (!toGoal)
         {
             if (hitPoint.transform.position.x > position + moveRange)
             {
                 botPlayer.moveInputFlag = -1;
+                if (moveDirection == 1)
+                {
+                    botPlayer.moveInputFlag = -0.5f;
+                }
             }
             else if (hitPoint.transform.position.x < position - moveRange)
             {
                 botPlayer.moveInputFlag = 1;
+                if (moveDirection == -1)
+                {
+                    botPlayer.moveInputFlag = 0.5f;
+                }
             }
             else
             {
@@ -328,15 +349,24 @@ public class HUABotManager : MonoBehaviour
     private IEnumerator MoveCoroutine(float position, float moveRange)
     {
         bool toGoal = false;
+        int moveDirection = botPlayer.transform.position.x > position + moveRange ? -1 : 1;
         while (!toGoal)
         {
             if (botPlayer.transform.position.x > position + moveRange)
             {
                 botPlayer.moveInputFlag = -1;
+                if (moveDirection == 1)
+                {
+                    botPlayer.moveInputFlag = -0.5f;
+                }
             }
             else if (botPlayer.transform.position.x < position - moveRange)
             {
                 botPlayer.moveInputFlag = 1;
+                if (moveDirection == -1)
+                {
+                    botPlayer.moveInputFlag = 0.5f;
+                }
             }
             else
             {
@@ -390,13 +420,13 @@ public class HUABotManager : MonoBehaviour
     {
         ResetSwingStyle();
 
+        LoadSwingStyle(Smash, true);
         LoadSwingStyle(UnderHandBack, false);
         LoadSwingStyle(UnderHandFront, false);
-        LoadSwingStyle(OverHand, false);
-
         LoadSwingStyle(UnderHandBack, true);
         LoadSwingStyle(UnderHandFront, true);
-        LoadSwingStyle(Smash, true);
+        LoadSwingStyle(OverHand, false);
+
     }
     private void LoadSwingStyle(HitPointInfo[] hitPointInfo, bool isJump)
     {
@@ -588,6 +618,7 @@ public class BallTrackDraw
                 }
             }
         }
+
         return reackFlag;
     }
     public static bool isBallReachHeight(Vector3[] BallPositions, float height, float currentTime, ref TrackPointInfo[] trackPointInfos)

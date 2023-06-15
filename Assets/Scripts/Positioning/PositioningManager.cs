@@ -67,11 +67,11 @@ public class PositioningManager : MonoBehaviour
     }
 
     public static readonly string[] instruction = {
-        "Great.",
-        "Standing a little too much on the left side.",
-        "Standing a little too much on the right side.",
-        "Standing a little too close.",
-        "Standing a little too far."
+        "Great",
+        "Too Left",
+        "Too Right",
+        "Too Close",
+        "Too Far"
     };
 
     public static PositioningManager instance { get; private set; }

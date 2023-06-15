@@ -58,6 +58,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] PlayerMovement Player1Movement;
     [SerializeField] PlayerMovement Player2Movement;
     [SerializeField] BallManager Ball;
+    [SerializeField] RacketManager Player1Racket;
+    [SerializeField] RacketManager Player2Racket;
 
     [SerializeField] Transform Player1HatPoint;
     [SerializeField] Transform Player2HatPoint;
@@ -86,7 +88,11 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] bool useKinect = true;
 
+    [SerializeField] AudioSource HuaWinSound;
+
     public Players Winner { get; private set; } = Players.None;
+    public bool isHua { get; private set; } = false;
+
 
     private void Awake()
     {
@@ -217,8 +223,8 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        gameState = GameStates.GameOver;
 
+        gameState = GameStates.GameOver;
 
         // Set Animator UpdateMode to UnscaledTime inorder to play dance animation.
         Player1Movement.animator.updateMode = AnimatorUpdateMode.UnscaledTime;
@@ -233,7 +239,11 @@ public class GameManager : MonoBehaviour
         }
         else if (Player1Info.score < Player2Info.score)
         {
-            PlayerTwoWinSound.Play();
+
+            if (Player2Info.name == "Hua") 
+                HuaWinSound.Play();
+            else
+                PlayerTwoWinSound.Play();
             Winner = Players.Player2;
             Player1Movement.animator.SetTrigger("Lose");
             Player2Movement.animator.SetTrigger("Dancing1");
@@ -300,6 +310,27 @@ public class GameManager : MonoBehaviour
         Player2Movement.ResetInputFlag();
     }
 
+    private void SetHuaIsActive(bool active)
+    {
+        if (!active) return;
+        
+        GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.HatList.Length - 1].hatData.HatPrefab);
+        tmpHatPrefab.transform.SetParent(Player2HatPoint, false);
+
+        Player2Movement.movementSpeed = 10f;
+        Player2Movement.airMovementSpeed = 8f;
+        Player2Racket.hitForce = 15f;
+        Player2Racket.powerHitForce = 30f;
+        Player2Racket.defenceHitForce = 12f;
+        Player2Racket.swinDownForce = 12f;
+        directionalLight.enabled = false;
+        var huaLight = Player2Movement.GetComponentsInChildren<Light>();
+        foreach (var item in huaLight)
+        {
+            item.enabled = true;
+        }
+    }
+
     #region Button_Event
     public void OnQuitClick()
     {
@@ -355,6 +386,7 @@ public class GameManager : MonoBehaviour
         // Get Info From Game Start Setting.
         Player1Info.name = gameStarManager.Player1NameInput.text;
         Player2Info.name = gameStarManager.Player2NameInput.text;
+        isHua = (gameStarManager.Player2NameInput.text == "Hua");
 
         // Set Hat.
         if (CharacterSlot.HatList[CharacterSlot.player1currentHatIdx].hatData.HatPrefab != null)
@@ -362,11 +394,14 @@ public class GameManager : MonoBehaviour
             GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player1currentHatIdx].hatData.HatPrefab);
             tmpHatPrefab.transform.SetParent(Player1HatPoint, false);
         }
-        if (CharacterSlot.HatList[CharacterSlot.player2currentHatIdx].hatData.HatPrefab != null)
+        if (CharacterSlot.HatList[CharacterSlot.player2currentHatIdx].hatData.HatPrefab != null && !isHua)
         {
             GameObject tmpHatPrefab = GameObject.Instantiate(CharacterSlot.HatList[CharacterSlot.player2currentHatIdx].hatData.HatPrefab);
             tmpHatPrefab.transform.SetParent(Player2HatPoint, false);
         }
+
+        SetHuaIsActive(isHua);
+
 
         // Ser Winning Score.
         if (gameStarManager.scoreToWin.options.ToArray()[gameStarManager.scoreToWin.value].text != "Endless")
