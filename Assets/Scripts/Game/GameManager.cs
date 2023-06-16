@@ -60,6 +60,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] BallManager Ball;
     [SerializeField] RacketManager Player1Racket;
     [SerializeField] RacketManager Player2Racket;
+    [SerializeField] RacketManager Player1Racket;
+    [SerializeField] RacketManager Player2Racket;
 
     [SerializeField] Transform Player1HatPoint;
     [SerializeField] Transform Player2HatPoint;
@@ -88,6 +90,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] bool useKinect = true;
 
+    [SerializeField] AudioSource HuaWinSound;
 
     public Players Winner { get; private set; } = Players.None;
     public bool isHua { get; private set; } = false;
@@ -222,8 +225,8 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        gameState = GameStates.GameOver;
 
+        gameState = GameStates.GameOver;
 
         // Set Animator UpdateMode to UnscaledTime inorder to play dance animation.
         Player1Movement.animator.updateMode = AnimatorUpdateMode.UnscaledTime;
@@ -238,7 +241,11 @@ public class GameManager : MonoBehaviour
         }
         else if (Player1Info.score < Player2Info.score)
         {
-            PlayerTwoWinSound.Play();
+
+            if (Player2Info.name == "Hua") 
+                HuaWinSound.Play();
+            else
+                PlayerTwoWinSound.Play();
             Winner = Players.Player2;
             Player1Movement.animator.SetTrigger("Lose");
             Player2Movement.animator.SetTrigger("Dancing1");

@@ -202,7 +202,7 @@ public class BodySourceView : MonoBehaviour
                             if (body.TrackingId == player1Id)
                             {
                                 PositioningManager.instance.DualLeftPlayerInfo.resetPlayerPosState();
-                                print(spineMidX);
+                                //print(spineMidX);
                                 if (spineMidZ < middlePosition - depthRange)
                                     PositioningManager.instance.DualLeftPlayerInfo.setState(PositioningManager.PlayerPosState.TooClose, true);
                                 if (spineMidZ > middlePosition + depthRange)
@@ -312,7 +312,7 @@ public class BodySourceView : MonoBehaviour
                             break;
                     }
                 }
-                RefreshBodyObject(body, _Bodies[body.TrackingId]);
+                //RefreshBodyObject(body, _Bodies[body.TrackingId]);
             }
         }
     }

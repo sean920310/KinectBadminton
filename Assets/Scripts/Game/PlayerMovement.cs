@@ -63,6 +63,10 @@ public class PlayerMovement : MonoBehaviour
     [ReadOnly] public bool swinDownInputFlag = false;
     [ReadOnly] public bool skillInputFlag = false;
 
+    [Header("Hua Sound")]
+    [SerializeField] AudioSource HuaSkillSound;
+    [SerializeField] AudioSource HuaIntroSound;
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -72,6 +76,11 @@ public class PlayerMovement : MonoBehaviour
             rb.useGravity = false;
         }
         facingRight = (transform.rotation.y == 0f);
+
+        if (GameManager.instance.Player2Info.name == "Hua" && gameObject.name.Contains("Player2"))
+        {
+            HuaIntroSound.Play();
+        }
     }
 
     private void OnDrawGizmosSelected()
@@ -120,7 +129,10 @@ public class PlayerMovement : MonoBehaviour
         //}
 
         if (PlayerMovement.isPlayingSkill)
+        {
+            skillInputFlag = false;
             return;
+        }
 
         // Jump
         // Serving Can't Jump
@@ -312,12 +324,18 @@ public class PlayerMovement : MonoBehaviour
 
     IEnumerator blackHoleCoroutine()
     {
+
+
+        if (GameManager.instance.Player2Info.name == "Hua" && gameObject.name.Contains("Player2"))
+        {
+            HuaSkillSound.Play();
+        }
         skillCoolDownCounter = 0.0f;
         PlayerMovement.isPlayingSkill = true;
         animator.SetTrigger("playBlackHole");
         animator.SetBool("BlackHole", true);
         blackHoleSound.Play();
-        piuSound.PlayScheduled(AudioSettings.dspTime + 1.1f);
+        piuSound.PlayScheduled(AudioSettings.dspTime + 1.2f);
         StartCoroutine(cameraShake.Shake(1.1f, 0.25f));
         while (isPlayingSkill)
         {
