@@ -48,6 +48,8 @@ public class SharedMemory : MonoBehaviour
         // Read data from the shared memory
         string data = ReadDataFromSharedMemory();
         Debug.Log("Data read from shared memory: " + data);
+
+        m_GameMode = PositioningManager.instance.playerCount;
     }
 
     // Update is called once per frame
@@ -56,21 +58,21 @@ public class SharedMemory : MonoBehaviour
         string data = ReadDataFromSharedMemory();
         if(data.Length != 0)
         {
-            print(data);
+            print(m_GameMode.ToString());
             switch (m_GameMode)
             {
                 case PositioningManager.PlayerCount.Solo:
-                    if (data.Contains("player1") || data.Contains("player2"))
+                    if (data.Substring(0, 6) == "player")
                     {
                         playerMovement1.OnKinectSkill();
                     }
                     break;
                 case PositioningManager.PlayerCount.Dual:
-                    if (data.Contains("player1"))
+                    if (data.Substring(0, 7)=="player1")
                     {
                         playerMovement1.OnKinectSkill();
                     }
-                    else if (data.Contains("player2"))
+                    else if (data.Substring(0, 7) == "player2")
                     {
                         playerMovement2.OnKinectSkill();
                     }
